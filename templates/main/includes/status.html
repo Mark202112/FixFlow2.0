@@ -1,0 +1,88 @@
+<!-- ═══════════════════════════ STATUS ═══════════════════════════ -->
+<section id="status" class="relative overflow-hidden" style="background:#1A1A1B; padding:100px 0;">
+
+    <div class="absolute inset-0 dot-grid pointer-events-none"></div>
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 divider-line"></div>
+
+    <div class="max-w-7xl mx-auto px-6 relative z-10">
+
+        <div class="reveal-on-scroll text-center mb-16">
+            <span class="block text-[10px] font-bold uppercase tracking-[0.3em] mb-4" style="color:#007AFF;">Відстеження</span>
+            <h2 class="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4">Статус замовлення</h2>
+            <p class="text-gray-400 text-lg max-w-2xl mx-auto">Введіть номер телефону або номер замовлення</p>
+        </div>
+
+        <div class="reveal-on-scroll max-w-2xl mx-auto">
+            <form method="POST" action="{% url 'main:check_status' %}" id="status-form"
+                  style="background:#1A1A1B; border:1px solid rgba(0,122,255,0.25); padding:40px;"
+                  onsubmit="return submitStatus(event)">
+                {% csrf_token %}
+
+                <div class="flex flex-col sm:flex-row gap-3 mb-6">
+                    <div class="relative flex-1">
+                        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-sm" style="color:#007AFF;"></i>
+                        <input type="text" name="search" id="status-input"
+                               placeholder="Номер замовлення або телефон"
+                               required
+                               style="width:100%;padding:14px 16px 14px 44px;background:rgba(42,42,45,0.5);
+                                      border:1px solid rgba(0,122,255,0.2);border-radius:10px;
+                                      color:#fff;font-size:0.9rem;outline:none;transition:border-color .2s;"
+                               onfocus="this.style.borderColor='rgba(0,122,255,0.7)'"
+                               onblur="this.style.borderColor='rgba(0,122,255,0.2)'">
+                    </div>
+                    <button type="submit" id="status-btn"
+                            style="padding:14px 28px;background:#007AFF;color:#fff;border:none;
+                                   border-radius:10px;font-size:0.875rem;font-weight:600;
+                                   cursor:pointer;white-space:nowrap;
+                                   box-shadow:0 0 18px rgba(0,122,255,0.35);
+                                   transition:opacity .2s, transform .2s;"
+                            onmouseover="this.style.opacity='.88';this.style.transform='scale(1.03)'"
+                            onmouseout="this.style.opacity='1';this.style.transform='scale(1)'">
+                        <i class="fas fa-arrow-right mr-1"></i> Знайти
+                    </button>
+                </div>
+
+                <!-- Results rendered by Django -->
+                {% if orders is not None %}
+                    {% if orders %}
+                        <div style="border-top:1px solid rgba(0,122,255,0.15);padding-top:24px;display:flex;flex-direction:column;gap:12px;">
+                            {% for order in orders %}
+                            <div style="padding:20px;background:rgba(42,42,45,0.25);border:1px solid rgba(0,122,255,0.2);border-radius:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+                                <div>
+                                    <p style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:#007AFF;margin-bottom:6px;">{{ order.order_number }}</p>
+                                    <p style="color:#fff;font-size:1rem;font-weight:600;margin-bottom:4px;">{{ order.device }}</p>
+                                    <p style="color:#6b7280;font-size:.8rem;">{{ order.client.phone }}</p>
+                                </div>
+                                <div>
+                                    <span style="padding:6px 14px;font-size:.75rem;font-weight:600;border-radius:6px;
+                                        {% if order.status == 'new' %}background:rgba(0,122,255,.15);color:#007AFF;border:1px solid rgba(0,122,255,.3);
+                                        {% elif order.status == 'in_progress' %}background:rgba(255,149,0,.12);color:#ff9500;border:1px solid rgba(255,149,0,.3);
+                                        {% elif order.status == 'ready' %}background:rgba(52,199,89,.12);color:#34c759;border:1px solid rgba(52,199,89,.3);
+                                        {% elif order.status == 'completed' %}background:rgba(134,134,139,.12);color:#86868b;border:1px solid rgba(134,134,139,.3);
+                                        {% else %}background:rgba(255,59,48,.12);color:#ff3b30;border:1px solid rgba(255,59,48,.3);
+                                        {% endif %}">
+                                        {{ order.get_status_display }}
+                                    </span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div style="border-top:1px solid rgba(0,122,255,0.15);padding-top:24px;">
+                            <div style="padding:16px;background:rgba(255,149,0,.08);border:1px solid rgba(255,149,0,.25);border-radius:10px;display:flex;align-items:center;gap:12px;">
+                                <i class="fas fa-exclamation-circle" style="color:#ff9500;font-size:1.1rem;flex-shrink:0;"></i>
+                                <div>
+                                    <p style="color:#ff9500;font-size:.875rem;font-weight:600;margin-bottom:2px;">Замовлення не знайдено</p>
+                                    <p style="color:#9ca3af;font-size:.8rem;">Перевірте правильність введеного номера</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </form>
+        </div>
+
+    </div>
+
+    <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-1/2 divider-line"></div>
+</section>

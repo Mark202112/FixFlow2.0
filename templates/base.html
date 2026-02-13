@@ -6,304 +6,137 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}FixFlow — Ремонтна Майстерня{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { 'brand': '#007AFF', 'brand-dark': '#0056CC' } } }
+        }
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'brand': '#007AFF',
-                        'brand-dark': '#0056CC',
-                        'surface': '#2A2A2D',
-                        'bg-main': '#1A1A1B',
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        :root {
-            --brand: #007AFF;
-            --brand-dark: #0056CC;
-            --bg-main: #1A1A1B;
-            --surface: #2A2A2D;
-        }
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background-color: var(--bg-main);
-            color: #ffffff;
-        }
-        /* Dot grid pattern — зберігаємо твій паттерн, новий колір */
-        .dot-grid {
-            background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
-            background-size: 30px 30px;
-        }
-        /* Line grid pattern — з архіву */
-        .line-grid {
-            background-image:
-                linear-gradient(#3A3A3D 1px, transparent 1px),
-                linear-gradient(90deg, #3A3A3D 1px, transparent 1px);
-            background-size: 50px 50px;
-        }
-        /* Divider gradient */
-        .divider-line {
-            background: linear-gradient(to right, transparent, rgba(0,122,255,0.3), transparent);
-            height: 1px;
-        }
-        /* Reveal animation */
-        .reveal-on-scroll { opacity: 0; transition: opacity 0.6s ease, transform 0.6s ease; transform: translateY(20px); }
-        .reveal-on-scroll.visible { opacity: 1; transform: translateY(0); }
-        /* Fade-in for legacy support */
-        .fade-in { animation: fadeIn 0.6s ease forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-        /* Nav active link */
-        .nav-link { position: relative; }
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: -2px; left: 0; right: 0;
-            height: 1px;
-            background: var(--brand);
-            transform: scaleX(0);
-            transition: transform 0.3s ease;
-        }
-        .nav-link:hover::after { transform: scaleX(1); }
-        /* Pulse glow */
-        @keyframes pulseGlow {
-            0%, 100% { box-shadow: 0 0 20px rgba(0,122,255,0.2); }
-            50%       { box-shadow: 0 0 40px rgba(0,122,255,0.5); }
-        }
-        .glow-btn { animation: pulseGlow 3s ease-in-out infinite; }
-        /* Float badge */
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50%       { transform: translateY(-8px); }
-        }
-        .float-anim { animation: float 3s ease-in-out infinite; }
-    </style>
 </head>
-<body class="flex flex-col min-h-screen">
 
-    <!-- ═══════════════════════════════ NAVBAR ═══════════════════════════════ -->
-    <header id="main-header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
-            style="background: rgba(26,26,27,0.55); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-bottom: 1px solid rgba(255,255,255,0.06);">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="flex items-center justify-between h-20">
-
-                <!-- Brand name only (no icon) -->
-                <a href="{% url 'main:home' %}" class="group select-none">
-                    <span class="text-xl font-bold tracking-tight">
-                        <span class="text-white group-hover:text-white/90 transition-colors">Fix</span><span style="color:#007AFF;">Flow</span>
-                    </span>
-                </a>
-
-                <!-- Desktop Nav -->
-                <nav class="hidden lg:flex items-center gap-8">
-                    <a href="{% url 'main:home' %}"            class="nav-link text-gray-300 hover:text-white text-sm font-medium transition-colors">Головна</a>
-                    <a href="{% url 'main:home' %}#services"   class="nav-link text-gray-300 hover:text-white text-sm font-medium transition-colors">Послуги</a>
-                    <a href="{% url 'main:check_status' %}"    class="nav-link text-gray-300 hover:text-white text-sm font-medium transition-colors">Статус</a>
-                    <a href="{% url 'main:home' %}#advantages" class="nav-link text-gray-300 hover:text-white text-sm font-medium transition-colors">Про нас</a>
-                </nav>
-
-                <!-- Right actions -->
-                <div class="flex items-center gap-3">
-                    <!-- Зв'язок — scroll to contact section -->
-                    <a href="{% url 'main:home' %}#contact"
-                       class="hidden sm:flex items-center gap-2 px-5 py-2.5 text-white text-sm font-semibold transition-all duration-300 hover:opacity-90 hover:scale-[1.03] active:scale-[0.97] rounded-lg"
-                       style="background: #007AFF; box-shadow: 0 0 18px rgba(0,122,255,0.35);">
-                        <i class="fas fa-phone text-xs"></i>
-                        Зв'язок
-                    </a>
-
-                    {% if user.is_authenticated %}
-                        <a href="{% url 'dashboard:home' %}"
-                           class="hidden sm:flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:bg-white/10 rounded-lg"
-                           style="border: 1px solid rgba(255,255,255,0.12);">
-                            <i class="fas fa-tachometer-alt text-xs"></i>
-                            Dashboard
-                        </a>
-                    {% else %}
-                        <a href="{% url 'dashboard:login' %}"
-                           class="hidden sm:flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-400 hover:text-white transition-colors rounded-lg"
-                           style="border: 1px solid rgba(255,255,255,0.08);">
-                            <i class="fas fa-sign-in-alt text-xs"></i>
-                            Вхід
-                        </a>
-                    {% endif %}
-
-                    <!-- Mobile burger -->
-                    <button id="burger-btn" onclick="toggleMobileMenu()"
-                            class="lg:hidden flex flex-col justify-center gap-[5px] w-9 h-9 rounded-lg transition-colors hover:bg-white/10"
-                            style="border: 1px solid rgba(255,255,255,0.08);">
-                        <span class="burger-line block w-4 h-0.5 bg-white mx-auto transition-all duration-300"></span>
-                        <span class="burger-line block w-4 h-0.5 bg-white mx-auto transition-all duration-300"></span>
-                        <span class="burger-line block w-4 h-0.5 bg-white mx-auto transition-all duration-300"></span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Mobile menu -->
-        <div id="mobile-menu" class="lg:hidden hidden px-6 pb-6 pt-2"
-             style="border-top: 1px solid rgba(255,255,255,0.06); background: rgba(26,26,27,0.92);">
-            <nav class="flex flex-col gap-1">
-                <a href="{% url 'main:home' %}"            onclick="toggleMobileMenu()" class="text-gray-300 hover:text-white text-sm font-medium transition-colors py-2.5 px-3 rounded-lg hover:bg-white/5">Головна</a>
-                <a href="{% url 'main:home' %}#services"   onclick="toggleMobileMenu()" class="text-gray-300 hover:text-white text-sm font-medium transition-colors py-2.5 px-3 rounded-lg hover:bg-white/5">Послуги</a>
-                <a href="{% url 'main:check_status' %}"    onclick="toggleMobileMenu()" class="text-gray-300 hover:text-white text-sm font-medium transition-colors py-2.5 px-3 rounded-lg hover:bg-white/5">Статус</a>
-                <a href="{% url 'main:home' %}#advantages" onclick="toggleMobileMenu()" class="text-gray-300 hover:text-white text-sm font-medium transition-colors py-2.5 px-3 rounded-lg hover:bg-white/5">Про нас</a>
-                <div class="pt-2 mt-1" style="border-top: 1px solid rgba(255,255,255,0.06);">
-                    <a href="{% url 'main:home' %}#contact" onclick="toggleMobileMenu();"
-                       class="flex items-center justify-center gap-2 w-full py-3 text-white text-sm font-semibold rounded-lg transition-opacity hover:opacity-90"
-                       style="background: #007AFF;">
-                        <i class="fas fa-phone text-xs"></i>
-                        Зв'язок
-                    </a>
-                </div>
+<!-- NAVBAR -->
+<header id="hdr" style="position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(20,20,21,0.72);border-bottom:1px solid rgba(0,122,255,0.4);box-shadow:0 2px 24px rgba(0,0,0,0.6);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);transition:background .4s,box-shadow .4s;">
+    <div style="max-width:1280px;margin:0 auto;padding:0 24px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;height:72px;">
+            <a href="{% url 'main:home' %}" style="text-decoration:none;">
+                <span style="font-size:1.25rem;font-weight:700;letter-spacing:-0.02em;">
+                    <span style="color:#fff;">Fix</span><span style="color:#007AFF;">Flow</span>
+                </span>
+            </a>
+            <nav id="desk-nav" style="display:none;align-items:center;gap:32px;">
+                <a href="{% url 'main:home' %}"            class="hdr-link">Головна</a>
+                <a href="{% url 'main:home' %}#services"   class="hdr-link">Послуги</a>
+                <a href="{% url 'main:home' %}#status"     class="hdr-link">Статус</a>
+                <a href="{% url 'main:home' %}#advantages" class="hdr-link">Про нас</a>
             </nav>
+            <div style="display:flex;align-items:center;gap:12px;">
+                <a href="{% url 'main:home' %}#contact" class="zvyazok-btn"><i class="fas fa-phone" style="font-size:.75rem;"></i> Зв'язок</a>
+                {% if user.is_authenticated %}
+                <a href="{% url 'dashboard:home' %}" id="dash-btn" style="display:none;align-items:center;gap:8px;padding:10px 16px;border:1px solid rgba(255,255,255,.15);border-radius:10px;color:#fff;font-size:.875rem;font-weight:500;text-decoration:none;transition:background .2s;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='transparent'"><i class="fas fa-tachometer-alt" style="font-size:.75rem;"></i> Dashboard</a>
+                {% else %}
+                <a href="{% url 'dashboard:login' %}" id="login-btn" style="display:none;align-items:center;gap:8px;padding:10px 16px;border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#9ca3af;font-size:.875rem;font-weight:500;text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#9ca3af'"><i class="fas fa-sign-in-alt" style="font-size:.75rem;"></i> Вхід</a>
+                {% endif %}
+                <button id="burger" onclick="toggleMobileMenu()" style="display:flex;flex-direction:column;justify-content:center;gap:5px;width:40px;height:40px;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:8px;cursor:pointer;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='transparent'">
+                    <span style="display:block;width:16px;height:2px;background:#fff;margin:0 auto;"></span>
+                    <span style="display:block;width:16px;height:2px;background:#fff;margin:0 auto;"></span>
+                    <span style="display:block;width:16px;height:2px;background:#fff;margin:0 auto;"></span>
+                </button>
+            </div>
         </div>
-    </header>
-
-    <!-- Messages -->
-    {% if messages %}
-    <div class="fixed top-24 right-6 z-40 space-y-2 max-w-sm w-full">
-        {% for message in messages %}
-        <div class="px-5 py-3 text-sm text-white" style="background: rgba(26,26,27,0.95); border: 1px solid rgba(0,122,255,0.4);">
-            {{ message }}
-        </div>
-        {% endfor %}
     </div>
-    {% endif %}
-
-    <!-- Page content -->
-    <main class="flex-1 pt-20">
-        {% block content %}{% endblock %}
-    </main>
-
-    <!-- ═══════════════════════════════ FOOTER ═══════════════════════════════ -->
-    <footer style="background: #1A1A1B; border-top: 1px solid rgba(0,122,255,0.15);">
-        <div class="max-w-7xl mx-auto px-6 py-16">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
-
-                <!-- Brand -->
-                <div>
-                    <div class="flex items-center gap-3 mb-5">
-                        <div class="w-10 h-10 rounded-lg flex items-center justify-center"
-                             style="background: linear-gradient(135deg, #2A2A2D 0%, #007AFF 100%);">
-                            <i class="fas fa-microchip text-white text-lg"></i>
-                        </div>
-                        <div class="leading-none">
-                            <div class="text-white font-bold text-lg tracking-tight">FixFlow</div>
-                            <div class="text-[10px] tracking-[0.2em] font-semibold" style="color:#007AFF;">PROFESSIONAL</div>
-                        </div>
-                    </div>
-                    <p class="text-gray-500 text-sm leading-relaxed">
-                        Професійний сервісний центр з ремонту електроніки. Якість, швидкість, надійність.
-                    </p>
-                </div>
-
-                <!-- Services -->
-                <div>
-                    <h4 class="text-[10px] font-bold uppercase tracking-[0.2em] mb-5" style="color:#007AFF;">Послуги</h4>
-                    <ul class="space-y-2.5 text-sm text-gray-500">
-                        <li><a href="{% url 'main:home' %}#services" class="hover:text-white transition-colors">Ремонт смартфонів</a></li>
-                        <li><a href="{% url 'main:home' %}#services" class="hover:text-white transition-colors">Ремонт ноутбуків</a></li>
-                        <li><a href="{% url 'main:home' %}#services" class="hover:text-white transition-colors">Ремонт ПК</a></li>
-                        <li><a href="{% url 'main:home' %}#services" class="hover:text-white transition-colors">Відновлення даних</a></li>
-                        <li><a href="{% url 'main:home' %}#services" class="hover:text-white transition-colors">Налаштування ПЗ</a></li>
-                    </ul>
-                </div>
-
-                <!-- Company -->
-                <div>
-                    <h4 class="text-[10px] font-bold uppercase tracking-[0.2em] mb-5" style="color:#007AFF;">Компанія</h4>
-                    <ul class="space-y-2.5 text-sm text-gray-500">
-                        <li><a href="{% url 'main:home' %}#advantages" class="hover:text-white transition-colors">Про нас</a></li>
-                        <li><a href="{% url 'main:home' %}#advantages" class="hover:text-white transition-colors">Гарантії</a></li>
-                        <li><a href="{% url 'main:check_status' %}"    class="hover:text-white transition-colors">Статус замовлення</a></li>
-                        <li><a href="{% url 'main:home' %}#contact"    class="hover:text-white transition-colors">Контакти</a></li>
-                    </ul>
-                </div>
-
-                <!-- Contacts -->
-                <div>
-                    <h4 class="text-[10px] font-bold uppercase tracking-[0.2em] mb-5" style="color:#007AFF;">Контакти</h4>
-                    <ul class="space-y-2.5 text-sm text-gray-500 mb-6">
-                        <li class="flex items-start gap-2"><i class="fas fa-map-marker-alt mt-0.5 text-xs" style="color:#007AFF;"></i>м. Київ, вул. Хрещатик, 1</li>
-                        <li class="flex items-start gap-2"><i class="fas fa-phone mt-0.5 text-xs" style="color:#007AFF;"></i>+380 50 123 45 67</li>
-                        <li class="flex items-start gap-2"><i class="fas fa-envelope mt-0.5 text-xs" style="color:#007AFF;"></i>info@fixflow.ua</li>
-                        <li class="flex items-start gap-2"><i class="fas fa-clock mt-0.5 text-xs" style="color:#007AFF;"></i>Пн–Нд: 9:00–21:00</li>
-                    </ul>
-                    <div class="flex gap-2">
-                        <a href="#" class="w-9 h-9 flex items-center justify-center transition-all duration-300 hover:scale-110"
-                           style="border:1px solid rgba(0,122,255,0.3); background: rgba(0,122,255,0.05);">
-                            <i class="fab fa-instagram text-gray-400 hover:text-brand text-sm"></i>
-                        </a>
-                        <a href="#" class="w-9 h-9 flex items-center justify-center transition-all duration-300 hover:scale-110"
-                           style="border:1px solid rgba(0,122,255,0.3); background: rgba(0,122,255,0.05);">
-                            <i class="fab fa-facebook text-gray-400 hover:text-brand text-sm"></i>
-                        </a>
-                        <a href="#" class="w-9 h-9 flex items-center justify-center transition-all duration-300 hover:scale-110"
-                           style="border:1px solid rgba(0,122,255,0.3); background: rgba(0,122,255,0.05);">
-                            <i class="fab fa-telegram text-gray-400 hover:text-brand text-sm"></i>
-                        </a>
-                    </div>
-                </div>
+    <div id="mob-menu" style="display:none;padding:12px 24px 20px;border-top:1px solid rgba(0,122,255,.2);background:rgba(18,18,19,.97);">
+        <nav style="display:flex;flex-direction:column;gap:4px;">
+            <a href="{% url 'main:home' %}"            onclick="closeMobileMenu()" class="mob-link">Головна</a>
+            <a href="{% url 'main:home' %}#services"   onclick="closeMobileMenu()" class="mob-link">Послуги</a>
+            <a href="{% url 'main:home' %}#status"     onclick="closeMobileMenu()" class="mob-link">Статус</a>
+            <a href="{% url 'main:home' %}#advantages" onclick="closeMobileMenu()" class="mob-link">Про нас</a>
+            <div style="padding-top:8px;margin-top:4px;border-top:1px solid rgba(255,255,255,.06);">
+                <a href="{% url 'main:home' %}#contact" onclick="closeMobileMenu()" class="zvyazok-btn" style="justify-content:center;display:flex;"><i class="fas fa-phone" style="font-size:.75rem;"></i> Зв'язок</a>
             </div>
+        </nav>
+    </div>
+</header>
 
-            <!-- Bottom bar -->
-            <div class="pt-8 flex flex-col md:flex-row justify-between items-center gap-4"
-                 style="border-top: 1px solid rgba(0,122,255,0.12);">
-                <p class="text-gray-600 text-xs">© 2026 FixFlow Professional. Всі права захищені.</p>
-                <div class="flex gap-6 text-xs text-gray-600">
-                    <a href="#" class="hover:text-white transition-colors">Політика конфіденційності</a>
-                    <a href="#" class="hover:text-white transition-colors">Умови використання</a>
+{% if messages %}
+<div style="position:fixed;top:88px;right:24px;z-index:9000;display:flex;flex-direction:column;gap:8px;max-width:360px;">
+    {% for message in messages %}<div style="padding:12px 16px;font-size:.875rem;color:#fff;background:rgba(26,26,27,.97);border:1px solid rgba(0,122,255,.4);border-radius:8px;">{{ message }}</div>{% endfor %}
+</div>
+{% endif %}
+
+<main style="flex:1;padding-top:72px;">{% block content %}{% endblock %}</main>
+
+<footer style="background:#1A1A1B;border-top:1px solid rgba(0,122,255,.15);">
+    <div style="max-width:1280px;margin:0 auto;padding:64px 24px;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:40px;margin-bottom:48px;">
+            <div>
+                <div style="margin-bottom:16px;"><span style="font-size:1.25rem;font-weight:700;letter-spacing:-.02em;"><span style="color:#fff;">Fix</span><span style="color:#007AFF;">Flow</span></span></div>
+                <p style="color:#6b7280;font-size:.875rem;line-height:1.6;">Сервісний центр з ремонту електроніки. Якість, швидкість, надійність.</p>
+            </div>
+            <div>
+                <h4 style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:#007AFF;margin-bottom:20px;">Послуги</h4>
+                <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;">
+                    <li><a href="{% url 'main:home' %}#services" class="ftr-link">Ремонт смартфонів</a></li>
+                    <li><a href="{% url 'main:home' %}#services" class="ftr-link">Ремонт ноутбуків</a></li>
+                    <li><a href="{% url 'main:home' %}#services" class="ftr-link">Ремонт ПК</a></li>
+                    <li><a href="{% url 'main:home' %}#services" class="ftr-link">Відновлення даних</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:#007AFF;margin-bottom:20px;">Компанія</h4>
+                <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;">
+                    <li><a href="{% url 'main:home' %}#advantages" class="ftr-link">Про нас</a></li>
+                    <li><a href="{% url 'main:home' %}#advantages" class="ftr-link">Гарантії</a></li>
+                    <li><a href="{% url 'main:home' %}#status"     class="ftr-link">Статус замовлення</a></li>
+                    <li><a href="{% url 'main:home' %}#contact"    class="ftr-link">Контакти</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:#007AFF;margin-bottom:20px;">Контакти</h4>
+                <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
+                    <li style="display:flex;align-items:flex-start;gap:8px;color:#6b7280;font-size:.875rem;"><i class="fas fa-map-marker-alt" style="color:#007AFF;font-size:.75rem;margin-top:3px;flex-shrink:0;"></i>м. Київ, вул. Хрещатик, 1</li>
+                    <li style="display:flex;align-items:flex-start;gap:8px;color:#6b7280;font-size:.875rem;"><i class="fas fa-phone" style="color:#007AFF;font-size:.75rem;margin-top:3px;flex-shrink:0;"></i>+380 50 123 45 67</li>
+                    <li style="display:flex;align-items:flex-start;gap:8px;color:#6b7280;font-size:.875rem;"><i class="fas fa-envelope" style="color:#007AFF;font-size:.75rem;margin-top:3px;flex-shrink:0;"></i>info@fixflow.ua</li>
+                    <li style="display:flex;align-items:flex-start;gap:8px;color:#6b7280;font-size:.875rem;"><i class="fas fa-clock" style="color:#007AFF;font-size:.75rem;margin-top:3px;flex-shrink:0;"></i>Пн–Нд: 9:00–21:00</li>
+                </ul>
+                <div style="display:flex;gap:8px;">
+                    <a href="#" class="soc-btn"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="soc-btn"><i class="fab fa-facebook"></i></a>
+                    <a href="#" class="soc-btn"><i class="fab fa-telegram"></i></a>
                 </div>
             </div>
         </div>
-    </footer>
+        <div style="padding-top:32px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px;border-top:1px solid rgba(0,122,255,.12);">
+            <p style="color:#4b5563;font-size:.75rem;">© 2026 FixFlow Professional. Всі права захищені.</p>
+            <div style="display:flex;gap:24px;">
+                <a href="#" class="ftr-link" style="font-size:.75rem;">Політика конфіденційності</a>
+                <a href="#" class="ftr-link" style="font-size:.75rem;">Умови використання</a>
+            </div>
+        </div>
+    </div>
+</footer>
 
-    <!-- ═══════════════ GLOBAL SCRIPTS ═══════════════ -->
-    <script>
-    // Mobile menu toggle
-    function toggleMobileMenu() {
-        const menu = document.getElementById('mobile-menu');
-        menu.classList.toggle('hidden');
-    }
+<style>
+.hdr-link{color:#9ca3af;font-size:.9rem;font-weight:500;text-decoration:none;padding:4px 0;position:relative;transition:color .25s;}
+.hdr-link::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:1px;background:#007AFF;transform:scaleX(0);transition:transform .25s;}
+.hdr-link:hover{color:#fff;}.hdr-link:hover::after{transform:scaleX(1);}
+.mob-link{color:#9ca3af;font-size:.9rem;font-weight:500;text-decoration:none;padding:10px 12px;border-radius:8px;display:block;transition:color .2s,background .2s;}
+.mob-link:hover{color:#fff;background:rgba(255,255,255,.05);}
+.zvyazok-btn{display:flex;align-items:center;gap:8px;padding:10px 20px;background:#007AFF;color:#fff;border-radius:10px;font-size:.875rem;font-weight:600;text-decoration:none;box-shadow:0 0 20px rgba(0,122,255,.4);transition:opacity .2s,transform .2s;}
+.zvyazok-btn:hover{opacity:.88;transform:scale(1.03);}
+.ftr-link{color:#6b7280;font-size:.875rem;text-decoration:none;transition:color .2s;}.ftr-link:hover{color:#fff;}
+.soc-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,122,255,.25);background:rgba(0,122,255,.05);border-radius:8px;color:#6b7280;font-size:.875rem;text-decoration:none;transition:color .2s,background .2s,transform .2s;}
+.soc-btn:hover{color:#007AFF;background:rgba(0,122,255,.12);transform:scale(1.1);}
+@media(min-width:1024px){#desk-nav{display:flex!important;}#dash-btn,#login-btn{display:flex!important;}#burger{display:none!important;}}
+</style>
 
-    // Header opacity on scroll
-    window.addEventListener('scroll', function () {
-        const header = document.getElementById('main-header');
-        if (window.scrollY > 40) {
-            header.style.background = 'rgba(26,26,27,0.82)';
-            header.style.borderBottomColor = 'rgba(255,255,255,0.08)';
-        } else {
-            header.style.background = 'rgba(26,26,27,0.55)';
-            header.style.borderBottomColor = 'rgba(255,255,255,0.06)';
-        }
-    });
-
-    // Reveal on scroll (IntersectionObserver)
-    document.addEventListener('DOMContentLoaded', function () {
-        const reveals = document.querySelectorAll('.reveal-on-scroll');
-        if (!reveals.length) return;
-        if ('IntersectionObserver' in window) {
-            const io = new IntersectionObserver((entries, observer) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, { threshold: 0.1 });
-            reveals.forEach(r => io.observe(r));
-        } else {
-            reveals.forEach(r => r.classList.add('visible'));
-        }
-    });
-    </script>
-
-    {% block extra_js %}{% endblock %}
+<script>
+function toggleMobileMenu(){var m=document.getElementById('mob-menu');m.style.display=(m.style.display==='block')?'none':'block';}
+function closeMobileMenu(){document.getElementById('mob-menu').style.display='none';}
+window.addEventListener('scroll',function(){var h=document.getElementById('hdr');if(window.scrollY>50){h.style.background='rgba(14,14,15,0.95)';h.style.boxShadow='0 2px 40px rgba(0,0,0,0.8)';}else{h.style.background='rgba(20,20,21,0.72)';h.style.boxShadow='0 2px 24px rgba(0,0,0,0.6)';}});
+document.addEventListener('DOMContentLoaded',function(){var els=document.querySelectorAll('.reveal-on-scroll');if(!els.length)return;if('IntersectionObserver'in window){var io=new IntersectionObserver(function(entries,obs){entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}});},{threshold:0.08});els.forEach(function(el){io.observe(el);});}else{els.forEach(function(el){el.classList.add('visible');});}});
+</script>
+{% block extra_js %}{% endblock %}
 </body>
 </html>

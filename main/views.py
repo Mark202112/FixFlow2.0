@@ -42,10 +42,15 @@ def order_success(request):
     return render(request, 'main/order_success.html', {'order': order})
 
 def check_status(request):
-    """Перевірка статусу"""
-    orders = []
+    """Перевірка статусу — вбудована в головну сторінку"""
+    orders = None
     if request.method == 'POST':
-        search = request.POST.get('search')
-        orders = Order.objects.filter(order_number__icontains=search) | \
-                 Order.objects.filter(client__phone__icontains=search)
-    return render(request, 'main/check_status.html', {'orders': orders})
+        search = request.POST.get('search', '').strip()
+        if search:
+            orders = list(
+                Order.objects.filter(order_number__icontains=search) |
+                Order.objects.filter(client__phone__icontains=search)
+            )
+        else:
+            orders = []
+    return render(request, 'main/home.html', {'orders': orders})
