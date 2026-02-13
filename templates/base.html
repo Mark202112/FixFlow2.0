@@ -87,64 +87,59 @@
 <body class="flex flex-col min-h-screen">
 
     <!-- ═══════════════════════════════ NAVBAR ═══════════════════════════════ -->
-    <header id="main-header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
-            style="background: rgba(26,26,27,0.9); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,122,255,0.15);">
+    <header id="main-header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
+            style="background: rgba(26,26,27,0.55); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-bottom: 1px solid rgba(255,255,255,0.06);">
         <div class="max-w-7xl mx-auto px-6">
             <div class="flex items-center justify-between h-20">
 
-                <!-- Logo -->
-                <a href="{% url 'main:home' %}" class="flex items-center gap-3 group">
-                    <div class="relative w-10 h-10 flex-shrink-0">
-                        <div class="absolute inset-0 bg-brand rounded-lg opacity-20 blur-md group-hover:opacity-40 transition-opacity"></div>
-                        <div class="relative w-10 h-10 rounded-lg flex items-center justify-center"
-                             style="background: linear-gradient(135deg, #2A2A2D 0%, #007AFF 100%);">
-                            <i class="fas fa-microchip text-white text-lg"></i>
-                        </div>
-                    </div>
-                    <div class="leading-none">
-                        <div class="text-white font-bold text-lg tracking-tight">FixFlow</div>
-                        <div class="text-[10px] tracking-[0.2em] font-semibold" style="color: #007AFF;">PROFESSIONAL</div>
-                    </div>
+                <!-- Brand name only (no icon) -->
+                <a href="{% url 'main:home' %}" class="group select-none">
+                    <span class="text-xl font-bold tracking-tight">
+                        <span class="text-white group-hover:text-white/90 transition-colors">Fix</span><span style="color:#007AFF;">Flow</span>
+                    </span>
                 </a>
 
                 <!-- Desktop Nav -->
                 <nav class="hidden lg:flex items-center gap-8">
-                    <a href="{% url 'main:home' %}#services"   class="nav-link text-gray-300 hover:text-white text-xs font-bold uppercase tracking-widest transition-colors">Послуги</a>
-                    <a href="{% url 'main:home' %}#advantages" class="nav-link text-gray-300 hover:text-white text-xs font-bold uppercase tracking-widest transition-colors">Переваги</a>
-                    <a href="{% url 'main:home' %}#process"    class="nav-link text-gray-300 hover:text-white text-xs font-bold uppercase tracking-widest transition-colors">Процес</a>
-                    <a href="{% url 'main:check_status' %}"    class="nav-link text-gray-300 hover:text-white text-xs font-bold uppercase tracking-widest transition-colors">Статус</a>
+                    <a href="{% url 'main:home' %}"            class="nav-link text-gray-300 hover:text-white text-sm font-medium transition-colors">Головна</a>
+                    <a href="{% url 'main:home' %}#services"   class="nav-link text-gray-300 hover:text-white text-sm font-medium transition-colors">Послуги</a>
+                    <a href="{% url 'main:check_status' %}"    class="nav-link text-gray-300 hover:text-white text-sm font-medium transition-colors">Статус</a>
+                    <a href="{% url 'main:home' %}#advantages" class="nav-link text-gray-300 hover:text-white text-sm font-medium transition-colors">Про нас</a>
                 </nav>
 
                 <!-- Right actions -->
                 <div class="flex items-center gap-3">
-                    <button onclick="openOrderModal()"
-                            class="hidden sm:flex glow-btn items-center gap-2 px-5 py-2.5 text-white text-xs font-bold uppercase tracking-widest transition-all duration-300 hover:scale-105"
-                            style="background: #007AFF; border: 1px solid rgba(0,122,255,0.5);">
-                        <i class="fas fa-plus text-[10px]"></i>
-                        Замовлення
-                    </button>
+                    <!-- Зв'язок — scroll to contact section -->
+                    <a href="{% url 'main:home' %}#contact"
+                       class="hidden sm:flex items-center gap-2 px-5 py-2.5 text-white text-sm font-semibold transition-all duration-300 hover:opacity-90 hover:scale-[1.03] active:scale-[0.97] rounded-lg"
+                       style="background: #007AFF; box-shadow: 0 0 18px rgba(0,122,255,0.35);">
+                        <i class="fas fa-phone text-xs"></i>
+                        Зв'язок
+                    </a>
+
                     {% if user.is_authenticated %}
                         <a href="{% url 'dashboard:home' %}"
-                           class="flex items-center gap-2 px-4 py-2.5 text-xs font-bold uppercase tracking-widest transition-all duration-300 hover:bg-white/10"
-                           style="border: 1px solid rgba(255,255,255,0.15); color: #fff;">
-                            <i class="fas fa-tachometer-alt text-[10px]"></i>
+                           class="hidden sm:flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:bg-white/10 rounded-lg"
+                           style="border: 1px solid rgba(255,255,255,0.12);">
+                            <i class="fas fa-tachometer-alt text-xs"></i>
                             Dashboard
                         </a>
                     {% else %}
                         <a href="{% url 'dashboard:login' %}"
-                           class="flex items-center gap-2 px-4 py-2.5 text-gray-400 hover:text-white text-xs font-bold uppercase tracking-widest transition-colors"
+                           class="hidden sm:flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-400 hover:text-white transition-colors rounded-lg"
                            style="border: 1px solid rgba(255,255,255,0.08);">
-                            <i class="fas fa-sign-in-alt text-[10px]"></i>
+                            <i class="fas fa-sign-in-alt text-xs"></i>
                             Вхід
                         </a>
                     {% endif %}
 
                     <!-- Mobile burger -->
                     <button id="burger-btn" onclick="toggleMobileMenu()"
-                            class="lg:hidden flex flex-col gap-1.5 p-2 text-white">
-                        <span class="burger-line block w-5 h-0.5 bg-white transition-all duration-300"></span>
-                        <span class="burger-line block w-5 h-0.5 bg-white transition-all duration-300"></span>
-                        <span class="burger-line block w-5 h-0.5 bg-white transition-all duration-300"></span>
+                            class="lg:hidden flex flex-col justify-center gap-[5px] w-9 h-9 rounded-lg transition-colors hover:bg-white/10"
+                            style="border: 1px solid rgba(255,255,255,0.08);">
+                        <span class="burger-line block w-4 h-0.5 bg-white mx-auto transition-all duration-300"></span>
+                        <span class="burger-line block w-4 h-0.5 bg-white mx-auto transition-all duration-300"></span>
+                        <span class="burger-line block w-4 h-0.5 bg-white mx-auto transition-all duration-300"></span>
                     </button>
                 </div>
             </div>
@@ -152,17 +147,20 @@
 
         <!-- Mobile menu -->
         <div id="mobile-menu" class="lg:hidden hidden px-6 pb-6 pt-2"
-             style="border-top: 1px solid rgba(0,122,255,0.15);">
-            <nav class="flex flex-col gap-4">
-                <a href="{% url 'main:home' %}#services"   onclick="toggleMobileMenu()" class="text-gray-300 hover:text-brand text-xs font-bold uppercase tracking-widest transition-colors py-2">Послуги</a>
-                <a href="{% url 'main:home' %}#advantages" onclick="toggleMobileMenu()" class="text-gray-300 hover:text-brand text-xs font-bold uppercase tracking-widest transition-colors py-2">Переваги</a>
-                <a href="{% url 'main:home' %}#process"    onclick="toggleMobileMenu()" class="text-gray-300 hover:text-brand text-xs font-bold uppercase tracking-widest transition-colors py-2">Процес</a>
-                <a href="{% url 'main:check_status' %}"    onclick="toggleMobileMenu()" class="text-gray-300 hover:text-brand text-xs font-bold uppercase tracking-widest transition-colors py-2">Статус</a>
-                <button onclick="openOrderModal(); toggleMobileMenu();"
-                        class="w-full py-3 text-white text-xs font-bold uppercase tracking-widest text-center"
-                        style="background: #007AFF;">
-                    Залишити замовлення
-                </button>
+             style="border-top: 1px solid rgba(255,255,255,0.06); background: rgba(26,26,27,0.92);">
+            <nav class="flex flex-col gap-1">
+                <a href="{% url 'main:home' %}"            onclick="toggleMobileMenu()" class="text-gray-300 hover:text-white text-sm font-medium transition-colors py-2.5 px-3 rounded-lg hover:bg-white/5">Головна</a>
+                <a href="{% url 'main:home' %}#services"   onclick="toggleMobileMenu()" class="text-gray-300 hover:text-white text-sm font-medium transition-colors py-2.5 px-3 rounded-lg hover:bg-white/5">Послуги</a>
+                <a href="{% url 'main:check_status' %}"    onclick="toggleMobileMenu()" class="text-gray-300 hover:text-white text-sm font-medium transition-colors py-2.5 px-3 rounded-lg hover:bg-white/5">Статус</a>
+                <a href="{% url 'main:home' %}#advantages" onclick="toggleMobileMenu()" class="text-gray-300 hover:text-white text-sm font-medium transition-colors py-2.5 px-3 rounded-lg hover:bg-white/5">Про нас</a>
+                <div class="pt-2 mt-1" style="border-top: 1px solid rgba(255,255,255,0.06);">
+                    <a href="{% url 'main:home' %}#contact" onclick="toggleMobileMenu();"
+                       class="flex items-center justify-center gap-2 w-full py-3 text-white text-sm font-semibold rounded-lg transition-opacity hover:opacity-90"
+                       style="background: #007AFF;">
+                        <i class="fas fa-phone text-xs"></i>
+                        Зв'язок
+                    </a>
+                </div>
             </nav>
         </div>
     </header>
@@ -274,13 +272,15 @@
         menu.classList.toggle('hidden');
     }
 
-    // Header shadow on scroll
+    // Header opacity on scroll
     window.addEventListener('scroll', function () {
         const header = document.getElementById('main-header');
-        if (window.scrollY > 20) {
-            header.style.borderBottomColor = 'rgba(0,122,255,0.25)';
+        if (window.scrollY > 40) {
+            header.style.background = 'rgba(26,26,27,0.82)';
+            header.style.borderBottomColor = 'rgba(255,255,255,0.08)';
         } else {
-            header.style.borderBottomColor = 'rgba(0,122,255,0.15)';
+            header.style.background = 'rgba(26,26,27,0.55)';
+            header.style.borderBottomColor = 'rgba(255,255,255,0.06)';
         }
     });
 

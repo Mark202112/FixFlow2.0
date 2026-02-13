@@ -43,16 +43,16 @@
                 <!-- CTA buttons -->
                 <div class="flex flex-col sm:flex-row gap-4 mb-14">
                     <button onclick="openOrderModal()"
-                            class="glow-btn flex items-center justify-center gap-2 px-8 py-4 text-white text-xs font-bold uppercase tracking-widest transition-all duration-300 hover:scale-105"
-                            style="background: #007AFF; border: 1px solid rgba(0,122,255,0.6);">
-                        <i class="fas fa-plus text-[10px]"></i>
+                            class="glow-btn flex items-center justify-center gap-2 px-8 py-4 text-white text-sm font-semibold transition-all duration-300 hover:opacity-90 hover:scale-[1.03] active:scale-[0.97] rounded-xl"
+                            style="background: #007AFF;">
+                        <i class="fas fa-plus text-xs"></i>
                         Залишити заявку
-                        <i class="fas fa-arrow-right text-[10px]"></i>
+                        <i class="fas fa-arrow-right text-xs"></i>
                     </button>
                     <a href="{% url 'main:check_status' %}"
-                       class="flex items-center justify-center gap-2 px-8 py-4 text-white text-xs font-bold uppercase tracking-widest transition-all duration-300 hover:bg-white/5"
+                       class="flex items-center justify-center gap-2 px-8 py-4 text-white text-sm font-semibold transition-all duration-300 hover:bg-white/5 rounded-xl"
                        style="border: 2px solid rgba(255,255,255,0.2);">
-                        <i class="fas fa-search text-[10px]"></i>
+                        <i class="fas fa-search text-xs"></i>
                         Перевірити статус
                     </a>
                 </div>
