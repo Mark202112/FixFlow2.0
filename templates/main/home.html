@@ -1,34 +1,121 @@
 {% extends 'base.html' %}
-{% block content %}
-{% comment %}Адаптированная главная страница из TESTSITE2 (компактно) {% endcomment %}
-<section class="container mx-auto px-6 py-24 flex flex-col items-center text-center relative overflow-hidden">
-    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-brand-blue/5 blur-[120px] rounded-full pointer-events-none"></div>
+{% block title %}FixFlow — Ремонт техніки нового рівня{% endblock %}
 
-    <div class="max-w-4xl relative z-10">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded bg-brand-blue/10 border border-brand-blue/20 text-brand-blue text-[10px] font-bold uppercase tracking-[0.2em] mb-8">
-            Service Management System v1.0
-        </div>
-        <h1 class="text-5xl md:text-6xl font-bold tracking-tighter mb-8 leading-[0.95]">
-            Ремонт техніки <br> <span class="text-brand-blue italic">нового рівня.</span>
-        </h1>
-        <p class="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed">
-            Ми автоматизували процес ремонту: від онлайн-заявки до відстеження статусу в реальному часі.
-        </p>
-        <div class="flex flex-wrap justify-center gap-4">
-            <button onclick="openOrderModal()" class="bg-brand-blue px-8 py-3 rounded-sm font-bold uppercase text-xs tracking-widest hover:bg-blue-700 transition shadow-lg shadow-blue-500/20 text-white">
-                Створити замовлення
-            </button>
-            <a href="{% url 'main:check_status' %}" class="border border-white/10 px-8 py-3 rounded-sm font-bold uppercase text-xs tracking-widest hover:bg-white/5 transition text-white">
-                Перевірити статус
-            </a>
+{% block content %}
+
+<!-- ═══════════════════════════════ HERO ═══════════════════════════════ -->
+<section class="relative overflow-hidden" style="background: #1A1A1B; padding: 100px 0 80px;">
+
+    <!-- Dot grid background (твій паттерн) -->
+    <div class="absolute inset-0 dot-grid opacity-100 pointer-events-none"></div>
+
+    <!-- Glowing blobs -->
+    <div class="absolute top-20 left-10 w-96 h-96 rounded-full pointer-events-none"
+         style="background: rgba(0,122,255,0.08); filter: blur(80px); animation: pulseGlow 4s ease-in-out infinite;"></div>
+    <div class="absolute bottom-20 right-10 w-80 h-80 rounded-full pointer-events-none"
+         style="background: rgba(42,42,45,0.3); filter: blur(80px); animation: pulseGlow 4s ease-in-out infinite 1.5s;"></div>
+
+    <div class="max-w-7xl mx-auto px-6 relative z-10">
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+
+            <!-- Left col -->
+            <div class="reveal-on-scroll">
+                <!-- Badge -->
+                <div class="inline-flex items-center gap-2 px-4 py-2 mb-8"
+                     style="background: rgba(0,122,255,0.08); border: 1px solid rgba(0,122,255,0.25);">
+                    <div class="w-1.5 h-1.5 rounded-full bg-brand" style="animation: pulseGlow 2s infinite;"></div>
+                    <span class="text-[10px] font-bold uppercase tracking-[0.25em]" style="color:#007AFF;">
+                        Сервісний центр · Онлайн прийом
+                    </span>
+                </div>
+
+                <!-- Heading -->
+                <h1 class="font-bold tracking-tight mb-6 leading-none">
+                    <span class="block text-white" style="font-size: clamp(2.5rem, 5vw, 4.5rem);">Ремонт техніки</span>
+                    <span class="block italic" style="font-size: clamp(2.5rem, 5vw, 4.5rem); color:#007AFF;">нового рівня.</span>
+                </h1>
+
+                <p class="text-gray-400 text-lg leading-relaxed mb-10 max-w-xl">
+                    Сервісний центр з ремонту смартфонів, ноутбуків та&nbsp;комп'ютерної техніки.
+                    Гарантія якості. Оригінальні запчастини. Швидкий сервіс.
+                </p>
+
+                <!-- CTA buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 mb-14">
+                    <button onclick="openOrderModal()"
+                            class="glow-btn flex items-center justify-center gap-2 px-8 py-4 text-white text-xs font-bold uppercase tracking-widest transition-all duration-300 hover:scale-105"
+                            style="background: #007AFF; border: 1px solid rgba(0,122,255,0.6);">
+                        <i class="fas fa-plus text-[10px]"></i>
+                        Залишити заявку
+                        <i class="fas fa-arrow-right text-[10px]"></i>
+                    </button>
+                    <a href="{% url 'main:check_status' %}"
+                       class="flex items-center justify-center gap-2 px-8 py-4 text-white text-xs font-bold uppercase tracking-widest transition-all duration-300 hover:bg-white/5"
+                       style="border: 2px solid rgba(255,255,255,0.2);">
+                        <i class="fas fa-search text-[10px]"></i>
+                        Перевірити статус
+                    </a>
+                </div>
+
+                <!-- Stats row -->
+                <div class="grid grid-cols-3 gap-6">
+                    <div class="pl-4" style="border-left: 2px solid #007AFF;">
+                        <p class="text-3xl font-bold text-white mb-1">15K+</p>
+                        <p class="text-xs text-gray-500 uppercase tracking-wider">ремонтів</p>
+                    </div>
+                    <div class="pl-4" style="border-left: 2px solid #007AFF;">
+                        <p class="text-3xl font-bold text-white mb-1">12 міс</p>
+                        <p class="text-xs text-gray-500 uppercase tracking-wider">гарантія</p>
+                    </div>
+                    <div class="pl-4" style="border-left: 2px solid #007AFF;">
+                        <p class="text-3xl font-bold text-white mb-1">98%</p>
+                        <p class="text-xs text-gray-500 uppercase tracking-wider">задоволені</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right col — image card -->
+            <div class="reveal-on-scroll relative hidden lg:block">
+                <div class="relative">
+                    <!-- Glow behind image -->
+                    <div class="absolute inset-0 rounded-sm pointer-events-none"
+                         style="background: rgba(0,122,255,0.15); filter: blur(40px); transform: scale(0.9);"></div>
+
+                    <!-- Image frame -->
+                    <div class="relative overflow-hidden" style="border: 1px solid rgba(0,122,255,0.25);">
+                        <div class="absolute inset-0 pointer-events-none z-10"
+                             style="background: linear-gradient(135deg, rgba(42,42,45,0.2) 0%, transparent 60%);"></div>
+                        <img src="https://images.unsplash.com/photo-1709102884400-b50ca1a12bc3?w=800&q=80&fit=crop"
+                             alt="Ремонт техніки"
+                             class="w-full h-auto block"
+                             loading="lazy">
+                    </div>
+
+                    <!-- Floating badge -->
+                    <div class="float-anim absolute -bottom-6 -left-6 p-5 z-20"
+                         style="background: #1A1A1B; border: 2px solid #007AFF; box-shadow: 0 0 30px rgba(0,122,255,0.3);">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-shield-alt text-2xl" style="color:#007AFF;"></i>
+                            <div>
+                                <p class="text-white font-semibold text-sm leading-none mb-1">Гарантія</p>
+                                <p class="text-xs" style="color:#007AFF;">до 12 місяців</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </section>
 
-{# includes from TESTSITE2, адаптированы пути include -> main/includes #}
+<!-- ═══════════════════════════ INCLUDES ═══════════════════════════ -->
 {% include 'main/includes/services.html' %}
+{% include 'main/includes/advantages.html' %}
 {% include 'main/includes/process.html' %}
-{% include 'main/includes/features.html' %}
+{% include 'main/includes/contact.html' %}
+
+<!-- Modals -->
 {% include 'main/includes/service_modal.html' %}
 {% include 'main/includes/order_modal.html' %}
 

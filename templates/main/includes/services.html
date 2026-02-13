@@ -1,65 +1,170 @@
-<section id="services" class="reveal-on-scroll container mx-auto px-6 py-20 border-t border-white/5 relative overflow-hidden opacity-0">
-    <div class="absolute inset-0 opacity-[0.02] pointer-events-none" 
-         style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 30px 30px;"></div>
+<!-- ═══════════════════════════ SERVICES ═══════════════════════════ -->
+<section id="services" class="relative overflow-hidden" style="background: #1A1A1B; padding: 100px 0;">
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-0 relative z-10">
-        
-        <div class="group relative p-10 bg-transparent border border-white/5 transition-all duration-500 hover:bg-brand-blue/[0.03] overflow-hidden cursor-pointer"
-            onclick="openServiceModal('phones')">
-            <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" 
-                 style="background: radial-gradient(circle at center, rgba(37, 99, 235, 0.08) 0%, transparent 70%);"></div>
-            
-            <span class="absolute top-6 right-8 text-xl font-black text-white/5 group-hover:text-brand-blue/20 transition-colors">01</span>
-            
-            <div class="relative z-10">
-                <div class="w-16 h-16 bg-brand-blue/10 border border-brand-blue/20 rounded-lg flex items-center justify-center text-brand-blue mb-8 group-hover:bg-brand-blue group-hover:text-white group-hover:scale-110 transition-all duration-500 shadow-lg shadow-brand-blue/0 group-hover:shadow-brand-blue/20">
-                    <i class="fas fa-mobile-alt text-2xl"></i>
+    <!-- Dot grid background -->
+    <div class="absolute inset-0 dot-grid pointer-events-none opacity-100"></div>
+
+    <!-- Top divider -->
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 divider-line"></div>
+
+    <div class="max-w-7xl mx-auto px-6 relative z-10">
+
+        <!-- Section header -->
+        <div class="reveal-on-scroll text-center mb-16">
+            <span class="block text-[10px] font-bold uppercase tracking-[0.3em] mb-4" style="color:#007AFF;">Наші послуги</span>
+            <h2 class="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4">Професійний сервіс</h2>
+            <p class="text-gray-400 text-lg max-w-2xl mx-auto">Повний спектр послуг з ремонту та обслуговування електроніки</p>
+        </div>
+
+        <!-- Main services — photo cards -->
+        <div class="reveal-on-scroll grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+
+            <!-- Smartphones -->
+            <div class="group relative overflow-hidden cursor-pointer transition-transform duration-300 hover:-translate-y-1"
+                 onclick="openServiceModal('phones')">
+                <div class="relative h-72 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1736628274358-f020fa50b7a8?w=800&q=80&fit=crop"
+                         alt="Ремонт смартфонів"
+                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                         loading="lazy">
+                    <div class="absolute inset-0" style="background: linear-gradient(to top, #1A1A1B 0%, rgba(26,26,27,0.5) 50%, transparent 100%);"></div>
+                    <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                         style="background: rgba(0,122,255,0.15);"></div>
                 </div>
-                <h3 class="text-xl font-bold mb-4 uppercase tracking-tight group-hover:text-brand-blue transition-colors">Ремонт смартфонів</h3>
-                <p class="text-gray-500 text-sm leading-relaxed mb-10">Заміна екранів, батарей, камер. Ремонт після води.</p>
-                
-                <div class="pt-6 border-t border-white/5 flex justify-between items-center">
-                    <span class="text-brand-blue font-bold tracking-tight text-sm uppercase">від 250 ₴</span>
-                    <span class="text-[10px] text-gray-600 group-hover:text-brand-blue font-bold uppercase tracking-widest transition">Детальніше →</span>
+                <div class="absolute bottom-0 left-0 right-0 p-6 backdrop-blur-md"
+                     style="background: rgba(42,42,45,0.4); border-top: 1px solid rgba(255,255,255,0.08);">
+                    <div class="flex items-start justify-between mb-2">
+                        <h3 class="text-xl font-bold text-white tracking-tight">Ремонт смартфонів</h3>
+                        <span class="text-sm font-bold shrink-0 ml-2" style="color:#007AFF;">від 250 ₴</span>
+                    </div>
+                    <p class="text-gray-300 text-sm leading-relaxed">Заміна екранів, батарей, камер. Ремонт після води. iPhone, Samsung, Xiaomi.</p>
+                    <!-- hover bottom border -->
+                    <div class="absolute bottom-0 left-0 right-0 h-0.5 transition-transform duration-300 scale-x-0 group-hover:scale-x-100 origin-left"
+                         style="background: linear-gradient(to right, #007AFF, #0056CC);"></div>
                 </div>
+                <span class="absolute top-5 right-5 text-xs font-black text-white/10 group-hover:text-brand/30 transition-colors select-none">01</span>
+            </div>
+
+            <!-- Laptops -->
+            <div class="group relative overflow-hidden cursor-pointer transition-transform duration-300 hover:-translate-y-1"
+                 onclick="openServiceModal('laptops')">
+                <div class="relative h-72 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1659543038938-c31e75428b97?w=800&q=80&fit=crop"
+                         alt="Ремонт ноутбуків"
+                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                         loading="lazy">
+                    <div class="absolute inset-0" style="background: linear-gradient(to top, #1A1A1B 0%, rgba(26,26,27,0.5) 50%, transparent 100%);"></div>
+                    <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                         style="background: rgba(0,122,255,0.15);"></div>
+                </div>
+                <div class="absolute bottom-0 left-0 right-0 p-6 backdrop-blur-md"
+                     style="background: rgba(42,42,45,0.4); border-top: 1px solid rgba(255,255,255,0.08);">
+                    <div class="flex items-start justify-between mb-2">
+                        <h3 class="text-xl font-bold text-white tracking-tight">Ремонт ноутбуків</h3>
+                        <span class="text-sm font-bold shrink-0 ml-2" style="color:#007AFF;">від 400 ₴</span>
+                    </div>
+                    <p class="text-gray-300 text-sm leading-relaxed">Чистка системи охолодження, заміна комплектуючих, ремонт материнських плат.</p>
+                    <div class="absolute bottom-0 left-0 right-0 h-0.5 transition-transform duration-300 scale-x-0 group-hover:scale-x-100 origin-left"
+                         style="background: linear-gradient(to right, #007AFF, #0056CC);"></div>
+                </div>
+                <span class="absolute top-5 right-5 text-xs font-black text-white/10 group-hover:text-brand/30 transition-colors select-none">02</span>
+            </div>
+
+            <!-- PC -->
+            <div class="group relative overflow-hidden cursor-pointer transition-transform duration-300 hover:-translate-y-1"
+                 onclick="openServiceModal('pc')">
+                <div class="relative h-72 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1760114333188-a1a8b50b5d94?w=800&q=80&fit=crop"
+                         alt="Ремонт ПК"
+                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                         loading="lazy">
+                    <div class="absolute inset-0" style="background: linear-gradient(to top, #1A1A1B 0%, rgba(26,26,27,0.5) 50%, transparent 100%);"></div>
+                    <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                         style="background: rgba(0,122,255,0.15);"></div>
+                </div>
+                <div class="absolute bottom-0 left-0 right-0 p-6 backdrop-blur-md"
+                     style="background: rgba(42,42,45,0.4); border-top: 1px solid rgba(255,255,255,0.08);">
+                    <div class="flex items-start justify-between mb-2">
+                        <h3 class="text-xl font-bold text-white tracking-tight">Ремонт ПК</h3>
+                        <span class="text-sm font-bold shrink-0 ml-2" style="color:#007AFF;">від 300 ₴</span>
+                    </div>
+                    <p class="text-gray-300 text-sm leading-relaxed">Збірка, модернізація, встановлення ОС, налаштування продуктивності.</p>
+                    <div class="absolute bottom-0 left-0 right-0 h-0.5 transition-transform duration-300 scale-x-0 group-hover:scale-x-100 origin-left"
+                         style="background: linear-gradient(to right, #007AFF, #0056CC);"></div>
+                </div>
+                <span class="absolute top-5 right-5 text-xs font-black text-white/10 group-hover:text-brand/30 transition-colors select-none">03</span>
             </div>
         </div>
 
-        <div class="group relative p-10 bg-transparent border border-white/5 md:border-l-0 transition-all duration-500 hover:bg-brand-blue/[0.03] overflow-hidden cursor-pointer"
-            onclick="openServiceModal('laptops')">
-            <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" style="background: radial-gradient(circle at center, rgba(37, 99, 235, 0.08) 0%, transparent 70%);"></div>
-            <span class="absolute top-6 right-8 text-xl font-black text-white/5 group-hover:text-brand-blue/20 transition-colors">02</span>
-            
-            <div class="relative z-10">
-                <div class="w-16 h-16 bg-brand-blue/10 border border-brand-blue/20 rounded-lg flex items-center justify-center text-brand-blue mb-8 group-hover:bg-brand-blue group-hover:text-white group-hover:scale-110 transition-all duration-500 shadow-lg shadow-brand-blue/0 group-hover:shadow-brand-blue/20">
-                    <i class="fas fa-laptop text-2xl"></i>
-                </div>
-                <h3 class="text-xl font-bold mb-4 uppercase tracking-tight group-hover:text-brand-blue transition-colors">Ремонт ноутбуків</h3>
-                <p class="text-gray-500 text-sm leading-relaxed mb-10">Чистка системи охолодження, заміна комплектуючих.</p>
-                <div class="pt-6 border-t border-white/5 flex justify-between items-center">
-                    <span class="text-brand-blue font-bold tracking-tight text-sm uppercase">від 400 ₴</span>
-                    <span class="text-[10px] text-gray-600 group-hover:text-brand-blue font-bold uppercase tracking-widest transition">Детальніше →</span>
+        <!-- Additional services — icon cards -->
+        <div class="reveal-on-scroll grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            <div class="group relative p-6 transition-all duration-300 hover:-translate-y-1 overflow-hidden"
+                 style="background: rgba(42,42,45,0.25); border: 1px solid rgba(0,122,255,0.18);">
+                <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                     style="background: linear-gradient(135deg, rgba(0,122,255,0.06) 0%, transparent 100%);"></div>
+                <div class="absolute top-5 right-5 text-xs font-black text-white/5 group-hover:text-brand/20 transition-colors select-none">04</div>
+                <div class="relative">
+                    <div class="w-14 h-14 flex items-center justify-center mb-5"
+                         style="background: rgba(26,26,27,0.6); border: 1px solid rgba(0,122,255,0.3);">
+                        <i class="fas fa-hdd text-2xl" style="color:#007AFF;"></i>
+                    </div>
+                    <div class="flex items-start justify-between mb-3">
+                        <h3 class="text-lg font-bold text-white tracking-tight">Відновлення даних</h3>
+                    </div>
+                    <p class="text-gray-500 text-sm leading-relaxed mb-5">Професійне відновлення інформації з пошкоджених носіїв.</p>
+                    <div class="flex items-center justify-between pt-4" style="border-top: 1px solid rgba(0,122,255,0.15);">
+                        <span class="text-sm font-bold" style="color:#007AFF;">від 800 ₴</span>
+                        <i class="fas fa-arrow-right text-xs text-gray-600 group-hover:text-brand group-hover:translate-x-1 transition-all duration-300"></i>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="group relative p-10 bg-transparent border border-white/5 md:border-l-0 transition-all duration-500 hover:bg-brand-blue/[0.03] overflow-hidden cursor-pointer"
-            onclick="openServiceModal('pc')">
-            <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" style="background: radial-gradient(circle at center, rgba(37, 99, 235, 0.08) 0%, transparent 70%);"></div>
-            <span class="absolute top-6 right-8 text-xl font-black text-white/5 group-hover:text-brand-blue/20 transition-colors">03</span>
-            
-            <div class="relative z-10">
-                <div class="w-16 h-16 bg-brand-blue/10 border border-brand-blue/20 rounded-lg flex items-center justify-center text-brand-blue mb-8 group-hover:bg-brand-blue group-hover:text-white group-hover:scale-110 transition-all duration-500 shadow-lg shadow-brand-blue/0 group-hover:shadow-brand-blue/20">
-                    <i class="fas fa-desktop text-2xl"></i>
-                </div>
-                <h3 class="text-xl font-bold mb-4 uppercase tracking-tight group-hover:text-brand-blue transition-colors">Ремонт ПК</h3>
-                <p class="text-gray-500 text-sm leading-relaxed mb-10">Збірка, модернізація, встановлення ОС.</p>
-                <div class="pt-6 border-t border-white/5 flex justify-between items-center">
-                    <span class="text-brand-blue font-bold tracking-tight text-sm uppercase">від 300 ₴</span>
-                    <span class="text-[10px] text-gray-600 group-hover:text-brand-blue font-bold uppercase tracking-widest transition">Детальніше →</span>
+            <div class="group relative p-6 transition-all duration-300 hover:-translate-y-1 overflow-hidden"
+                 style="background: rgba(42,42,45,0.25); border: 1px solid rgba(0,122,255,0.18);">
+                <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                     style="background: linear-gradient(135deg, rgba(0,122,255,0.06) 0%, transparent 100%);"></div>
+                <div class="absolute top-5 right-5 text-xs font-black text-white/5 group-hover:text-brand/20 transition-colors select-none">05</div>
+                <div class="relative">
+                    <div class="w-14 h-14 flex items-center justify-center mb-5"
+                         style="background: rgba(26,26,27,0.6); border: 1px solid rgba(0,122,255,0.3);">
+                        <i class="fas fa-cog text-2xl" style="color:#007AFF;"></i>
+                    </div>
+                    <div class="flex items-start justify-between mb-3">
+                        <h3 class="text-lg font-bold text-white tracking-tight">Налаштування ПЗ</h3>
+                    </div>
+                    <p class="text-gray-500 text-sm leading-relaxed mb-5">Оптимізація системи, видалення вірусів, встановлення програм.</p>
+                    <div class="flex items-center justify-between pt-4" style="border-top: 1px solid rgba(0,122,255,0.15);">
+                        <span class="text-sm font-bold" style="color:#007AFF;">від 200 ₴</span>
+                        <i class="fas fa-arrow-right text-xs text-gray-600 group-hover:text-brand group-hover:translate-x-1 transition-all duration-300"></i>
+                    </div>
                 </div>
             </div>
-        </div>
 
+            <div class="group relative p-6 transition-all duration-300 hover:-translate-y-1 overflow-hidden"
+                 style="background: rgba(42,42,45,0.25); border: 1px solid rgba(0,122,255,0.18);">
+                <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                     style="background: linear-gradient(135deg, rgba(0,122,255,0.06) 0%, transparent 100%);"></div>
+                <div class="absolute top-5 right-5 text-xs font-black text-white/5 group-hover:text-brand/20 transition-colors select-none">06</div>
+                <div class="relative">
+                    <div class="w-14 h-14 flex items-center justify-center mb-5"
+                         style="background: rgba(26,26,27,0.6); border: 1px solid rgba(0,122,255,0.3);">
+                        <i class="fas fa-bolt text-2xl" style="color:#007AFF;"></i>
+                    </div>
+                    <div class="flex items-start justify-between mb-3">
+                        <h3 class="text-lg font-bold text-white tracking-tight">Експрес-сервіс</h3>
+                    </div>
+                    <p class="text-gray-500 text-sm leading-relaxed mb-5">Терміновий ремонт протягом 1–3 годин. Доступно щодня.</p>
+                    <div class="flex items-center justify-between pt-4" style="border-top: 1px solid rgba(0,122,255,0.15);">
+                        <span class="text-sm font-bold" style="color:#007AFF;">+50% до ціни</span>
+                        <i class="fas fa-arrow-right text-xs text-gray-600 group-hover:text-brand group-hover:translate-x-1 transition-all duration-300"></i>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
+
+    <!-- Bottom divider -->
+    <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-1/2 divider-line"></div>
 </section>
