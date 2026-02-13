@@ -25,7 +25,7 @@
 </head>
 
 <!-- NAVBAR -->
-<header id="hdr" style="position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(20,20,21,0.72);border-bottom:1px solid rgba(0,122,255,0.4);box-shadow:0 2px 24px rgba(0,0,0,0.6);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);transition:background .4s,box-shadow .4s;">
+<header id="hdr" style="position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(20,20,21,0.55);border-bottom:1px solid rgba(0,122,255,0.25);box-shadow:0 2px 30px rgba(0,0,0,0.35);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);">
     <div style="max-width:1280px;margin:0 auto;padding:0 24px;">
         <div style="display:flex;align-items:center;justify-content:space-between;height:72px;">
             <a href="{% url 'main:home' %}" style="text-decoration:none;">
@@ -41,11 +41,6 @@
             </nav>
             <div style="display:flex;align-items:center;gap:12px;">
                 <a href="{% url 'main:home' %}#contact" class="zvyazok-btn"><i class="fas fa-phone" style="font-size:.75rem;"></i> Зв'язок</a>
-                {% if user.is_authenticated %}
-                <a href="{% url 'dashboard:home' %}" id="dash-btn" style="display:none;align-items:center;gap:8px;padding:10px 16px;border:1px solid rgba(255,255,255,.15);border-radius:10px;color:#fff;font-size:.875rem;font-weight:500;text-decoration:none;transition:background .2s;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='transparent'"><i class="fas fa-tachometer-alt" style="font-size:.75rem;"></i> Dashboard</a>
-                {% else %}
-                <a href="{% url 'dashboard:login' %}" id="login-btn" style="display:none;align-items:center;gap:8px;padding:10px 16px;border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#9ca3af;font-size:.875rem;font-weight:500;text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#9ca3af'"><i class="fas fa-sign-in-alt" style="font-size:.75rem;"></i> Вхід</a>
-                {% endif %}
                 <button id="burger" onclick="toggleMobileMenu()" style="display:flex;flex-direction:column;justify-content:center;gap:5px;width:40px;height:40px;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:8px;cursor:pointer;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='transparent'">
                     <span style="display:block;width:16px;height:2px;background:#fff;margin:0 auto;"></span>
                     <span style="display:block;width:16px;height:2px;background:#fff;margin:0 auto;"></span>
@@ -117,9 +112,15 @@
         </div>
         <div style="padding-top:32px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px;border-top:1px solid rgba(0,122,255,.12);">
             <p style="color:#4b5563;font-size:.75rem;">© 2026 FixFlow Professional. Всі права захищені.</p>
-            <div style="display:flex;gap:24px;">
+            <div style="display:flex;align-items:center;gap:24px;">
                 <a href="#" class="ftr-link" style="font-size:.75rem;">Політика конфіденційності</a>
                 <a href="#" class="ftr-link" style="font-size:.75rem;">Умови використання</a>
+                <span style="color:#2a2a2d;font-size:.75rem;">·</span>
+                {% if user.is_authenticated %}
+                <a href="{% url 'dashboard:home' %}" style="display:inline-flex;align-items:center;gap:6px;color:#3a3a3d;font-size:.7rem;font-weight:500;text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#6b7280'" onmouseout="this.style.color='#3a3a3d'"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                {% else %}
+                <a href="{% url 'dashboard:login' %}" style="display:inline-flex;align-items:center;gap:6px;color:#3a3a3d;font-size:.7rem;font-weight:500;text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#6b7280'" onmouseout="this.style.color='#3a3a3d'"><i class="fas fa-sign-in-alt"></i> Вхід</a>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -136,13 +137,13 @@
 .ftr-link{color:#6b7280;font-size:.875rem;text-decoration:none;transition:color .2s;}.ftr-link:hover{color:#fff;}
 .soc-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,122,255,.25);background:rgba(0,122,255,.05);border-radius:8px;color:#6b7280;font-size:.875rem;text-decoration:none;transition:color .2s,background .2s,transform .2s;}
 .soc-btn:hover{color:#007AFF;background:rgba(0,122,255,.12);transform:scale(1.1);}
-@media(min-width:1024px){#desk-nav{display:flex!important;}#dash-btn,#login-btn{display:flex!important;}#burger{display:none!important;}}
+@media(min-width:1024px){#desk-nav{display:flex!important;}#burger{display:none!important;}}
 </style>
 
 <script>
 function toggleMobileMenu(){var m=document.getElementById('mob-menu');m.style.display=(m.style.display==='block')?'none':'block';}
 function closeMobileMenu(){document.getElementById('mob-menu').style.display='none';}
-window.addEventListener('scroll',function(){var h=document.getElementById('hdr');if(window.scrollY>50){h.style.background='rgba(14,14,15,0.95)';h.style.boxShadow='0 2px 40px rgba(0,0,0,0.8)';}else{h.style.background='rgba(20,20,21,0.72)';h.style.boxShadow='0 2px 24px rgba(0,0,0,0.6)';}});
+
 document.addEventListener('DOMContentLoaded',function(){var els=document.querySelectorAll('.reveal-on-scroll');if(!els.length)return;if('IntersectionObserver'in window){var io=new IntersectionObserver(function(entries,obs){entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}});},{threshold:0.08});els.forEach(function(el){io.observe(el);});}else{els.forEach(function(el){el.classList.add('visible');});}});
 </script>
 {% block extra_js %}{% endblock %}

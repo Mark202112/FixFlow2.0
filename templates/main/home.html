@@ -41,12 +41,11 @@
 
                 <!-- CTA buttons -->
                 <div class="flex flex-col sm:flex-row gap-4 mb-14">
-                    <button onclick="openOrderModal()"
+                    <button onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})"
                             class="glow-btn flex items-center justify-center gap-2 px-8 py-4 text-white text-sm font-semibold transition-all duration-300 hover:opacity-90 hover:scale-[1.03] active:scale-[0.97] rounded-xl"
                             style="background: #007AFF;">
-                        <i class="fas fa-plus text-xs"></i>
+                        <i class="fas fa-arrow-down text-xs"></i>
                         Залишити заявку
-                        <i class="fas fa-arrow-right text-xs"></i>
                     </button>
                     <a href="#status"
                        onclick="document.getElementById('status').scrollIntoView({behavior:'smooth'}); return false;"
