@@ -8,9 +8,17 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            corePlugins: { preflight: false },
             theme: { extend: { colors: { 'brand': '#007AFF', 'brand-dark': '#0056CC' } } }
         }
     </script>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background:#1A1A1B; color:#fff; line-height:1.6; -webkit-font-smoothing:antialiased; }
+        img { display:block; max-width:100%; }
+        a { text-decoration:none; }
+        ul, ol { list-style:none; }
+    </style>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">

@@ -1,7 +1,5 @@
 <!-- ═══════════════════════════ STATUS ═══════════════════════════ -->
 <section id="status" class="relative overflow-hidden" style="background:#1A1A1B; padding:100px 0;">
-
-    <div class="absolute inset-0 dot-grid pointer-events-none"></div>
     <div class="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 divider-line"></div>
 
     <div class="max-w-7xl mx-auto px-6 relative z-10">
@@ -54,13 +52,12 @@
                                     <p style="color:#6b7280;font-size:.8rem;">{{ order.client.phone }}</p>
                                 </div>
                                 <div>
-                                    <span style="padding:6px 14px;font-size:.75rem;font-weight:600;border-radius:6px;
-                                        {% if order.status == 'new' %}background:rgba(0,122,255,.15);color:#007AFF;border:1px solid rgba(0,122,255,.3);
-                                        {% elif order.status == 'in_progress' %}background:rgba(255,149,0,.12);color:#ff9500;border:1px solid rgba(255,149,0,.3);
-                                        {% elif order.status == 'ready' %}background:rgba(52,199,89,.12);color:#34c759;border:1px solid rgba(52,199,89,.3);
-                                        {% elif order.status == 'completed' %}background:rgba(134,134,139,.12);color:#86868b;border:1px solid rgba(134,134,139,.3);
-                                        {% else %}background:rgba(255,59,48,.12);color:#ff3b30;border:1px solid rgba(255,59,48,.3);
-                                        {% endif %}">
+                                    <span class="status-badge
+                                        {% if order.status == 'new' %}badge-new
+                                        {% elif order.status == 'in_progress' %}badge-progress
+                                        {% elif order.status == 'ready' %}badge-ready
+                                        {% elif order.status == 'completed' %}badge-completed
+                                        {% else %}badge-cancelled{% endif %}">
                                         {{ order.get_status_display }}
                                     </span>
                                 </div>
@@ -86,3 +83,19 @@
 
     <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-1/2 divider-line"></div>
 </section>
+
+<style>
+.status-badge {
+    display: inline-block;
+    padding: 5px 14px;
+    font-size: .72rem;
+    font-weight: 600;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+.badge-new       { background: rgba(0,122,255,.15);    color: #007AFF;  border: 1px solid rgba(0,122,255,.3); }
+.badge-progress  { background: rgba(255,149,0,.12);    color: #ff9500;  border: 1px solid rgba(255,149,0,.3); }
+.badge-ready     { background: rgba(52,199,89,.12);    color: #34c759;  border: 1px solid rgba(52,199,89,.3); }
+.badge-completed { background: rgba(134,134,139,.12);  color: #86868b;  border: 1px solid rgba(134,134,139,.3); }
+.badge-cancelled { background: rgba(255,59,48,.12);    color: #ff3b30;  border: 1px solid rgba(255,59,48,.3); }
+</style>
