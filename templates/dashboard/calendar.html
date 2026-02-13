@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container dashboard-layout">
+    <div class="sidebar">
+        <a href="{% url 'dashboard:home' %}" class="sidebar-link">📊 Головна</a>
+        <a href="{% url 'dashboard:orders_list' %}" class="sidebar-link">📋 Замовлення</a>
+        <a href="{% url 'dashboard:clients_list' %}" class="sidebar-link">👥 Клієнти</a>
+        <a href="{% url 'dashboard:calendar' %}" class="sidebar-link active">📅 Календар</a>
+        <a href="{% url 'dashboard:reports' %}" class="sidebar-link">📈 Звіти</a>
+        <a href="/admin/" class="sidebar-link">⚙️ Адмін</a>
+    </div>
+    <div class="main-content">
+        <h1 style="font-size: 42px; margin-bottom: 40px;">Календар (тиждень)</h1>
+        <div class="card">
+            <table class="table">
+                <thead><tr><th>Дата</th><th>Замовлення</th></tr></thead>
+                <tbody>
+                {% for date, orders in calendar_data.items %}
+                <tr>
+                    <td><strong>{{ date|date:"d.m.Y (D)" }}</strong></td>
+                    <td>{{ orders.count }} замовлень</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

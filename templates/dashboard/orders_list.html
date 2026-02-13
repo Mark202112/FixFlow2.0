@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container dashboard-layout">
+    <div class="sidebar">
+        <a href="{% url 'dashboard:home' %}" class="sidebar-link">📊 Головна</a>
+        <a href="{% url 'dashboard:orders_list' %}" class="sidebar-link active">📋 Замовлення</a>
+        <a href="{% url 'dashboard:clients_list' %}" class="sidebar-link">👥 Клієнти</a>
+        <a href="{% url 'dashboard:calendar' %}" class="sidebar-link">📅 Календар</a>
+        <a href="{% url 'dashboard:reports' %}" class="sidebar-link">📈 Звіти</a>
+        <a href="/admin/" class="sidebar-link">⚙️ Адмін</a>
+    </div>
+    <div class="main-content">
+        <h1 style="font-size: 42px; margin-bottom: 40px;">Замовлення</h1>
+        <div class="card">
+            <form method="get" style="display: flex; gap: 10px; margin-bottom: 30px;">
+                <input type="text" name="search" class="form-control" placeholder="Пошук..." value="{{ request.GET.search }}">
+                <select name="status" class="form-control" style="width: 150px;">
+                    <option value="">Всі</option>
+                    <option value="new">Нові</option>
+                    <option value="in_progress">В роботі</option>
+                    <option value="ready">Готові</option>
+                </select>
+                <button type="submit" class="btn btn-primary">Фільтр</button>
+            </form>
+            <table class="table">
+                <thead><tr><th>Номер</th><th>Клієнт</th><th>Пристрій</th><th>Статус</th><th>Майстер</th></tr></thead>
+                <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td><a href="{% url 'dashboard:order_detail' order.order_number %}">{{ order.order_number }}</a></td>
+                    <td>{{ order.client.name }}</td>
+                    <td>{{ order.device }}</td>
+                    <td><span class="badge badge-{{ order.status }}">{{ order.get_status_display }}</span></td>
+                    <td>{{ order.assigned_master.name|default:"—" }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

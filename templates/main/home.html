@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+{% comment %}Адаптированная главная страница из TESTSITE2 (компактно) {% endcomment %}
+<section class="container mx-auto px-6 py-24 flex flex-col items-center text-center relative overflow-hidden">
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-brand-blue/5 blur-[120px] rounded-full pointer-events-none"></div>
+
+    <div class="max-w-4xl relative z-10">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded bg-brand-blue/10 border border-brand-blue/20 text-brand-blue text-[10px] font-bold uppercase tracking-[0.2em] mb-8">
+            Service Management System v1.0
+        </div>
+        <h1 class="text-5xl md:text-6xl font-bold tracking-tighter mb-8 leading-[0.95]">
+            Ремонт техніки <br> <span class="text-brand-blue italic">нового рівня.</span>
+        </h1>
+        <p class="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed">
+            Ми автоматизували процес ремонту: від онлайн-заявки до відстеження статусу в реальному часі.
+        </p>
+        <div class="flex flex-wrap justify-center gap-4">
+            <button onclick="openOrderModal()" class="bg-brand-blue px-8 py-3 rounded-sm font-bold uppercase text-xs tracking-widest hover:bg-blue-700 transition shadow-lg shadow-blue-500/20 text-white">
+                Створити замовлення
+            </button>
+            <a href="{% url 'main:check_status' %}" class="border border-white/10 px-8 py-3 rounded-sm font-bold uppercase text-xs tracking-widest hover:bg-white/5 transition text-white">
+                Перевірити статус
+            </a>
+        </div>
+    </div>
+</section>
+
+{# includes from TESTSITE2, адаптированы пути include -> main/includes #}
+{% include 'main/includes/services.html' %}
+{% include 'main/includes/process.html' %}
+{% include 'main/includes/features.html' %}
+{% include 'main/includes/service_modal.html' %}
+{% include 'main/includes/order_modal.html' %}
+
+{% endblock %}

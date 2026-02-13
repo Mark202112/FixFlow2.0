@@ -1,0 +1,35 @@
+<nav class="flex flex-col w-64 h-screen px-4 py-8 bg-white/80 backdrop-blur-md border-r border-gray-200/50 sticky top-0">
+    <div class="flex items-center px-2 mb-10">
+        <div class="w-10 h-10 bg-gradient-to-tr from-blue-600 to-indigo-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" /></svg>
+        </div>
+        <span class="ml-3 text-xl font-bold tracking-tight text-gray-800">Workshop<span class="text-blue-600">Pro</span></span>
+    </div>
+
+    <div class="space-y-2">
+        <a href="{% url 'dashboard:home' %}" class="flex items-center px-4 py-3 text-gray-600 transition-all duration-200 rounded-lg hover:bg-blue-50 hover:text-blue-700 group">
+            <svg class="w-5 h-5 opacity-70 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z" /></svg>
+            <span class="ml-4 font-medium">Огляд</span>
+        </a>
+
+        <a href="{% url 'dashboard:orders_list' %}" class="flex items-center px-4 py-3 text-gray-700 bg-blue-50/50 border border-blue-100/50 rounded-lg shadow-sm">
+            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <span class="ml-4 font-semibold text-blue-700">Замовлення</span>
+        </a>
+
+        <a href="{% url 'dashboard:clients_list' %}" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+            <span class="ml-4 font-medium text-sm">Клієнти</span>
+        </a>
+    </div>
+
+    <div class="mt-auto border-t border-gray-100 pt-4">
+        <div class="flex items-center px-2 py-3 rounded-xl bg-gray-50/50 border border-gray-100">
+            <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-xs">AD</div>
+            <div class="ml-3 overflow-hidden">
+                <p class="text-xs font-bold text-gray-800 truncate">{{ user.username }}</p>
+                <a href="{% url 'dashboard:logout' %}" class="text-[10px] text-red-500 hover:underline">Вийти</a>
+            </div>
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container" style="max-width: 600px; margin-top: 80px; text-align: center;">
+    <div class="fade-in">
+        <h1 style="font-size: 80px; margin-bottom: 20px;">✅</h1>
+        <h2>Заявку створено!</h2>
+        {% if order %}
+        <div class="card" style="margin: 40px 0;">
+            <h3 style="color: var(--primary); font-size: 32px;">{{ order.order_number }}</h3>
+            <p><strong>{{ order.device }}</strong></p>
+            <span class="badge badge-new">{{ order.get_status_display }}</span>
+        </div>
+        {% endif %}
+        <a href="{% url 'main:check_status' %}" class="btn btn-primary">Перевірити статус</a>
+    </div>
+</div>
+{% endblock %}

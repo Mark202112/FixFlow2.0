@@ -1,0 +1,32 @@
+<div class="relative pl-8 border-l-2 border-dashed border-gray-200 space-y-8">
+    {% for status_code, status_name in order.STATUS_CHOICES %}
+        <div class="relative">
+            <div class="absolute -left-[41px] top-1 w-5 h-5 rounded-full border-4 border-white shadow-sm
+                {% if order.status == status_code %}
+                    bg-blue-600 animate-pulse ring-4 ring-blue-100
+                {% elif forloop.counter0 < order.get_status_stage %}
+                    bg-green-500
+                {% else %}
+                    bg-gray-300
+                {% endif %}">
+            </div>
+            
+            <div class="bg-white/60 p-4 rounded-xl border border-gray-100 shadow-sm backdrop-blur-sm 
+                {% if order.status == status_code %} ring-1 ring-blue-500/20 shadow-blue-50 {% endif %}">
+                <div class="flex items-center justify-between">
+                    <h4 class="font-bold text-sm {% if order.status == status_code %} text-blue-700 {% elif forloop.counter0 < order.get_status_stage %} text-green-700 {% else %} text-gray-500 {% endif %}">
+                        {{ status_name }}
+                    </h4>
+                    {% if forloop.counter0 < order.get_status_stage %}
+                        <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>
+                    {% endif %}
+                </div>
+                
+                {% if order.status == status_code %}
+                    <p class="text-[11px] text-blue-500 font-medium mt-1">Зараз на цьому етапі</p>
+                    <p class="text-[10px] text-gray-400">Останнє оновлення: {{ order.updated_at|date:"H:i" }}</p>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>

@@ -1,0 +1,65 @@
+<section id="services" class="reveal-on-scroll container mx-auto px-6 py-20 border-t border-white/5 relative overflow-hidden opacity-0">
+    <div class="absolute inset-0 opacity-[0.02] pointer-events-none" 
+         style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 30px 30px;"></div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-0 relative z-10">
+        
+        <div class="group relative p-10 bg-transparent border border-white/5 transition-all duration-500 hover:bg-brand-blue/[0.03] overflow-hidden cursor-pointer"
+            onclick="openServiceModal('phones')">
+            <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" 
+                 style="background: radial-gradient(circle at center, rgba(37, 99, 235, 0.08) 0%, transparent 70%);"></div>
+            
+            <span class="absolute top-6 right-8 text-xl font-black text-white/5 group-hover:text-brand-blue/20 transition-colors">01</span>
+            
+            <div class="relative z-10">
+                <div class="w-16 h-16 bg-brand-blue/10 border border-brand-blue/20 rounded-lg flex items-center justify-center text-brand-blue mb-8 group-hover:bg-brand-blue group-hover:text-white group-hover:scale-110 transition-all duration-500 shadow-lg shadow-brand-blue/0 group-hover:shadow-brand-blue/20">
+                    <i class="fas fa-mobile-alt text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-4 uppercase tracking-tight group-hover:text-brand-blue transition-colors">Ремонт смартфонів</h3>
+                <p class="text-gray-500 text-sm leading-relaxed mb-10">Заміна екранів, батарей, камер. Ремонт після води.</p>
+                
+                <div class="pt-6 border-t border-white/5 flex justify-between items-center">
+                    <span class="text-brand-blue font-bold tracking-tight text-sm uppercase">від 250 ₴</span>
+                    <span class="text-[10px] text-gray-600 group-hover:text-brand-blue font-bold uppercase tracking-widest transition">Детальніше →</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="group relative p-10 bg-transparent border border-white/5 md:border-l-0 transition-all duration-500 hover:bg-brand-blue/[0.03] overflow-hidden cursor-pointer"
+            onclick="openServiceModal('laptops')">
+            <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" style="background: radial-gradient(circle at center, rgba(37, 99, 235, 0.08) 0%, transparent 70%);"></div>
+            <span class="absolute top-6 right-8 text-xl font-black text-white/5 group-hover:text-brand-blue/20 transition-colors">02</span>
+            
+            <div class="relative z-10">
+                <div class="w-16 h-16 bg-brand-blue/10 border border-brand-blue/20 rounded-lg flex items-center justify-center text-brand-blue mb-8 group-hover:bg-brand-blue group-hover:text-white group-hover:scale-110 transition-all duration-500 shadow-lg shadow-brand-blue/0 group-hover:shadow-brand-blue/20">
+                    <i class="fas fa-laptop text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-4 uppercase tracking-tight group-hover:text-brand-blue transition-colors">Ремонт ноутбуків</h3>
+                <p class="text-gray-500 text-sm leading-relaxed mb-10">Чистка системи охолодження, заміна комплектуючих.</p>
+                <div class="pt-6 border-t border-white/5 flex justify-between items-center">
+                    <span class="text-brand-blue font-bold tracking-tight text-sm uppercase">від 400 ₴</span>
+                    <span class="text-[10px] text-gray-600 group-hover:text-brand-blue font-bold uppercase tracking-widest transition">Детальніше →</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="group relative p-10 bg-transparent border border-white/5 md:border-l-0 transition-all duration-500 hover:bg-brand-blue/[0.03] overflow-hidden cursor-pointer"
+            onclick="openServiceModal('pc')">
+            <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" style="background: radial-gradient(circle at center, rgba(37, 99, 235, 0.08) 0%, transparent 70%);"></div>
+            <span class="absolute top-6 right-8 text-xl font-black text-white/5 group-hover:text-brand-blue/20 transition-colors">03</span>
+            
+            <div class="relative z-10">
+                <div class="w-16 h-16 bg-brand-blue/10 border border-brand-blue/20 rounded-lg flex items-center justify-center text-brand-blue mb-8 group-hover:bg-brand-blue group-hover:text-white group-hover:scale-110 transition-all duration-500 shadow-lg shadow-brand-blue/0 group-hover:shadow-brand-blue/20">
+                    <i class="fas fa-desktop text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-4 uppercase tracking-tight group-hover:text-brand-blue transition-colors">Ремонт ПК</h3>
+                <p class="text-gray-500 text-sm leading-relaxed mb-10">Збірка, модернізація, встановлення ОС.</p>
+                <div class="pt-6 border-t border-white/5 flex justify-between items-center">
+                    <span class="text-brand-blue font-bold tracking-tight text-sm uppercase">від 300 ₴</span>
+                    <span class="text-[10px] text-gray-600 group-hover:text-brand-blue font-bold uppercase tracking-widest transition">Детальніше →</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>

@@ -1,0 +1,100 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Ремонтна Майстерня{% endblock %}</title>
+    <!-- Tailwind CDN (keeps styling from TESTSITE2 templates) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #070b1d; color: #ffffff; }
+        /* Brand tokens used by copied templates */
+        :root{
+            --bg-main: #070b1d;
+            --bg-footer: #0a0f2c;
+            --brand-blue: #2563eb;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+    <nav class="border-b border-white/5 bg-bg-main/80 backdrop-blur-md sticky top-0 z-50 py-4">
+        <div class="container mx-auto px-6 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <a href="/" class="flex items-center gap-3">
+                    <img src="{% static 'images/logo 11.png' %}"
+                        alt="FixFlow Logo"
+                        class="h-8 w-auto invert">
+                    <span class="font-bold text-lg uppercase tracking-tight">FixFlow</span>
+                </a>
+            </div>
+
+            <div class="hidden md:flex gap-8 text-xs font-bold uppercase tracking-widest text-gray-400">
+                <a href="{% url 'main:home' %}" class="hover:text-brand-blue transition">Головна</a>
+                <a href="{% url 'main:check_status' %}" class="hover:text-brand-blue transition">Статус замовлення</a>
+            </div>
+            {% if user.is_authenticated %}
+                <a href="{% url 'dashboard:home' %}" class="bg-brand-blue px-4 py-2 rounded text-xs font-bold uppercase hover:bg-blue-700 transition">Dashboard</a>
+            {% else %}
+                <a href="{% url 'dashboard:login' %}" class="bg-brand-blue px-4 py-2 rounded text-xs font-bold uppercase hover:bg-blue-700 transition">Вхід</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    {% if messages %}
+    <div class="container mx-auto px-6 mt-4">
+        {% for message in messages %}
+        <div class="bg-[#0a0f2c]/90 border border-brand-blue/50 text-white px-4 py-2 rounded mb-2">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+
+    <footer class="bg-bg-footer border-t border-white/5 pt-16 pb-8 mt-12">
+        <div class="container mx-auto px-6 text-left text-[12px] text-gray-400">
+            <div class="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p>© 2026 Майстерня. Всі права захищені.</p>
+                <div class="flex gap-6">
+                    <a href="#" class="hover:text-white transition">Політика конфіденційності</a>
+                    <a href="#" class="hover:text-white transition">Умови використання</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+    // Reveal-on-scroll: плавное появление секций (IntersectionObserver)
+    document.addEventListener('DOMContentLoaded', function(){
+        try {
+            const reveals = document.querySelectorAll('.reveal-on-scroll');
+            if (!reveals.length) return;
+            if ('IntersectionObserver' in window) {
+                const io = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.remove('opacity-0');
+                            entry.target.classList.add('fade-in');
+                            // небольшой ступенчатый эффект для дочерних group-элементов
+                            const items = entry.target.querySelectorAll('.group');
+                            items.forEach((el, idx) => {
+                                setTimeout(() => el.classList.add('animate-zoom-in'), idx * 80);
+                            });
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.15 });
+                reveals.forEach(r => io.observe(r));
+            } else {
+                reveals.forEach(r => { r.classList.remove('opacity-0'); r.classList.add('fade-in'); });
+            }
+        } catch (e) {
+            console.error('reveal-on-scroll error', e);
+        }
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container dashboard-layout">
+    <div class="sidebar">
+        <a href="{% url 'dashboard:home' %}" class="sidebar-link">📊 Головна</a>
+        <a href="{% url 'dashboard:orders_list' %}" class="sidebar-link">📋 Замовлення</a>
+        <a href="{% url 'dashboard:clients_list' %}" class="sidebar-link active">👥 Клієнти</a>
+        <a href="{% url 'dashboard:calendar' %}" class="sidebar-link">📅 Календар</a>
+        <a href="{% url 'dashboard:reports' %}" class="sidebar-link">📈 Звіти</a>
+        <a href="/admin/" class="sidebar-link">⚙️ Адмін</a>
+    </div>
+    <div class="main-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+            <h1 style="font-size: 42px;">Клієнти</h1>
+            <a href="{% url 'dashboard:create_client' %}" class="btn btn-primary">+ Додати</a>
+        </div>
+        <div class="card">
+            <table class="table">
+                <thead><tr><th>Ім'я</th><th>Телефон</th><th>Email</th><th>Замовлень</th></tr></thead>
+                <tbody>
+                {% for client in clients %}
+                <tr>
+                    <td><strong>{{ client.name }}</strong></td>
+                    <td>{{ client.phone }}</td>
+                    <td>{{ client.email|default:"—" }}</td>
+                    <td><span class="badge" style="background: var(--primary); color: white;">{{ client.orders_count }}</span></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

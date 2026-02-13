@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container" style="max-width: 600px; margin-top: 60px;">
+    <div class="card fade-in">
+        <h2>Створити заявку</h2>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Ваше ім'я</label>
+                <input type="text" name="name" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label>Телефон</label>
+                <input type="tel" name="phone" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label>Email (необов'язково)</label>
+                <input type="email" name="email" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Пристрій</label>
+                <input type="text" name="device" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label>Опис проблеми</label>
+                <textarea name="problem" class="form-control" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Створити</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

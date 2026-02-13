@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container dashboard-layout">
+    <div class="sidebar">
+        <a href="{% url 'dashboard:home' %}" class="sidebar-link">📊 Головна</a>
+        <a href="{% url 'dashboard:orders_list' %}" class="sidebar-link">📋 Замовлення</a>
+        <a href="{% url 'dashboard:clients_list' %}" class="sidebar-link">👥 Клієнти</a>
+        <a href="{% url 'dashboard:calendar' %}" class="sidebar-link">📅 Календар</a>
+        <a href="{% url 'dashboard:reports' %}" class="sidebar-link active">📈 Звіти</a>
+        <a href="/admin/" class="sidebar-link">⚙️ Адмін</a>
+    </div>
+    <div class="main-content">
+        <h1 style="font-size: 42px; margin-bottom: 40px;">Звіти</h1>
+        <div class="card">
+            <form method="get" style="display: flex; gap: 10px; margin-bottom: 30px;">
+                <input type="date" name="start_date" class="form-control" value="{{ request.GET.start_date }}">
+                <input type="date" name="end_date" class="form-control" value="{{ request.GET.end_date }}">
+                <button type="submit" class="btn btn-primary">Фільтр</button>
+            </form>
+            <h3>Статистика по майстрам</h3>
+            <table class="table">
+                <thead><tr><th>Майстер</th><th>Завершено</th></tr></thead>
+                <tbody>
+                {% for master in masters_stats %}
+                <tr>
+                    <td>{{ master.name }}</td>
+                    <td>{{ master.total_orders }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

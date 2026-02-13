@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark">Панель управления</h2>
+        <form class="d-flex shadow-sm" method="GET" action="">
+            <input type="hidden" name="tab" value="{{ current_tab }}">
+            <input class="form-control me-2" type="search" name="search" placeholder="Поиск..." value="{{ request.GET.search }}">
+            <button class="btn btn-primary" type="submit">Найти</button>
+        </form>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white shadow border-0">
+                <div class="card-body text-center">
+                    <h6 class="small fw-bold">ВСЕГО</h6>
+                    <h2 class="fw-bold">{{ total_orders }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark shadow border-0">
+                <div class="card-body text-center">
+                    <h6 class="small fw-bold">НОВЫЕ</h6>
+                    <h2 class="fw-bold">{{ new_orders }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white shadow border-0">
+                <div class="card-body text-center">
+                    <h6 class="small fw-bold">В РАБОТЕ</h6>
+                    <h2 class="fw-bold">{{ in_progress_orders }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white shadow border-0">
+                <div class="card-body text-center">
+                    <h6 class="small fw-bold">ГОТОВО</h6>
+                    <h2 class="fw-bold">{{ completed_orders }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="btn-group mb-3 shadow-sm">
+        <a href="?tab=active" class="btn btn-{% if current_tab == 'active' %}primary{% else %}outline-primary{% endif %} px-4">
+            Активные заявки
+        </a>
+        <a href="?tab=archive" class="btn btn-{% if current_tab == 'archive' %}primary{% else %}outline-primary{% endif %} px-4">
+            Архив (Готовые)
+        </a>
+        <a href="?tab=all" class="btn btn-{% if current_tab == 'all' %}primary{% else %}outline-primary{% endif %} px-4">
+            Все записи
+        </a>
+    </div>
+
+    <div class="card shadow border-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Устройство</th>
+                        <th>Клиент</th>
+                        <th>Статус</th>
+                        <th>Дата</th>
+                        <th class="text-center">Управление</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in recent_orders %}
+                    <tr>
+                        <td><span class="text-muted small">#{{ order.id }}</span></td>
+                        <td><strong>{{ order.device }}</strong></td>
+                        <td>
+                            <a href="#" class="text-primary fw-bold text-decoration-none" data-bs-toggle="modal" data-bs-target="#modal{{ order.id }}">
+                                {{ order.client.name }} 👁️
+                            </a>
+                        </td>
+                        <td>
+                            {% if order.status == 'new' %}
+                                <span class="badge rounded-pill bg-warning text-dark">Новая</span>
+                            {% elif order.status == 'in_progress' %}
+                                <span class="badge rounded-pill bg-info">В работе</span>
+                            {% else %}
+                                <span class="badge rounded-pill bg-success">Готово</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ order.created_at|date:"d.m.Y H:i" }}</td>
+                        <td class="text-center">
+                            <div class="btn-group shadow-sm">
+                                {% if order.status == 'new' %}
+                                    <a href="{% url 'change_status' order.id 'in_progress' %}" class="btn btn-sm btn-outline-info">В работу</a>
+                                {% endif %}
+                                {% if order.status != 'completed' %}
+                                    <a href="{% url 'change_status' order.id 'completed' %}" class="btn btn-sm btn-outline-success">Завершить</a>
+                                {% endif %}
+                                <a href="/admin/core/order/{{ order.id }}/change/" class="btn btn-sm btn-outline-secondary">⚙</a>
+                                <a href="{% url 'delete_order' order.id %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Удалить?')">🗑</a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <div class="modal fade" id="modal{{ order.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content shadow">
+                                <div class="modal-header bg-light">
+                                    <h5 class="modal-title fw-bold">Детали заказа #{{ order.id }}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p><strong>Устройство:</strong> {{ order.device }}</p>
+                                    <p><strong>Клиент:</strong> {{ order.client.name }}</p>
+                                    <p><strong>Телефон:</strong> {{ order.client.phone }}</p>
+                                    <hr>
+                                    <p class="bg-light p-3 rounded border">{{ order.description }}</p>
+                                </div>
+                                <div class="modal-footer border-0">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">В этой категории заявок нет</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

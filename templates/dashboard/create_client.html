@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container" style="max-width: 600px; margin-top: 60px;">
+    <div class="card">
+        <h2>Додати клієнта</h2>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Ім'я</label>
+                <input type="text" name="name" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label>Телефон</label>
+                <input type="tel" name="phone" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary">Додати</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
