@@ -1,41 +1,50 @@
 <!-- ═══════════════════════ SERVICE MODAL ═══════════════════════ -->
-<div id="serviceModal" class="fixed inset-0 z-[100]" style="display:none;">
-    <!-- Overlay -->
-    <div id="modalOverlay"
-         onclick="closeServiceModal()"
-         class="absolute inset-0 transition-opacity duration-300 opacity-0"
-         style="background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);"></div>
+<div id="serviceModal" style="display:none; position:fixed; inset:0; z-index:8000;">
 
-    <!-- Modal -->
-    <div class="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
-        <div id="modalContainer"
-             class="relative w-full max-w-lg p-8 md:p-10 shadow-2xl transform transition-all duration-300 scale-95 opacity-0 pointer-events-auto"
-             style="background: #1A1A1B; border: 1px solid rgba(0,122,255,0.35);">
+    <!-- Overlay — click outside to close -->
+    <div id="svcOverlay" onclick="closeServiceModal()"
+         style="position:absolute; inset:0;
+                background:rgba(0,0,0,0); backdrop-filter:blur(0px);
+                transition:background .35s ease, backdrop-filter .35s ease;"></div>
 
-            <!-- Blue accent line top -->
-            <div class="absolute top-0 left-0 right-0 h-0.5"
-                 style="background: linear-gradient(to right, transparent, #007AFF, transparent);"></div>
+    <!-- Centered container -->
+    <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; padding:16px; pointer-events:none;">
+        <div id="svcContainer"
+             style="pointer-events:auto; width:100%; max-width:560px; max-height:90vh; overflow-y:auto;
+                    position:relative; background:#1A1A1B;
+                    border:1px solid rgba(0,122,255,0.35);
+                    box-shadow:0 32px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(0,122,255,0.08);
+                    opacity:0; transform:scale(.94) translateY(16px);
+                    transition:opacity .32s cubic-bezier(.16,1,.3,1), transform .32s cubic-bezier(.16,1,.3,1);
+                    scrollbar-width:thin; scrollbar-color:rgba(0,122,255,.3) transparent;">
 
-            <!-- Close -->
-            <button onclick="closeServiceModal()"
-                    class="absolute top-5 right-5 w-8 h-8 flex items-center justify-center text-gray-500 hover:text-white transition-all duration-300 hover:rotate-90"
-                    style="border: 1px solid rgba(255,255,255,0.1);">
-                <i class="fas fa-times text-sm"></i>
+            <!-- Top accent line -->
+            <div style="position:absolute;top:0;left:0;right:0;height:2px;
+                        background:linear-gradient(90deg,transparent,#007AFF 40%,#007AFF 60%,transparent);"></div>
+
+            <!-- Close X -->
+            <button onclick="closeServiceModal()" id="svcCloseBtn"
+                    style="position:absolute;top:16px;right:16px;z-index:10;width:34px;height:34px;
+                           border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);
+                           color:#6b7280;cursor:pointer;display:flex;align-items:center;justify-content:center;
+                           transition:color .2s,background .2s,transform .25s,border-color .2s;"
+                    onmouseover="this.style.color='#fff';this.style.background='rgba(255,255,255,.1)';this.style.transform='rotate(90deg)';this.style.borderColor='rgba(255,255,255,.25)'"
+                    onmouseout="this.style.color='#6b7280';this.style.background='rgba(255,255,255,.04)';this.style.transform='rotate(0)';this.style.borderColor='rgba(255,255,255,.1)'">
+                <i class="fas fa-times" style="font-size:.8rem;"></i>
             </button>
 
             <!-- Dynamic content -->
-            <div id="modalData" class="space-y-5"></div>
+            <div id="svcContent" style="padding:36px 36px 0;"></div>
 
-            <div class="mt-8 pt-6 flex flex-col sm:flex-row gap-3" style="border-top: 1px solid rgba(255,255,255,0.05);">
-                <button onclick="openOrderModal(); closeServiceModal();"
-                        class="flex-1 py-3 text-white text-sm font-semibold transition-all duration-300 hover:opacity-90 rounded-xl"
-                        style="background: #007AFF; box-shadow: 0 0 16px rgba(0,122,255,0.25);">
-                    <i class="fas fa-plus mr-2"></i>
+            <!-- Footer -->
+            <div style="padding:24px 36px 32px;display:flex;gap:12px;flex-wrap:wrap;
+                        border-top:1px solid rgba(255,255,255,.05);margin-top:28px;">
+                <button onclick="openOrderModal();closeServiceModal();" class="btn-primary"
+                        style="flex:1;min-width:160px;padding:13px 24px;">
                     Залишити заявку
                 </button>
-                <button onclick="closeServiceModal()"
-                        class="px-6 py-3 text-gray-400 hover:text-white text-sm font-medium transition-colors rounded-xl"
-                        style="border: 1px solid rgba(255,255,255,0.1);">
+                <button onclick="closeServiceModal()" class="btn-outline"
+                        style="padding:13px 24px;">
                     Закрити
                 </button>
             </div>
@@ -43,105 +52,94 @@
     </div>
 </div>
 
+<style>
+#svcContainer::-webkit-scrollbar{width:4px;}
+#svcContainer::-webkit-scrollbar-track{background:transparent;}
+#svcContainer::-webkit-scrollbar-thumb{background:rgba(0,122,255,.3);border-radius:2px;}
+@keyframes featureIn{to{opacity:1;transform:translateX(0);}}
+</style>
+
 <script>
 const serviceInfo = {
-    'phones': {
-        icon: 'fa-mobile-alt',
-        title: 'Ремонт смартфонів',
-        text: 'Професійне відновлення смартфонів будь-якої складності. Підтримка всіх моделей iPhone, Samsung, Xiaomi та інших брендів.',
-        price: 'від 250 ₴',
-        features: [
-            'Заміна екрана (OLED / LCD)',
-            'Заміна акумулятора',
-            'Ремонт після залиття',
-            'Заміна камери та мікрофона',
-            'Ремонт роз\'ємів та кнопок'
-        ]
-    },
-    'laptops': {
-        icon: 'fa-laptop',
-        title: 'Ремонт ноутбуків',
-        text: 'Комплексне обслуговування ноутбуків усіх брендів: Apple, ASUS, Dell, HP, Lenovo та інших.',
-        price: 'від 400 ₴',
-        features: [
-            'Чистка та заміна термопасти',
-            'Ремонт та заміна матриці',
-            'Заміна клавіатури',
-            'Ремонт материнської плати',
-            'Апгрейд RAM та SSD'
-        ]
-    },
-    'pc': {
-        icon: 'fa-desktop',
-        title: 'Ремонт ПК',
-        text: 'Діагностика, ремонт та модернізація стаціонарних комп\'ютерів. Gaming PC та робочі станції.',
-        price: 'від 300 ₴',
-        features: [
-            'Апгрейд компонентів',
-            'Збірка під ключ',
-            'Встановлення ОС та ПЗ',
-            'Видалення вірусів',
-            'Налаштування продуктивності'
-        ]
-    }
+    phones:{num:'01',icon:'fa-mobile-alt',label:'Смартфони',title:'Ремонт смартфонів',price:'від 250 ₴',time:'30 хв – 2 год',warranty:'12 місяців',
+        desc:'Професійне відновлення смартфонів будь-якої складності. Працюємо з усіма моделями iPhone, Samsung, Xiaomi, Huawei та інших брендів.',
+        features:['Заміна екрана (OLED / LCD / AMOLED)','Заміна акумулятора','Ремонт після залиття водою','Заміна камери та мікрофона','Ремонт роз\'ємів та кнопок','Відновлення після механічних пошкоджень']},
+    laptops:{num:'02',icon:'fa-laptop',label:'Ноутбуки',title:'Ремонт ноутбуків',price:'від 400 ₴',time:'1 – 48 год',warranty:'12 місяців',
+        desc:'Комплексне обслуговування ноутбуків усіх брендів: Apple MacBook, ASUS, Dell, HP, Lenovo, Acer та інших. Мікропайка та відновлення материнських плат.',
+        features:['Чистка та заміна термопасти','Ремонт та заміна матриці','Заміна клавіатури','Ремонт материнської плати (мікропайка)','Апгрейд RAM та SSD','Заміна акумулятора']},
+    pc:{num:'03',icon:'fa-desktop',label:'ПК',title:'Ремонт ПК',price:'від 300 ₴',time:'1 – 24 год',warranty:'12 місяців',
+        desc:'Діагностика, ремонт та модернізація стаціонарних комп\'ютерів будь-якої конфігурації. Gaming PC, робочі станції, сервери.',
+        features:['Апгрейд відеокарти, RAM, CPU','Збірка ПК під ключ за бюджетом','Встановлення Windows / Linux','Видалення вірусів та оптимізація','Ремонт блоку живлення','Налаштування охолодження']},
+    data:{num:'04',icon:'fa-hdd',label:'Відновлення',title:'Відновлення даних',price:'від 800 ₴',time:'2 – 72 год',warranty:'Гарантія результату',
+        desc:'Професійне відновлення інформації з пошкоджених носіїв: HDD, SSD, флешки, карти пам\'яті. Навіть після фізичного пошкодження.',
+        features:['Відновлення з HDD та SSD','Відновлення з флешок та карт пам\'яті','Відновлення після форматування','Відновлення після вірусного ураження','Відновлення з механічно пошкоджених носіїв','Безкоштовна діагностика']},
+    software:{num:'05',icon:'fa-cog',label:'Програмне ПЗ',title:'Налаштування ПЗ',price:'від 200 ₴',time:'30 хв – 3 год',warranty:'3 місяці',
+        desc:'Оптимізація ОС, встановлення програм, повне видалення вірусів та шкідливого ПЗ. Працюємо з Windows та macOS.',
+        features:['Встановлення та активація Windows / macOS','Видалення вірусів та рекламного ПЗ','Оптимізація швидкодії системи','Встановлення та налаштування програм','Налаштування мережі та Інтернету','Резервне копіювання даних']},
+    express:{num:'06',icon:'fa-bolt',label:'Терміново',title:'Експрес-сервіс',price:'+50% до ціни',time:'30 хв – 3 год',warranty:'12 місяців',
+        desc:'Терміновий ремонт у пріоритетному порядку без черги. Ваш пристрій беруть у роботу негайно. Доступно щодня, у вихідні та святкові дні.',
+        features:['Пріоритетна обробка без черги','Виконання у день звернення','Доступно 7 днів на тиждень','Для всіх видів ремонту','SMS-повідомлення про готовність','Та сама гарантія якості']}
 };
 
-function openServiceModal(id) {
-    const data      = serviceInfo[id];
-    const modal     = document.getElementById('serviceModal');
-    const container = document.getElementById('modalContainer');
-    const overlay   = document.getElementById('modalOverlay');
-
-    document.getElementById('modalData').innerHTML = `
-        <div class="flex items-center gap-4 mb-2">
-            <div class="w-14 h-14 flex items-center justify-center flex-shrink-0"
-                 style="background: rgba(0,122,255,0.1); border: 1px solid rgba(0,122,255,0.3); color:#007AFF;">
-                <i class="fas ${data.icon} text-2xl"></i>
-            </div>
-            <div>
-                <span class="block text-[10px] font-bold uppercase tracking-[0.25em] mb-1" style="color:#007AFF;">Послуга</span>
-                <h2 class="text-2xl font-bold text-white tracking-tight">${data.title}</h2>
-            </div>
-        </div>
-        <div class="h-px" style="background: linear-gradient(to right, rgba(0,122,255,0.4), transparent);"></div>
-        <p class="text-gray-400 text-sm leading-relaxed">${data.text}</p>
-        <ul class="space-y-2.5">
-            ${data.features.map(f => `
-            <li class="flex items-center gap-3 text-sm text-gray-300">
-                <i class="fas fa-check text-[10px] flex-shrink-0" style="color:#007AFF;"></i>
-                ${f}
-            </li>`).join('')}
-        </ul>
-        <div class="flex items-baseline gap-3 p-4" style="background: rgba(0,122,255,0.06); border: 1px solid rgba(0,122,255,0.2);">
-            <span class="text-[10px] font-bold uppercase tracking-widest text-gray-500">Орієнтовна вартість:</span>
-            <span class="text-2xl font-black text-white">${data.price}</span>
-        </div>
-    `;
-
-    modal.style.display = 'block';
-    document.body.style.overflow = 'hidden';
-
-    requestAnimationFrame(() => {
-        overlay.classList.add('opacity-100');
-        overlay.classList.remove('opacity-0');
-        container.classList.remove('scale-95', 'opacity-0');
-        container.classList.add('scale-100', 'opacity-100');
-    });
+function openServiceModal(id){
+    var d=serviceInfo[id];
+    var modal=document.getElementById('serviceModal');
+    var cnt=document.getElementById('svcContainer');
+    var ovl=document.getElementById('svcOverlay');
+    document.getElementById('svcContent').innerHTML=
+        '<div style="display:flex;align-items:flex-start;gap:16px;margin-bottom:24px;">'+
+            '<div style="width:54px;height:54px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:rgba(0,122,255,.1);border:1px solid rgba(0,122,255,.3);border-radius:10px;color:#007AFF;">'+
+                '<i class="fas '+d.icon+'" style="font-size:1.4rem;"></i>'+
+            '</div>'+
+            '<div style="flex:1;">'+
+                '<span style="display:block;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.2em;color:#007AFF;margin-bottom:5px;">'+d.label+'</span>'+
+                '<h2 style="color:#fff;font-size:1.45rem;font-weight:700;line-height:1.2;margin:0;">'+d.title+'</h2>'+
+            '</div>'+
+            '<span style="padding-right:42px;font-size:.65rem;font-weight:700;color:rgba(255,255,255,.07);margin-top:2px;">'+d.num+'</span>'+
+        '</div>'+
+        '<div style="height:1px;background:linear-gradient(90deg,rgba(0,122,255,.4),transparent);margin-bottom:20px;"></div>'+
+        '<p style="color:#9ca3af;font-size:.875rem;line-height:1.75;margin-bottom:22px;">'+d.desc+'</p>'+
+        '<ul style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px;list-style:none;padding:0;">'+
+            d.features.map(function(f,i){return(
+                '<li style="display:flex;align-items:center;gap:12px;color:#d1d5db;font-size:.875rem;opacity:0;transform:translateX(-8px);animation:featureIn .3s ease forwards;animation-delay:'+(.05+i*.06)+'s;">'+
+                    '<span style="width:20px;height:20px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:rgba(0,122,255,.12);border-radius:4px;">'+
+                        '<i class="fas fa-check" style="font-size:.5rem;color:#007AFF;"></i>'+
+                    '</span>'+f+'</li>'
+            );}).join('')+
+        '</ul>'+
+        '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">'+
+            [
+                {l:'Вартість',v:d.price},
+                {l:'Час',v:d.time},
+                {l:'Гарантія',v:d.warranty}
+            ].map(function(s){return(
+                '<div style="padding:14px 12px;background:rgba(0,122,255,.06);border:1px solid rgba(0,122,255,.18);border-radius:10px;text-align:center;">'+
+                    '<p style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#6b7280;margin-bottom:6px;">'+s.l+'</p>'+
+                    '<p style="color:#fff;font-size:.95rem;font-weight:700;">'+s.v+'</p>'+
+                '</div>'
+            );}).join('')+
+        '</div>';
+    modal.style.display='block';
+    document.body.style.overflow='hidden';
+    cnt.scrollTop=0;
+    requestAnimationFrame(function(){requestAnimationFrame(function(){
+        ovl.style.background='rgba(0,0,0,0.72)';
+        ovl.style.backdropFilter='blur(8px)';
+        cnt.style.opacity='1';
+        cnt.style.transform='scale(1) translateY(0)';
+    });});
 }
 
-function closeServiceModal() {
-    const modal     = document.getElementById('serviceModal');
-    const container = document.getElementById('modalContainer');
-    const overlay   = document.getElementById('modalOverlay');
-
-    overlay.classList.remove('opacity-100');
-    overlay.classList.add('opacity-0');
-    container.classList.remove('scale-100', 'opacity-100');
-    container.classList.add('scale-95', 'opacity-0');
-
-    setTimeout(() => {
-        modal.style.display = 'none';
-        document.body.style.overflow = '';
-    }, 300);
+function closeServiceModal(){
+    var modal=document.getElementById('serviceModal');
+    var cnt=document.getElementById('svcContainer');
+    var ovl=document.getElementById('svcOverlay');
+    ovl.style.background='rgba(0,0,0,0)';
+    ovl.style.backdropFilter='blur(0px)';
+    cnt.style.opacity='0';
+    cnt.style.transform='scale(.94) translateY(16px)';
+    setTimeout(function(){modal.style.display='none';document.body.style.overflow='';},340);
 }
+
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeServiceModal();});
 </script>
