@@ -43,18 +43,13 @@
                 <!-- CTA buttons -->
                 <div class="flex flex-col sm:flex-row gap-4 mb-14">
                     <button onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})"
-                            class="glow-btn flex items-center justify-center gap-2 px-8 py-4 text-white text-sm font-semibold transition-all duration-300 hover:opacity-90 hover:scale-[1.03] active:scale-[0.97] rounded-xl"
-                            style="background: #007AFF;">
-                        <i class="fas fa-arrow-down text-xs"></i>
+                            class="btn-primary">
                         Залишити заявку
                     </button>
-                    <a href="#status"
-                       onclick="document.getElementById('status').scrollIntoView({behavior:'smooth'}); return false;"
-                       class="flex items-center justify-center gap-2 px-8 py-4 text-white text-sm font-semibold transition-all duration-300 hover:bg-white/5 rounded-xl"
-                       style="border: 2px solid rgba(255,255,255,0.2);">
-                        <i class="fas fa-search text-xs"></i>
+                    <button onclick="document.getElementById('status').scrollIntoView({behavior:'smooth'})"
+                            class="btn-outline">
                         Перевірити статус
-                    </a>
+                    </button>
                 </div>
 
                 <!-- Stats row -->
@@ -85,7 +80,7 @@
                     <div class="relative overflow-hidden" style="border: 1px solid rgba(0,122,255,0.25);">
                         <div class="absolute inset-0 pointer-events-none z-10"
                              style="background: linear-gradient(135deg, rgba(42,42,45,0.2) 0%, transparent 60%);"></div>
-                        <img src="{% static 'images/site/hero.jpg' %}"
+                        <img src="https://images.unsplash.com/photo-1709102884400-b50ca1a12bc3?w=800&q=80&fit=crop"
                              alt="Ремонт техніки"
                              class="w-full h-auto block"
                              loading="lazy">
