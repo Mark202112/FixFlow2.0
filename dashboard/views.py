@@ -64,6 +64,17 @@ def orders_list(request):
 def order_detail(request, order_number):
     """Деталі замовлення"""
     order = get_object_or_404(Order, order_number=order_number)
+    if request.method == 'POST':
+        status = request.POST.get('status')
+        price  = request.POST.get('price')
+        if status:
+            order.status = status
+        if price:
+            try:
+                order.price = float(price)
+            except ValueError:
+                pass
+        order.save()
     return render(request, 'dashboard/order_detail.html', {'order': order})
 
 @login_required
@@ -81,9 +92,20 @@ def clients_list(request):
     })
 
 # --- Тимчасові заглушки для авторизації ---
-def login_view(request): 
-    # Тут краще зробити справжню авторизацію пізніше
-    return render(request, 'dashboard/login.html')
+def login_view(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard:home')
+    error = None
+    if request.method == 'POST':
+        from django.contrib.auth import authenticate, login
+        user = authenticate(request,
+                            username=request.POST.get('username',''),
+                            password=request.POST.get('password',''))
+        if user is not None:
+            login(request, user)
+            return redirect('dashboard:home')
+        error = 'Невірний логін або пароль'
+    return render(request, 'dashboard/login.html', {'error': error})
 
 def logout_view(request): 
     from django.contrib.auth import logout

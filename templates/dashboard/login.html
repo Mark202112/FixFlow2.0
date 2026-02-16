@@ -1,20 +1,132 @@
 {% extends 'base.html' %}
+{% load static %}
+{% block title %}Вхід — FixFlow{% endblock %}
+
 {% block content %}
-<div class="container" style="max-width: 450px; margin-top: 100px;">
-    <div class="card fade-in" style="text-align: center;">
-        <h2>Вхід для персоналу</h2>
-        <form method="post" style="margin-top: 30px;">
-            {% csrf_token %}
-            <div class="form-group" style="text-align: left;">
-                <label>Логін</label>
-                <input type="text" name="username" class="form-control" required>
+<div style="min-height:calc(100vh - 72px); display:flex; align-items:center; justify-content:center; padding:40px 16px;
+            background-color:#1A1A1B;
+            background-image:radial-gradient(rgba(255,255,255,0.045) 1px, transparent 1px);
+            background-size:30px 30px;">
+
+    <!-- Glow blob -->
+    <div style="position:fixed; top:30%; left:50%; transform:translate(-50%,-50%);
+                width:600px; height:400px; border-radius:50%;
+                background:rgba(0,122,255,0.07); filter:blur(90px); pointer-events:none; z-index:0;"></div>
+
+    <div style="position:relative; z-index:1; width:100%; max-width:420px;">
+
+        <!-- Logo -->
+        <div style="text-align:center; margin-bottom:36px;">
+            <a href="{% url 'main:home' %}" style="text-decoration:none; display:inline-flex; align-items:center; gap:10px;">
+                <div style="width:44px; height:44px; border-radius:11px; display:flex; align-items:center; justify-content:center;
+                            background:linear-gradient(135deg,#2A2A2D 0%,#007AFF 100%);">
+                    <i class="fas fa-microchip" style="color:#fff; font-size:1.1rem;"></i>
+                </div>
+                <span style="font-size:1.4rem; font-weight:700; letter-spacing:-0.02em;">
+                    <span style="color:#fff;">Fix</span><span style="color:#007AFF;">Flow</span>
+                </span>
+            </a>
+            <p style="color:#6b7280; font-size:.8rem; margin-top:10px; letter-spacing:.05em;">ПАНЕЛЬ ПЕРСОНАЛУ</p>
+        </div>
+
+        <!-- Card -->
+        <div style="background:#1A1A1B; border:1px solid rgba(0,122,255,0.3);
+                    box-shadow:0 24px 64px rgba(0,0,0,0.6), 0 0 0 1px rgba(0,122,255,0.08);
+                    padding:40px; position:relative; overflow:hidden;">
+
+            <!-- Top accent -->
+            <div style="position:absolute;top:0;left:0;right:0;height:2px;
+                        background:linear-gradient(90deg,transparent,#007AFF 40%,#007AFF 60%,transparent);"></div>
+
+            <h1 style="color:#fff; font-size:1.5rem; font-weight:700; margin-bottom:6px; letter-spacing:-0.01em;">Вхід</h1>
+            <p style="color:#6b7280; font-size:.875rem; margin-bottom:32px;">Введіть дані для доступу до системи</p>
+
+            {% if error %}
+            <div style="padding:12px 16px; margin-bottom:20px; border-radius:8px;
+                        background:rgba(255,59,48,0.1); border:1px solid rgba(255,59,48,0.3);
+                        display:flex; align-items:center; gap:10px; color:#ff3b30; font-size:.875rem;">
+                <i class="fas fa-exclamation-circle" style="flex-shrink:0;"></i>
+                {{ error }}
             </div>
-            <div class="form-group" style="text-align: left;">
-                <label>Пароль</label>
-                <input type="password" name="password" class="form-control" required>
+            {% endif %}
+
+            <form method="POST" action="{% url 'dashboard:login' %}" id="login-form">
+                {% csrf_token %}
+
+                <div style="margin-bottom:18px;">
+                    <label style="display:block; font-size:.65rem; font-weight:700; text-transform:uppercase;
+                                  letter-spacing:.18em; color:#007AFF; margin-bottom:8px;">Логін</label>
+                    <div style="position:relative;">
+                        <i class="fas fa-user" style="position:absolute; left:14px; top:50%; transform:translateY(-50%);
+                                                       color:#4b5563; font-size:.8rem; pointer-events:none;"></i>
+                        <input type="text" name="username" required autofocus
+                               placeholder="Ім'я користувача"
+                               style="width:100%; padding:13px 16px 13px 40px; background:rgba(42,42,45,0.5);
+                                      border:1px solid rgba(255,255,255,0.08); border-radius:10px;
+                                      color:#fff; font-size:.9rem; outline:none; box-sizing:border-box;
+                                      transition:border-color .2s, box-shadow .2s;"
+                               onfocus="this.style.borderColor='rgba(0,122,255,0.7)';this.style.boxShadow='0 0 0 3px rgba(0,122,255,0.12)'"
+                               onblur="this.style.borderColor='rgba(255,255,255,0.08)';this.style.boxShadow='none'">
+                    </div>
+                </div>
+
+                <div style="margin-bottom:28px;">
+                    <label style="display:block; font-size:.65rem; font-weight:700; text-transform:uppercase;
+                                  letter-spacing:.18em; color:#007AFF; margin-bottom:8px;">Пароль</label>
+                    <div style="position:relative;">
+                        <i class="fas fa-lock" style="position:absolute; left:14px; top:50%; transform:translateY(-50%);
+                                                       color:#4b5563; font-size:.8rem; pointer-events:none;"></i>
+                        <input type="password" name="password" required id="pass-input"
+                               placeholder="••••••••"
+                               style="width:100%; padding:13px 44px 13px 40px; background:rgba(42,42,45,0.5);
+                                      border:1px solid rgba(255,255,255,0.08); border-radius:10px;
+                                      color:#fff; font-size:.9rem; outline:none; box-sizing:border-box;
+                                      transition:border-color .2s, box-shadow .2s;"
+                               onfocus="this.style.borderColor='rgba(0,122,255,0.7)';this.style.boxShadow='0 0 0 3px rgba(0,122,255,0.12)'"
+                               onblur="this.style.borderColor='rgba(255,255,255,0.08)';this.style.boxShadow='none'">
+                        <!-- Eye toggle -->
+                        <button type="button" onclick="togglePass()"
+                                style="position:absolute; right:14px; top:50%; transform:translateY(-50%);
+                                       background:none; border:none; color:#4b5563; cursor:pointer; padding:0;
+                                       transition:color .2s; font-size:.8rem;"
+                                onmouseover="this.style.color='#9ca3af'"
+                                onmouseout="this.style.color='#4b5563'">
+                            <i class="fas fa-eye" id="eye-icon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary" style="width:100%; padding:14px;">
+                    <i class="fas fa-sign-in-alt" style="margin-right:8px; font-size:.85rem;"></i>
+                    Увійти
+                </button>
+            </form>
+
+            <div style="margin-top:24px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.05);
+                        text-align:center;">
+                <a href="{% url 'main:home' %}"
+                   style="color:#4b5563; font-size:.8rem; text-decoration:none; transition:color .2s;"
+                   onmouseover="this.style.color='#9ca3af'"
+                   onmouseout="this.style.color='#4b5563'">
+                    <i class="fas fa-arrow-left" style="margin-right:6px; font-size:.7rem;"></i>
+                    Повернутись на головну
+                </a>
             </div>
-            <button type="submit" class="btn btn-primary" style="width: 100%;">Увійти</button>
-        </form>
+        </div>
     </div>
 </div>
+
+<script>
+function togglePass() {
+    var inp = document.getElementById('pass-input');
+    var ico = document.getElementById('eye-icon');
+    if (inp.type === 'password') {
+        inp.type = 'text';
+        ico.className = 'fas fa-eye-slash';
+    } else {
+        inp.type = 'password';
+        ico.className = 'fas fa-eye';
+    }
+}
+</script>
 {% endblock %}

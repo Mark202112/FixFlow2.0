@@ -1,139 +1,95 @@
-{% extends 'base.html' %}
+{% extends 'dashboard/base_dashboard.html' %}
+{% block title %}Огляд — FixFlow Dashboard{% endblock %}
+{% block page_title %}Огляд{% endblock %}
+{% block nav_home %}active{% endblock %}
+
+{% block topbar_actions %}
+<span style="font-size:.75rem;color:#4b5563;">
+    <i class="fas fa-circle" style="color:#34c759;font-size:.5rem;margin-right:5px;"></i>
+    Система працює
+</span>
+{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold text-dark">Панель управления</h2>
-        <form class="d-flex shadow-sm" method="GET" action="">
-            <input type="hidden" name="tab" value="{{ current_tab }}">
-            <input class="form-control me-2" type="search" name="search" placeholder="Поиск..." value="{{ request.GET.search }}">
-            <button class="btn btn-primary" type="submit">Найти</button>
-        </form>
+
+<!-- Stat cards -->
+<div class="stat-grid">
+    <div class="stat-card">
+        <p class="stat-card-label">Всього замовлень</p>
+        <p class="stat-card-value">{{ total_orders }}</p>
+        <i class="fas fa-clipboard-list stat-card-icon"></i>
     </div>
-    
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card bg-primary text-white shadow border-0">
-                <div class="card-body text-center">
-                    <h6 class="small fw-bold">ВСЕГО</h6>
-                    <h2 class="fw-bold">{{ total_orders }}</h2>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-warning text-dark shadow border-0">
-                <div class="card-body text-center">
-                    <h6 class="small fw-bold">НОВЫЕ</h6>
-                    <h2 class="fw-bold">{{ new_orders }}</h2>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-info text-white shadow border-0">
-                <div class="card-body text-center">
-                    <h6 class="small fw-bold">В РАБОТЕ</h6>
-                    <h2 class="fw-bold">{{ in_progress_orders }}</h2>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-success text-white shadow border-0">
-                <div class="card-body text-center">
-                    <h6 class="small fw-bold">ГОТОВО</h6>
-                    <h2 class="fw-bold">{{ completed_orders }}</h2>
-                </div>
-            </div>
-        </div>
+    <div class="stat-card">
+        <p class="stat-card-label">Нові</p>
+        <p class="stat-card-value" style="color:#007AFF;">{{ new_orders }}</p>
+        <i class="fas fa-plus-circle stat-card-icon" style="color:#007AFF;"></i>
     </div>
-
-    <div class="btn-group mb-3 shadow-sm">
-        <a href="?tab=active" class="btn btn-{% if current_tab == 'active' %}primary{% else %}outline-primary{% endif %} px-4">
-            Активные заявки
-        </a>
-        <a href="?tab=archive" class="btn btn-{% if current_tab == 'archive' %}primary{% else %}outline-primary{% endif %} px-4">
-            Архив (Готовые)
-        </a>
-        <a href="?tab=all" class="btn btn-{% if current_tab == 'all' %}primary{% else %}outline-primary{% endif %} px-4">
-            Все записи
-        </a>
+    <div class="stat-card">
+        <p class="stat-card-label">В роботі</p>
+        <p class="stat-card-value" style="color:#ff9500;">{{ in_progress }}</p>
+        <i class="fas fa-tools stat-card-icon" style="color:#ff9500;"></i>
     </div>
-
-    <div class="card shadow border-0">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>ID</th>
-                        <th>Устройство</th>
-                        <th>Клиент</th>
-                        <th>Статус</th>
-                        <th>Дата</th>
-                        <th class="text-center">Управление</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for order in recent_orders %}
-                    <tr>
-                        <td><span class="text-muted small">#{{ order.id }}</span></td>
-                        <td><strong>{{ order.device }}</strong></td>
-                        <td>
-                            <a href="#" class="text-primary fw-bold text-decoration-none" data-bs-toggle="modal" data-bs-target="#modal{{ order.id }}">
-                                {{ order.client.name }} 👁️
-                            </a>
-                        </td>
-                        <td>
-                            {% if order.status == 'new' %}
-                                <span class="badge rounded-pill bg-warning text-dark">Новая</span>
-                            {% elif order.status == 'in_progress' %}
-                                <span class="badge rounded-pill bg-info">В работе</span>
-                            {% else %}
-                                <span class="badge rounded-pill bg-success">Готово</span>
-                            {% endif %}
-                        </td>
-                        <td>{{ order.created_at|date:"d.m.Y H:i" }}</td>
-                        <td class="text-center">
-                            <div class="btn-group shadow-sm">
-                                {% if order.status == 'new' %}
-                                    <a href="{% url 'change_status' order.id 'in_progress' %}" class="btn btn-sm btn-outline-info">В работу</a>
-                                {% endif %}
-                                {% if order.status != 'completed' %}
-                                    <a href="{% url 'change_status' order.id 'completed' %}" class="btn btn-sm btn-outline-success">Завершить</a>
-                                {% endif %}
-                                <a href="/admin/core/order/{{ order.id }}/change/" class="btn btn-sm btn-outline-secondary">⚙</a>
-                                <a href="{% url 'delete_order' order.id %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Удалить?')">🗑</a>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <div class="modal fade" id="modal{{ order.id }}" tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content shadow">
-                                <div class="modal-header bg-light">
-                                    <h5 class="modal-title fw-bold">Детали заказа #{{ order.id }}</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <p><strong>Устройство:</strong> {{ order.device }}</p>
-                                    <p><strong>Клиент:</strong> {{ order.client.name }}</p>
-                                    <p><strong>Телефон:</strong> {{ order.client.phone }}</p>
-                                    <hr>
-                                    <p class="bg-light p-3 rounded border">{{ order.description }}</p>
-                                </div>
-                                <div class="modal-footer border-0">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {% empty %}
-                    <tr>
-                        <td colspan="6" class="text-center py-5 text-muted">В этой категории заявок нет</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+    <div class="stat-card">
+        <p class="stat-card-label">Виручка (видані)</p>
+        <p class="stat-card-value" style="color:#34c759;">{{ total_revenue }} ₴</p>
+        <i class="fas fa-hryvnia-sign stat-card-icon" style="color:#34c759;"></i>
     </div>
 </div>
+
+<!-- Recent orders -->
+<div class="dash-section">
+    <div class="dash-section-header">
+        <span class="dash-section-title">Останні замовлення</span>
+        <a href="{% url 'dashboard:orders_list' %}" class="tb-btn tb-btn-ghost" style="font-size:.75rem;padding:6px 12px;">
+            Всі замовлення <i class="fas fa-arrow-right" style="margin-left:5px;font-size:.65rem;"></i>
+        </a>
+    </div>
+
+    {% if orders %}
+    <div style="overflow-x:auto;">
+        <table class="dash-table">
+            <thead>
+                <tr>
+                    <th>№ Замовлення</th>
+                    <th>Клієнт</th>
+                    <th>Пристрій</th>
+                    <th>Статус</th>
+                    <th>Ціна</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td style="font-family:monospace;color:#007AFF;font-weight:600;font-size:.8rem;">{{ order.order_number }}</td>
+                    <td>
+                        <div style="font-weight:500;color:#fff;">{{ order.client.name }}</div>
+                        <div style="font-size:.75rem;color:#4b5563;">{{ order.client.phone }}</div>
+                    </td>
+                    <td>{{ order.device }}</td>
+                    <td>
+                        <span class="status-chip status-{{ order.status }}">{{ order.get_status_display }}</span>
+                    </td>
+                    <td style="color:#fff;font-weight:500;">{% if order.price %}{{ order.price }} ₴{% else %}—{% endif %}</td>
+                    <td>
+                        <a href="{% url 'dashboard:order_detail' order.order_number %}"
+                           style="color:#4b5563;font-size:.8rem;transition:color .2s;"
+                           onmouseover="this.style.color='#007AFF'"
+                           onmouseout="this.style.color='#4b5563'">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="padding:48px;text-align:center;color:#4b5563;">
+        <i class="fas fa-inbox" style="font-size:2rem;margin-bottom:12px;display:block;"></i>
+        <p style="font-size:.875rem;">Замовлень ще немає</p>
+    </div>
+    {% endif %}
+</div>
+
 {% endblock %}

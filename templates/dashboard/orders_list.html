@@ -1,42 +1,87 @@
-{% extends 'base.html' %}
+{% extends 'dashboard/base_dashboard.html' %}
+{% block title %}Замовлення — FixFlow{% endblock %}
+{% block page_title %}Замовлення{% endblock %}
+{% block nav_orders %}active{% endblock %}
+
 {% block content %}
-<div class="container dashboard-layout">
-    <div class="sidebar">
-        <a href="{% url 'dashboard:home' %}" class="sidebar-link">📊 Головна</a>
-        <a href="{% url 'dashboard:orders_list' %}" class="sidebar-link active">📋 Замовлення</a>
-        <a href="{% url 'dashboard:clients_list' %}" class="sidebar-link">👥 Клієнти</a>
-        <a href="{% url 'dashboard:calendar' %}" class="sidebar-link">📅 Календар</a>
-        <a href="{% url 'dashboard:reports' %}" class="sidebar-link">📈 Звіти</a>
-        <a href="/admin/" class="sidebar-link">⚙️ Адмін</a>
+
+<!-- Search & filters -->
+<div class="dash-section" style="margin-bottom:20px;">
+    <form method="GET" style="padding:16px 22px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+        <input type="text" name="search" placeholder="Пошук за номером, пристроєм, клієнтом..."
+               value="{{ search_query }}" class="dash-input" style="flex:1;min-width:200px;">
+        <select name="status" class="dash-input" style="width:160px;cursor:pointer;">
+            <option value="">Всі статуси</option>
+            {% for val, label in status_choices %}
+            <option value="{{ val }}" {% if current_status == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="tb-btn tb-btn-primary">
+            <i class="fas fa-search" style="font-size:.75rem;"></i> Знайти
+        </button>
+        {% if search_query or current_status %}
+        <a href="{% url 'dashboard:orders_list' %}" class="tb-btn tb-btn-ghost">
+            <i class="fas fa-times" style="font-size:.75rem;"></i> Скинути
+        </a>
+        {% endif %}
+    </form>
+</div>
+
+<!-- Table -->
+<div class="dash-section">
+    <div class="dash-section-header">
+        <span class="dash-section-title">
+            Замовлення
+            <span style="font-size:.75rem;color:#4b5563;font-weight:400;margin-left:8px;">{{ orders|length }} записів</span>
+        </span>
     </div>
-    <div class="main-content">
-        <h1 style="font-size: 42px; margin-bottom: 40px;">Замовлення</h1>
-        <div class="card">
-            <form method="get" style="display: flex; gap: 10px; margin-bottom: 30px;">
-                <input type="text" name="search" class="form-control" placeholder="Пошук..." value="{{ request.GET.search }}">
-                <select name="status" class="form-control" style="width: 150px;">
-                    <option value="">Всі</option>
-                    <option value="new">Нові</option>
-                    <option value="in_progress">В роботі</option>
-                    <option value="ready">Готові</option>
-                </select>
-                <button type="submit" class="btn btn-primary">Фільтр</button>
-            </form>
-            <table class="table">
-                <thead><tr><th>Номер</th><th>Клієнт</th><th>Пристрій</th><th>Статус</th><th>Майстер</th></tr></thead>
-                <tbody>
+
+    {% if orders %}
+    <div style="overflow-x:auto;">
+        <table class="dash-table">
+            <thead>
+                <tr>
+                    <th>№</th>
+                    <th>Клієнт</th>
+                    <th>Пристрій</th>
+                    <th>Проблема</th>
+                    <th>Статус</th>
+                    <th>Ціна</th>
+                    <th>Дата</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
                 {% for order in orders %}
                 <tr>
-                    <td><a href="{% url 'dashboard:order_detail' order.order_number %}">{{ order.order_number }}</a></td>
-                    <td>{{ order.client.name }}</td>
-                    <td>{{ order.device }}</td>
-                    <td><span class="badge badge-{{ order.status }}">{{ order.get_status_display }}</span></td>
-                    <td>{{ order.assigned_master.name|default:"—" }}</td>
+                    <td style="font-family:monospace;color:#007AFF;font-weight:600;font-size:.78rem;white-space:nowrap;">{{ order.order_number }}</td>
+                    <td>
+                        <div style="font-weight:500;color:#fff;white-space:nowrap;">{{ order.client.name }}</div>
+                        <div style="font-size:.72rem;color:#4b5563;">{{ order.client.phone }}</div>
+                    </td>
+                    <td style="max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ order.device }}</td>
+                    <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#6b7280;font-size:.82rem;">{{ order.problem|truncatechars:50 }}</td>
+                    <td>
+                        <span class="status-chip status-{{ order.status }}">{{ order.get_status_display }}</span>
+                    </td>
+                    <td style="white-space:nowrap;color:#fff;font-weight:500;">{% if order.price %}{{ order.price }} ₴{% else %}—{% endif %}</td>
+                    <td style="font-size:.75rem;color:#4b5563;white-space:nowrap;">{{ order.created_at|date:"d.m.Y" }}</td>
+                    <td>
+                        <a href="{% url 'dashboard:order_detail' order.order_number %}" class="tb-btn tb-btn-ghost" style="padding:6px 12px;font-size:.75rem;">
+                            Відкрити
+                        </a>
+                    </td>
                 </tr>
                 {% endfor %}
-                </tbody>
-            </table>
-        </div>
+            </tbody>
+        </table>
     </div>
+    {% else %}
+    <div style="padding:56px;text-align:center;color:#4b5563;">
+        <i class="fas fa-clipboard" style="font-size:2.2rem;margin-bottom:14px;display:block;opacity:.4;"></i>
+        <p style="font-size:.9rem;font-weight:500;margin-bottom:4px;">Замовлень не знайдено</p>
+        <p style="font-size:.78rem;">Спробуйте інший пошуковий запит</p>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

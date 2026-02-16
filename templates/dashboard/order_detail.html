@@ -1,32 +1,107 @@
-<div class="relative pl-8 border-l-2 border-dashed border-gray-200 space-y-8">
-    {% for status_code, status_name in order.STATUS_CHOICES %}
-        <div class="relative">
-            <div class="absolute -left-[41px] top-1 w-5 h-5 rounded-full border-4 border-white shadow-sm
-                {% if order.status == status_code %}
-                    bg-blue-600 animate-pulse ring-4 ring-blue-100
-                {% elif forloop.counter0 < order.get_status_stage %}
-                    bg-green-500
-                {% else %}
-                    bg-gray-300
-                {% endif %}">
+{% extends 'dashboard/base_dashboard.html' %}
+{% block title %}{{ order.order_number }} — FixFlow{% endblock %}
+{% block page_title %}Замовлення {{ order.order_number }}{% endblock %}
+{% block nav_orders %}active{% endblock %}
+
+{% block topbar_actions %}
+<a href="{% url 'dashboard:orders_list' %}" class="tb-btn tb-btn-ghost">
+    <i class="fas fa-arrow-left" style="font-size:.75rem;"></i> Назад
+</a>
+{% endblock %}
+
+{% block content %}
+<div style="display:grid;grid-template-columns:1fr 320px;gap:20px;">
+
+    <!-- Left: main info -->
+    <div style="display:flex;flex-direction:column;gap:20px;">
+
+        <!-- Client & device -->
+        <div class="dash-section">
+            <div class="dash-section-header">
+                <span class="dash-section-title">Інформація</span>
+                <span style="font-size:.72rem;color:#4b5563;">{{ order.created_at|date:"d.m.Y H:i" }}</span>
             </div>
-            
-            <div class="bg-white/60 p-4 rounded-xl border border-gray-100 shadow-sm backdrop-blur-sm 
-                {% if order.status == status_code %} ring-1 ring-blue-500/20 shadow-blue-50 {% endif %}">
-                <div class="flex items-center justify-between">
-                    <h4 class="font-bold text-sm {% if order.status == status_code %} text-blue-700 {% elif forloop.counter0 < order.get_status_stage %} text-green-700 {% else %} text-gray-500 {% endif %}">
-                        {{ status_name }}
-                    </h4>
-                    {% if forloop.counter0 < order.get_status_stage %}
-                        <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>
-                    {% endif %}
+            <div style="padding:22px;display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+                <div>
+                    <p style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:#007AFF;margin-bottom:6px;">Клієнт</p>
+                    <p style="color:#fff;font-weight:600;margin-bottom:3px;">{{ order.client.name }}</p>
+                    <p style="color:#6b7280;font-size:.85rem;">{{ order.client.phone }}</p>
                 </div>
-                
-                {% if order.status == status_code %}
-                    <p class="text-[11px] text-blue-500 font-medium mt-1">Зараз на цьому етапі</p>
-                    <p class="text-[10px] text-gray-400">Останнє оновлення: {{ order.updated_at|date:"H:i" }}</p>
+                <div>
+                    <p style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:#007AFF;margin-bottom:6px;">Пристрій</p>
+                    <p style="color:#fff;font-weight:600;">{{ order.device }}</p>
+                </div>
+                <div style="grid-column:1/-1;">
+                    <p style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:#007AFF;margin-bottom:6px;">Проблема</p>
+                    <p style="color:#d1d5db;font-size:.9rem;line-height:1.6;">{{ order.problem }}</p>
+                </div>
+                {% if order.notes %}
+                <div style="grid-column:1/-1;">
+                    <p style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:#6b7280;margin-bottom:6px;">Нотатки майстра</p>
+                    <p style="color:#9ca3af;font-size:.875rem;line-height:1.6;">{{ order.notes }}</p>
+                </div>
                 {% endif %}
             </div>
         </div>
-    {% endfor %}
+
+        <!-- Update status form -->
+        <div class="dash-section">
+            <div class="dash-section-header">
+                <span class="dash-section-title">Оновити статус</span>
+            </div>
+            <form method="POST" action="{% url 'dashboard:order_detail' order.order_number %}"
+                  style="padding:22px;display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
+                {% csrf_token %}
+                <div style="flex:1;min-width:160px;">
+                    <p style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:#007AFF;margin-bottom:8px;">Статус</p>
+                    <select name="status" class="dash-input" style="cursor:pointer;">
+                        {% for val, label in order.STATUS_CHOICES %}
+                        <option value="{{ val }}" {% if order.status == val %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div style="flex:1;min-width:120px;">
+                    <p style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:#007AFF;margin-bottom:8px;">Ціна (₴)</p>
+                    <input type="number" name="price" value="{{ order.price|default:'' }}"
+                           placeholder="0.00" class="dash-input">
+                </div>
+                <button type="submit" class="tb-btn tb-btn-primary" style="padding:10px 20px;">
+                    <i class="fas fa-save" style="font-size:.75rem;"></i> Зберегти
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Right: status timeline -->
+    <div class="dash-section" style="height:fit-content;">
+        <div class="dash-section-header">
+            <span class="dash-section-title">Статус</span>
+        </div>
+        <div style="padding:22px;">
+            {% for val, label in order.STATUS_CHOICES %}
+            <div class="timeline-item {% if not forloop.last %}timeline-item--spaced{% endif %}"
+                 style="display:flex;align-items:flex-start;gap:12px;">
+                <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
+                    <div class="timeline-dot {% if order.status == val %}timeline-dot--active{% endif %}">
+                        <i class="fas {% if order.status == val %}fa-circle-dot{% else %}fa-circle{% endif %} timeline-dot-icon"></i>
+                    </div>
+                    {% if not forloop.last %}
+                    <div style="width:1px;height:20px;background:rgba(255,255,255,.06);margin-top:4px;"></div>
+                    {% endif %}
+                </div>
+                <div style="padding-top:4px;">
+                    <p class="timeline-label {% if order.status == val %}timeline-label--active{% endif %}">{{ label }}</p>
+                    {% if order.status == val %}
+                    <p style="font-size:.7rem;color:#007AFF;margin-top:2px;">Поточний</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+// Handle POST for status update
+{% endblock %}

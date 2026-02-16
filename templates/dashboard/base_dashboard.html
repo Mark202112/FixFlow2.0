@@ -1,0 +1,240 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}FixFlow Dashboard{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config={corePlugins:{preflight:false},theme:{extend:{colors:{brand:'#007AFF'}}}}</script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+        body{font-family:'Inter',sans-serif;background:#111112;color:#fff;display:flex;min-height:100vh;-webkit-font-smoothing:antialiased;}
+        a{text-decoration:none;}ul{list-style:none;}
+        input,select,textarea,button{font-family:inherit;}
+
+        /* ── Sidebar ── */
+        #sidebar{
+            width:240px;flex-shrink:0;
+            background:#1A1A1B;
+            border-right:1px solid rgba(0,122,255,.12);
+            display:flex;flex-direction:column;
+            position:fixed;top:0;left:0;bottom:0;z-index:100;
+            transition:transform .3s ease;
+        }
+        .sb-logo{padding:24px 20px 20px;border-bottom:1px solid rgba(255,255,255,.05);}
+        .sb-logo a{display:flex;align-items:center;gap:10px;text-decoration:none;}
+        .sb-logo-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;
+                      background:linear-gradient(135deg,#2A2A2D,#007AFF);flex-shrink:0;}
+        .sb-logo-text{font-size:1.1rem;font-weight:700;letter-spacing:-.02em;}
+        .sb-logo-text span{color:#007AFF;}
+        .sb-section{padding:20px 12px 0;flex:1;overflow-y:auto;}
+        .sb-section-label{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.18em;
+                           color:#3a3a3d;padding:0 8px;margin-bottom:8px;}
+        .sb-link{display:flex;align-items:center;gap:10px;padding:10px 10px;border-radius:8px;
+                 color:#6b7280;font-size:.875rem;font-weight:500;
+                 transition:color .2s,background .2s;margin-bottom:2px;cursor:pointer;}
+        .sb-link:hover{color:#fff;background:rgba(255,255,255,.05);}
+        .sb-link.active{color:#007AFF;background:rgba(0,122,255,.1);border:1px solid rgba(0,122,255,.18);}
+        .sb-link .sb-icon{width:18px;text-align:center;font-size:.85rem;flex-shrink:0;}
+        .sb-link .sb-badge{margin-left:auto;font-size:.6rem;font-weight:700;padding:2px 7px;
+                            border-radius:10px;background:rgba(0,122,255,.15);color:#007AFF;}
+        .sb-bottom{padding:16px 12px;border-top:1px solid rgba(255,255,255,.05);}
+        .sb-user{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;
+                 background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);}
+        .sb-avatar{width:32px;height:32px;border-radius:8px;background:rgba(0,122,255,.2);
+                   display:flex;align-items:center;justify-content:center;color:#007AFF;font-size:.75rem;flex-shrink:0;}
+        .sb-username{font-size:.8rem;font-weight:600;color:#d1d5db;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .sb-role{font-size:.65rem;color:#4b5563;}
+
+        /* ── Main content ── */
+        #main-wrap{margin-left:240px;flex:1;display:flex;flex-direction:column;min-height:100vh;}
+
+        /* ── Topbar ── */
+        #topbar{
+            height:64px;display:flex;align-items:center;justify-content:space-between;
+            padding:0 28px;background:#1A1A1B;
+            border-bottom:1px solid rgba(255,255,255,.05);
+            position:sticky;top:0;z-index:50;
+        }
+        .tb-title{font-size:1rem;font-weight:600;color:#fff;}
+        .tb-actions{display:flex;align-items:center;gap:10px;}
+        .tb-btn{display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:8px;
+                font-size:.8rem;font-weight:500;cursor:pointer;transition:background .2s,color .2s;border:none;}
+        .tb-btn-ghost{background:transparent;color:#6b7280;border:1px solid rgba(255,255,255,.08);}
+        .tb-btn-ghost:hover{background:rgba(255,255,255,.06);color:#fff;}
+        .tb-btn-primary{background:#007AFF;color:#fff;box-shadow:0 0 16px rgba(0,122,255,.3);}
+        .tb-btn-primary:hover{opacity:.88;}
+
+        /* ── Page content ── */
+        #page-content{flex:1;padding:28px;}
+
+        /* ── Stat cards ── */
+        .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:28px;}
+        .stat-card{
+            padding:22px 24px;background:#1A1A1B;
+            border:1px solid rgba(255,255,255,.06);border-radius:12px;
+            position:relative;overflow:hidden;
+            transition:border-color .2s,transform .2s;
+        }
+        .stat-card:hover{border-color:rgba(0,122,255,.25);transform:translateY(-1px);}
+        .stat-card-label{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:#6b7280;margin-bottom:10px;}
+        .stat-card-value{font-size:2rem;font-weight:800;color:#fff;letter-spacing:-.02em;line-height:1;}
+        .stat-card-icon{position:absolute;right:20px;top:50%;transform:translateY(-50%);
+                        font-size:1.6rem;opacity:.08;}
+        .stat-card-trend{font-size:.72rem;margin-top:8px;color:#6b7280;}
+        .stat-card-trend.up{color:#34c759;}
+
+        /* ── Table ── */
+        .dash-table{width:100%;border-collapse:separate;border-spacing:0;}
+        .dash-table th{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;
+                       color:#4b5563;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.05);
+                       text-align:left;white-space:nowrap;}
+        .dash-table td{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.04);
+                       font-size:.875rem;color:#d1d5db;vertical-align:middle;}
+        .dash-table tr:last-child td{border-bottom:none;}
+        .dash-table tbody tr{transition:background .15s;}
+        .dash-table tbody tr:hover td{background:rgba(255,255,255,.025);}
+
+        /* ── Section card ── */
+        .dash-section{background:#1A1A1B;border:1px solid rgba(255,255,255,.06);border-radius:12px;overflow:hidden;}
+        .dash-section-header{padding:18px 22px;display:flex;align-items:center;justify-content:space-between;
+                              border-bottom:1px solid rgba(255,255,255,.05);}
+        .dash-section-title{font-size:.9rem;font-weight:600;color:#fff;}
+
+        /* ── Search ── */
+        .dash-search{display:flex;align-items:center;gap:8px;padding:0 22px 16px;}
+        .dash-input{flex:1;padding:10px 14px;background:rgba(42,42,45,.5);
+                    border:1px solid rgba(255,255,255,.08);border-radius:8px;
+                    color:#fff;font-size:.875rem;outline:none;
+                    transition:border-color .2s,box-shadow .2s;}
+        .dash-input:focus{border-color:rgba(0,122,255,.6);box-shadow:0 0 0 3px rgba(0,122,255,.1);}
+        .dash-input::placeholder{color:#4b5563;}
+
+        /* ── Status chips ── */
+        .status-chip{
+            display:inline-block;padding:4px 10px;border-radius:5px;
+            font-size:.7rem;font-weight:600;white-space:nowrap;border:1px solid transparent;
+        }
+        .status-new       {background:rgba(0,122,255,.15);  color:#007AFF; border-color:rgba(0,122,255,.25);}
+        .status-in_progress{background:rgba(255,149,0,.12); color:#ff9500; border-color:rgba(255,149,0,.25);}
+        .status-ready     {background:rgba(52,199,89,.12);  color:#34c759; border-color:rgba(52,199,89,.25);}
+        .status-completed {background:rgba(134,134,139,.1); color:#86868b; border-color:rgba(134,134,139,.2);}
+        .status-cancelled {background:rgba(255,59,48,.1);   color:#ff3b30; border-color:rgba(255,59,48,.2);}
+
+        /* ── Timeline (order detail) ── */
+        .timeline-dot{
+            width:28px;height:28px;border-radius:50%;
+            display:flex;align-items:center;justify-content:center;
+            background:rgba(42,42,45,.8);border:1px solid rgba(255,255,255,.08);
+            transition:background .25s,box-shadow .25s;
+        }
+        .timeline-dot--active{background:#007AFF;border-color:#007AFF;box-shadow:0 0 12px rgba(0,122,255,.4);}
+        .timeline-dot-icon{font-size:.4rem;color:rgba(255,255,255,.15);}
+        .timeline-dot--active .timeline-dot-icon{font-size:.6rem;color:#fff;}
+        .timeline-label{font-size:.82rem;font-weight:400;color:#4b5563;}
+        .timeline-label--active{font-weight:600;color:#fff;}
+        .timeline-item--spaced{margin-bottom:20px;}
+
+        /* Mobile sidebar toggle */
+        #sb-toggle{display:none;background:none;border:none;color:#fff;cursor:pointer;font-size:1.1rem;padding:4px;}
+        @media(max-width:900px){
+            #sidebar{transform:translateX(-100%);}
+            #sidebar.open{transform:translateX(0);}
+            #main-wrap{margin-left:0;}
+            #sb-toggle{display:block;}
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── Sidebar ── -->
+<nav id="sidebar">
+    <div class="sb-logo">
+        <a href="{% url 'dashboard:home' %}">
+            <div class="sb-logo-icon"><i class="fas fa-microchip" style="color:#fff;font-size:.9rem;"></i></div>
+            <span class="sb-logo-text">Fix<span>Flow</span></span>
+        </a>
+    </div>
+
+    <div class="sb-section">
+        <p class="sb-section-label">Навігація</p>
+        <a href="{% url 'dashboard:home' %}" class="sb-link {% block nav_home %}{% endblock %}">
+            <i class="fas fa-chart-bar sb-icon"></i> Огляд
+        </a>
+        <a href="{% url 'dashboard:orders_list' %}" class="sb-link {% block nav_orders %}{% endblock %}">
+            <i class="fas fa-clipboard-list sb-icon"></i> Замовлення
+        </a>
+        <a href="{% url 'dashboard:clients_list' %}" class="sb-link {% block nav_clients %}{% endblock %}">
+            <i class="fas fa-users sb-icon"></i> Клієнти
+        </a>
+        <a href="{% url 'dashboard:calendar' %}" class="sb-link {% block nav_calendar %}{% endblock %}">
+            <i class="fas fa-calendar-alt sb-icon"></i> Календар
+        </a>
+        <a href="{% url 'dashboard:reports' %}" class="sb-link {% block nav_reports %}{% endblock %}">
+            <i class="fas fa-chart-line sb-icon"></i> Звіти
+        </a>
+
+        <p class="sb-section-label" style="margin-top:20px;">Система</p>
+        <a href="/admin/" class="sb-link">
+            <i class="fas fa-cog sb-icon"></i> Адмін-панель
+        </a>
+        <a href="{% url 'main:home' %}" class="sb-link" target="_blank">
+            <i class="fas fa-external-link-alt sb-icon"></i> Публічний сайт
+        </a>
+    </div>
+
+    <div class="sb-bottom">
+        <div class="sb-user">
+            <div class="sb-avatar"><i class="fas fa-user"></i></div>
+            <div style="min-width:0;">
+                <p class="sb-username">{{ request.user.username|default:"Адміністратор" }}</p>
+                <p class="sb-role">Персонал</p>
+            </div>
+            <a href="{% url 'dashboard:logout' %}" style="margin-left:auto;color:#4b5563;transition:color .2s;"
+               onmouseover="this.style.color='#ff3b30'" onmouseout="this.style.color='#4b5563'"
+               title="Вийти">
+                <i class="fas fa-sign-out-alt" style="font-size:.85rem;"></i>
+            </a>
+        </div>
+    </div>
+</nav>
+
+<!-- ── Main ── -->
+<div id="main-wrap">
+
+    <!-- Topbar -->
+    <header id="topbar">
+        <div style="display:flex;align-items:center;gap:14px;">
+            <button id="sb-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">
+                <i class="fas fa-bars"></i>
+            </button>
+            <span class="tb-title">{% block page_title %}Dashboard{% endblock %}</span>
+        </div>
+        <div class="tb-actions">
+            {% block topbar_actions %}{% endblock %}
+        </div>
+    </header>
+
+    <!-- Content -->
+    <main id="page-content">
+        {% block content %}{% endblock %}
+    </main>
+</div>
+
+<script>
+// Close sidebar on outside click (mobile)
+document.addEventListener('click', function(e){
+    var sb = document.getElementById('sidebar');
+    if(window.innerWidth<=900 && sb.classList.contains('open') &&
+       !sb.contains(e.target) && e.target.id !== 'sb-toggle'){
+        sb.classList.remove('open');
+    }
+});
+</script>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>

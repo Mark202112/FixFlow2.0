@@ -1,34 +1,71 @@
-{% extends 'base.html' %}
+{% extends 'dashboard/base_dashboard.html' %}
+{% block title %}Клієнти — FixFlow{% endblock %}
+{% block page_title %}Клієнти{% endblock %}
+{% block nav_clients %}active{% endblock %}
+
 {% block content %}
-<div class="container dashboard-layout">
-    <div class="sidebar">
-        <a href="{% url 'dashboard:home' %}" class="sidebar-link">📊 Головна</a>
-        <a href="{% url 'dashboard:orders_list' %}" class="sidebar-link">📋 Замовлення</a>
-        <a href="{% url 'dashboard:clients_list' %}" class="sidebar-link active">👥 Клієнти</a>
-        <a href="{% url 'dashboard:calendar' %}" class="sidebar-link">📅 Календар</a>
-        <a href="{% url 'dashboard:reports' %}" class="sidebar-link">📈 Звіти</a>
-        <a href="/admin/" class="sidebar-link">⚙️ Адмін</a>
+
+<div class="dash-section" style="margin-bottom:20px;">
+    <form method="GET" style="padding:16px 22px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+        <input type="text" name="search" placeholder="Пошук за іменем або телефоном..."
+               value="{{ search_query }}" class="dash-input" style="flex:1;min-width:200px;">
+        <button type="submit" class="tb-btn tb-btn-primary">
+            <i class="fas fa-search" style="font-size:.75rem;"></i> Знайти
+        </button>
+        {% if search_query %}
+        <a href="{% url 'dashboard:clients_list' %}" class="tb-btn tb-btn-ghost">
+            <i class="fas fa-times" style="font-size:.75rem;"></i> Скинути
+        </a>
+        {% endif %}
+    </form>
+</div>
+
+<div class="dash-section">
+    <div class="dash-section-header">
+        <span class="dash-section-title">
+            Клієнти
+            <span style="font-size:.75rem;color:#4b5563;font-weight:400;margin-left:8px;">{{ clients|length }} записів</span>
+        </span>
+        <a href="{% url 'dashboard:create_client' %}" class="tb-btn tb-btn-primary" style="font-size:.78rem;padding:7px 14px;">
+            <i class="fas fa-plus" style="font-size:.7rem;"></i> Новий клієнт
+        </a>
     </div>
-    <div class="main-content">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
-            <h1 style="font-size: 42px;">Клієнти</h1>
-            <a href="{% url 'dashboard:create_client' %}" class="btn btn-primary">+ Додати</a>
-        </div>
-        <div class="card">
-            <table class="table">
-                <thead><tr><th>Ім'я</th><th>Телефон</th><th>Email</th><th>Замовлень</th></tr></thead>
-                <tbody>
+
+    {% if clients %}
+    <div style="overflow-x:auto;">
+        <table class="dash-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Ім'я</th>
+                    <th>Телефон</th>
+                    <th>Email</th>
+                    <th>Замовлень</th>
+                </tr>
+            </thead>
+            <tbody>
                 {% for client in clients %}
                 <tr>
-                    <td><strong>{{ client.name }}</strong></td>
-                    <td>{{ client.phone }}</td>
-                    <td>{{ client.email|default:"—" }}</td>
-                    <td><span class="badge" style="background: var(--primary); color: white;">{{ client.orders_count }}</span></td>
+                    <td style="color:#4b5563;font-size:.78rem;">{{ forloop.counter }}</td>
+                    <td style="font-weight:500;color:#fff;">{{ client.name }}</td>
+                    <td style="font-family:monospace;color:#007AFF;font-size:.85rem;">{{ client.phone }}</td>
+                    <td style="color:#6b7280;font-size:.85rem;">{{ client.email|default:"—" }}</td>
+                    <td>
+                        <span style="padding:3px 10px;background:rgba(0,122,255,.1);color:#007AFF;
+                                     border-radius:5px;font-size:.72rem;font-weight:600;border:1px solid rgba(0,122,255,.2);">
+                            {{ client.orders.count }}
+                        </span>
+                    </td>
                 </tr>
                 {% endfor %}
-                </tbody>
-            </table>
-        </div>
+            </tbody>
+        </table>
     </div>
+    {% else %}
+    <div style="padding:56px;text-align:center;color:#4b5563;">
+        <i class="fas fa-users" style="font-size:2.2rem;margin-bottom:14px;display:block;opacity:.4;"></i>
+        <p style="font-size:.9rem;font-weight:500;margin-bottom:4px;">Клієнтів не знайдено</p>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

@@ -1,125 +1,170 @@
 <!-- ═══════════════════════ ORDER MODAL ═══════════════════════ -->
-<div id="orderModal" class="fixed inset-0 z-[120] hidden items-center justify-center p-4" style="display:none;">
+<div id="orderModal" style="display:none; position:fixed; inset:0; z-index:9000;">
+
     <!-- Overlay -->
-    <div id="orderOverlay"
-         onclick="closeOrderModal()"
-         class="absolute inset-0 transition-opacity duration-300 opacity-0"
-         style="background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);"></div>
+    <div id="ordOverlay" onclick="closeOrderModal()"
+         style="position:absolute; inset:0;
+                background:rgba(0,0,0,0); backdrop-filter:blur(0px);
+                transition:background .35s ease, backdrop-filter .35s ease;"></div>
 
-    <!-- Modal -->
-    <div id="orderContainer"
-         class="relative w-full max-w-lg p-8 md:p-10 shadow-2xl transform transition-all duration-300 scale-95 opacity-0 z-10"
-         style="background: #1A1A1B; border: 1px solid rgba(0,122,255,0.35);">
+    <!-- Container -->
+    <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; padding:16px; pointer-events:none;">
+        <div id="ordContainer"
+             style="pointer-events:auto; width:100%; max-width:520px; max-height:90vh; overflow-y:auto;
+                    position:relative; background:#1A1A1B;
+                    border:1px solid rgba(0,122,255,0.35);
+                    box-shadow:0 32px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(0,122,255,0.08);
+                    opacity:0; transform:scale(.94) translateY(16px);
+                    transition:opacity .32s cubic-bezier(.16,1,.3,1), transform .32s cubic-bezier(.16,1,.3,1);
+                    scrollbar-width:thin; scrollbar-color:rgba(0,122,255,.3) transparent;">
 
-        <!-- Blue accent line top -->
-        <div class="absolute top-0 left-0 right-0 h-0.5" style="background: linear-gradient(to right, transparent, #007AFF, transparent);"></div>
+            <!-- Top accent line -->
+            <div style="position:absolute;top:0;left:0;right:0;height:2px;
+                        background:linear-gradient(90deg,transparent,#007AFF 40%,#007AFF 60%,transparent);"></div>
 
-        <!-- Close -->
-        <button onclick="closeOrderModal()"
-                class="absolute top-5 right-5 w-8 h-8 flex items-center justify-center text-gray-500 hover:text-white transition-all duration-300 hover:rotate-90"
-                style="border: 1px solid rgba(255,255,255,0.1);">
-            <i class="fas fa-times text-sm"></i>
-        </button>
-
-        <!-- Header -->
-        <div class="mb-8">
-            <span class="block text-[10px] font-bold uppercase tracking-[0.3em] mb-2" style="color:#007AFF;">Заявка на сервіс</span>
-            <h2 class="text-3xl font-bold text-white tracking-tight">Оформлення</h2>
-            <div class="mt-3 h-px w-12" style="background:#007AFF;"></div>
-        </div>
-
-        <!-- Form -->
-        <form method="POST" action="{% url 'main:create_order' %}" class="space-y-4">
-            {% csrf_token %}
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-[10px] font-bold uppercase tracking-[0.2em] mb-2" style="color:#007AFF;">Ім'я</label>
-                    <input type="text" name="name" required placeholder="Ваше ім'я"
-                           class="w-full px-4 py-3 text-white text-sm outline-none transition-colors placeholder-gray-600"
-                           style="background: rgba(42,42,45,0.4); border: 1px solid rgba(255,255,255,0.08);"
-                           onfocus="this.style.borderColor='rgba(0,122,255,0.6)'"
-                           onblur="this.style.borderColor='rgba(255,255,255,0.08)'">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold uppercase tracking-[0.2em] mb-2" style="color:#007AFF;">Телефон</label>
-                    <input type="tel" name="phone" required placeholder="0501234567"
-                           class="w-full px-4 py-3 text-white text-sm outline-none transition-colors placeholder-gray-600"
-                           style="background: rgba(42,42,45,0.4); border: 1px solid rgba(255,255,255,0.08);"
-                           onfocus="this.style.borderColor='rgba(0,122,255,0.6)'"
-                           onblur="this.style.borderColor='rgba(255,255,255,0.08)'">
-                </div>
-            </div>
-
-            <div>
-                <label class="block text-[10px] font-bold uppercase tracking-[0.2em] mb-2" style="color:#007AFF;">Пристрій</label>
-                <input type="text" name="device" required placeholder="напр. iPhone 13 Pro, Samsung S23..."
-                       class="w-full px-4 py-3 text-white text-sm outline-none transition-colors placeholder-gray-600"
-                       style="background: rgba(42,42,45,0.4); border: 1px solid rgba(255,255,255,0.08);"
-                       onfocus="this.style.borderColor='rgba(0,122,255,0.6)'"
-                       onblur="this.style.borderColor='rgba(255,255,255,0.08)'">
-            </div>
-
-            <div>
-                <label class="block text-[10px] font-bold uppercase tracking-[0.2em] mb-2" style="color:#007AFF;">Опис проблеми</label>
-                <textarea name="problem" rows="4" placeholder="Опишіть що трапилось з пристроєм..."
-                          class="w-full px-4 py-3 text-white text-sm outline-none transition-colors placeholder-gray-600 resize-none"
-                          style="background: rgba(42,42,45,0.4); border: 1px solid rgba(255,255,255,0.08);"
-                          onfocus="this.style.borderColor='rgba(0,122,255,0.6)'"
-                          onblur="this.style.borderColor='rgba(255,255,255,0.08)'"></textarea>
-            </div>
-
-            <button type="submit"
-                    class="w-full py-4 text-white text-sm font-semibold transition-all duration-300 hover:opacity-90 active:scale-[0.98] rounded-xl"
-                    style="background: #007AFF; box-shadow: 0 0 18px rgba(0,122,255,0.3);">
-                <i class="fas fa-paper-plane mr-2"></i>
-                Відправити замовлення
-            </button>
-        </form>
-
-        <div class="mt-6 pt-5 text-center" style="border-top: 1px solid rgba(255,255,255,0.05);">
+            <!-- Close X -->
             <button onclick="closeOrderModal()"
-                    class="text-gray-600 hover:text-white text-[10px] font-bold uppercase tracking-[0.2em] transition-colors">
-                Скасувати
+                    style="position:absolute;top:16px;right:16px;z-index:10;
+                           width:34px;height:34px;border-radius:8px;
+                           background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);
+                           color:#6b7280;cursor:pointer;display:flex;align-items:center;justify-content:center;
+                           transition:color .2s,background .2s,transform .25s,border-color .2s;"
+                    onmouseover="this.style.color='#fff';this.style.background='rgba(255,255,255,.1)';this.style.transform='rotate(90deg)';this.style.borderColor='rgba(255,255,255,.25)'"
+                    onmouseout="this.style.color='#6b7280';this.style.background='rgba(255,255,255,.04)';this.style.transform='rotate(0)';this.style.borderColor='rgba(255,255,255,.1)'">
+                <i class="fas fa-times" style="font-size:.8rem;pointer-events:none;"></i>
             </button>
+
+            <!-- Header -->
+            <div style="padding:36px 36px 0;">
+                <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;">
+                    <div style="width:46px;height:46px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+                                background:rgba(0,122,255,.1);border:1px solid rgba(0,122,255,.3);border-radius:10px;color:#007AFF;">
+                        <i class="fas fa-tools" style="font-size:1.1rem;"></i>
+                    </div>
+                    <div>
+                        <span style="display:block;font-size:.6rem;font-weight:700;text-transform:uppercase;
+                                     letter-spacing:.22em;color:#007AFF;margin-bottom:4px;">Заявка на ремонт</span>
+                        <h2 style="color:#fff;font-size:1.4rem;font-weight:700;line-height:1.2;margin:0;">Оформлення заявки</h2>
+                    </div>
+                </div>
+                <div style="height:1px;background:linear-gradient(90deg,rgba(0,122,255,.4),transparent);margin-bottom:24px;"></div>
+            </div>
+
+            <!-- Form -->
+            <form method="POST" action="{% url 'main:create_order' %}" id="ord-form" style="padding:0 36px;">
+                {% csrf_token %}
+
+                <!-- Row: Name + Phone -->
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+                    <div>
+                        <label class="ord-label">Ім'я</label>
+                        <input type="text" name="name" required placeholder="Ваше ім'я" class="ord-input">
+                    </div>
+                    <div>
+                        <label class="ord-label">Телефон</label>
+                        <input type="tel" name="phone" required placeholder="0501234567" class="ord-input">
+                    </div>
+                </div>
+
+                <!-- Device -->
+                <div style="margin-bottom:14px;">
+                    <label class="ord-label">Пристрій</label>
+                    <input type="text" name="device" required placeholder="iPhone 15, Samsung S24, ноутбук Dell..." class="ord-input">
+                </div>
+
+                <!-- Problem -->
+<div style="margin-bottom:24px;">
+                    <label class="ord-label">Опис проблеми</label>
+                    <textarea name="problem" rows="3" placeholder="Що трапилось з пристроєм..." class="ord-input" style="resize:none;"></textarea>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" class="btn-primary" style="width:100%;padding:14px;margin-bottom:4px;">
+                    <i class="fas fa-paper-plane" style="margin-right:8px;font-size:.85rem;"></i>
+                    Відправити заявку
+                </button>
+            </form>
+
+            <!-- Footer -->
+            <div style="padding:16px 36px 28px;text-align:center;">
+                <button onclick="closeOrderModal()"
+                        style="background:none;border:none;color:#4b5563;font-size:.78rem;
+                               cursor:pointer;transition:color .2s;letter-spacing:.05em;"
+                        onmouseover="this.style.color='#9ca3af'"
+                        onmouseout="this.style.color='#4b5563'">
+                    Скасувати
+                </button>
+            </div>
         </div>
     </div>
 </div>
 
+<style>
+.ord-label {
+    display:block; font-size:.62rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:.18em;
+    color:#007AFF; margin-bottom:8px;
+}
+.ord-input {
+    width:100%; padding:12px 14px;
+    background:rgba(42,42,45,0.5);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:10px; color:#fff; font-size:.875rem;
+    outline:none; box-sizing:border-box;
+    transition:border-color .2s, box-shadow .2s;
+    font-family:inherit;
+}
+.ord-input::placeholder { color:#4b5563; }
+.ord-input:focus {
+    border-color:rgba(0,122,255,0.65);
+    box-shadow:0 0 0 3px rgba(0,122,255,0.1);
+}
+#ordContainer::-webkit-scrollbar{width:4px;}
+#ordContainer::-webkit-scrollbar-track{background:transparent;}
+#ordContainer::-webkit-scrollbar-thumb{background:rgba(0,122,255,.3);border-radius:2px;}
+</style>
+
 <script>
-function openOrderModal() {
-    const modal     = document.getElementById('orderModal');
-    const container = document.getElementById('orderContainer');
-    const overlay   = document.getElementById('orderOverlay');
+function openOrderModal(serviceTitle) {
+    var modal = document.getElementById('orderModal');
+    var cnt   = document.getElementById('ordContainer');
+    var ovl   = document.getElementById('ordOverlay');
 
-    modal.style.display = 'flex';
+    // Pre-fill device field with service title if provided
+    if (serviceTitle) {
+        var dev = document.querySelector('#ord-form [name="device"]');
+        if (dev && !dev.value) dev.value = serviceTitle;
+    }
+
+    modal.style.display = 'block';
     document.body.style.overflow = 'hidden';
+    cnt.scrollTop = 0;
 
-    requestAnimationFrame(() => {
-        overlay.classList.add('opacity-100');
-        overlay.classList.remove('opacity-0');
-        container.classList.remove('scale-95', 'opacity-0');
-        container.classList.add('scale-100', 'opacity-100');
-    });
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){
+        ovl.style.background     = 'rgba(0,0,0,0.75)';
+        ovl.style.backdropFilter = 'blur(8px)';
+        cnt.style.opacity        = '1';
+        cnt.style.transform      = 'scale(1) translateY(0)';
+    }); });
 }
 
 function closeOrderModal() {
-    const modal     = document.getElementById('orderModal');
-    const container = document.getElementById('orderContainer');
-    const overlay   = document.getElementById('orderOverlay');
+    var modal = document.getElementById('orderModal');
+    var cnt   = document.getElementById('ordContainer');
+    var ovl   = document.getElementById('ordOverlay');
 
-    overlay.classList.remove('opacity-100');
-    overlay.classList.add('opacity-0');
-    container.classList.remove('scale-100', 'opacity-100');
-    container.classList.add('scale-95', 'opacity-0');
+    ovl.style.background     = 'rgba(0,0,0,0)';
+    ovl.style.backdropFilter = 'blur(0px)';
+    cnt.style.opacity        = '0';
+    cnt.style.transform      = 'scale(.94) translateY(16px)';
 
-    setTimeout(() => {
-        modal.style.display = 'none';
+    setTimeout(function(){
+        modal.style.display  = 'none';
         document.body.style.overflow = '';
-    }, 300);
+    }, 340);
 }
 
-document.addEventListener('keydown', (e) => {
+document.addEventListener('keydown', function(e){
     if (e.key === 'Escape') closeOrderModal();
 });
 </script>
