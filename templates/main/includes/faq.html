@@ -1,0 +1,185 @@
+<!-- ═══════════════════════════════ FAQ ═══════════════════════════════ -->
+<section id="faq" style="background-color:#1A1A1B; background-image:radial-gradient(rgba(255,255,255,0.045) 1px, transparent 1px); background-size:30px 30px; padding:100px 0;">
+
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 divider-line"></div>
+
+    <div style="max-width:800px; margin:0 auto; padding:0 24px;">
+
+        <!-- Header -->
+        <div class="reveal-on-scroll" style="text-align:center; margin-bottom:64px;">
+            <span style="display:block; font-size:.62rem; font-weight:700; text-transform:uppercase;
+                          letter-spacing:.3em; color:#007AFF; margin-bottom:14px;">Запитання та відповіді</span>
+            <h2 style="color:#fff; font-size:2.6rem; font-weight:800; letter-spacing:-.02em;
+                        line-height:1.15; margin-bottom:16px;">Часті запитання</h2>
+            <p style="color:#6b7280; font-size:1rem; max-width:480px; margin:0 auto; line-height:1.7;">
+                Відповіді на найпопулярніші запитання наших клієнтів
+            </p>
+        </div>
+
+        <!-- FAQ items -->
+        <div style="display:flex; flex-direction:column; gap:12px;">
+
+            {% for faq in faqs %}
+            <div class="faq-item reveal-on-scroll"
+                 style="border:1px solid rgba(0,122,255,0.15); border-radius:12px;
+                         background:rgba(42,42,45,0.15); overflow:hidden;
+                         transition:border-color .25s;">
+                <button class="faq-trigger"
+                        onclick="toggleFaq(this)"
+                        style="width:100%; display:flex; align-items:center; justify-content:space-between;
+                               padding:20px 24px; background:none; border:none; cursor:pointer;
+                               text-align:left; gap:16px;">
+                    <span style="color:#fff; font-size:.95rem; font-weight:600; line-height:1.4;">{{ faq.question }}</span>
+                    <span class="faq-icon"
+                          style="width:28px; height:28px; flex-shrink:0; border-radius:7px;
+                                 background:rgba(0,122,255,0.1); border:1px solid rgba(0,122,255,0.25);
+                                 display:flex; align-items:center; justify-content:center;
+                                 transition:transform .3s ease, background .25s;">
+                        <i class="fas fa-plus" style="font-size:.65rem; color:#007AFF; transition:transform .3s ease;"></i>
+                    </span>
+                </button>
+                <div class="faq-body"
+                     style="max-height:0; overflow:hidden; transition:max-height .4s cubic-bezier(.16,1,.3,1);">
+                    <div style="padding:0 24px 20px;">
+                        <div style="height:1px; background:rgba(0,122,255,0.12); margin-bottom:16px;"></div>
+                        <p style="color:#9ca3af; font-size:.9rem; line-height:1.75;">{{ faq.answer }}</p>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+
+            {% for item in faq_default %}
+            <div class="faq-item reveal-on-scroll"
+                 style="border:1px solid rgba(0,122,255,0.15); border-radius:12px;
+                         background:rgba(42,42,45,0.15); overflow:hidden;
+                         transition:border-color .25s;">
+                <button class="faq-trigger"
+                        onclick="toggleFaq(this)"
+                        style="width:100%; display:flex; align-items:center; justify-content:space-between;
+                               padding:20px 24px; background:none; border:none; cursor:pointer;
+                               text-align:left; gap:16px;">
+                    <span style="color:#fff; font-size:.95rem; font-weight:600; line-height:1.4;">{{ item.q }}</span>
+                    <span class="faq-icon"
+                          style="width:28px; height:28px; flex-shrink:0; border-radius:7px;
+                                 background:rgba(0,122,255,0.1); border:1px solid rgba(0,122,255,0.25);
+                                 display:flex; align-items:center; justify-content:center;
+                                 transition:transform .3s ease, background .25s;">
+                        <i class="fas fa-plus" style="font-size:.65rem; color:#007AFF; transition:transform .3s ease;"></i>
+                    </span>
+                </button>
+                <div class="faq-body"
+                     style="max-height:0; overflow:hidden; transition:max-height .4s cubic-bezier(.16,1,.3,1);">
+                    <div style="padding:0 24px 20px;">
+                        <div style="height:1px; background:rgba(0,122,255,0.12); margin-bottom:16px;"></div>
+                        <p style="color:#9ca3af; font-size:.9rem; line-height:1.75;">{{ item.a }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            {% endfor %}
+        </div>
+
+        <!-- Bottom CTA -->
+        <div class="reveal-on-scroll" style="text-align:center; margin-top:52px;">
+            <p style="color:#6b7280; font-size:.875rem; margin-bottom:20px;">
+                Не знайшли відповіді? Напишіть нам напряму
+            </p>
+            <button onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})"
+                    class="btn-outline" style="padding:12px 28px; font-size:.875rem;">
+                <i class="fas fa-comment-dots" style="margin-right:8px; font-size:.8rem;"></i>
+                Задати запитання
+            </button>
+        </div>
+    </div>
+
+</section>
+
+<script>
+/* ── Default FAQ data (hardcoded fallback) ──────────────────── */
+(function() {
+    var defaults = [
+        {
+            q: 'Скільки часу займає ремонт?',
+            a: 'Більшість ремонтів виконується протягом 30 хвилин — 2 годин. Складні випадки (ремонт материнської плати, відновлення даних) можуть займати до 72 годин. Точний термін повідомляємо після діагностики.'
+        },
+        {
+            q: 'Чи надаєте гарантію на ремонт?',
+            a: 'Так, на всі види ремонту надаємо гарантію від 3 до 12 місяців. Гарантія поширюється на виконану роботу та встановлені запчастини. При настанні гарантійного випадку — ремонт безкоштовно.'
+        },
+        {
+            q: 'Які запчастини використовуєте?',
+            a: 'Використовуємо тільки оригінальні або сертифіковані аналоги від перевірених постачальників. Перед заміною завжди узгоджуємо тип запчастини та вартість з клієнтом.'
+        },
+        {
+            q: 'Чи можна перевірити статус замовлення онлайн?',
+            a: 'Так. Після прийому пристрою ви отримуєте номер замовлення. Введіть його або ваш номер телефону в розділі "Статус" на цій сторінці — і побачите поточний етап ремонту.'
+        },
+        {
+            q: 'Що якщо ремонт виявиться неможливим або занадто дорогим?',
+            a: 'Діагностика безкоштовна. Якщо після огляду ремонт недоцільний або вартість вас не влаштовує — ви забираєте пристрій без жодної оплати. Ніяких прихованих зборів.'
+        },
+        {
+            q: 'Як залишити заявку?',
+            a: 'Заповніть форму на цій сторінці або натисніть кнопку "Залишити заявку". Вкажіть ім\'я, телефон, модель пристрою та коротко опишіть проблему. Ми зв\'яжемося з вами протягом кількох хвилин.'
+        }
+    ];
+
+    /* Inject into empty containers if no Django data */
+    var items = document.querySelectorAll('.faq-item');
+    if (items.length === 0) {
+        var container = document.querySelector('#faq .faq-item')
+            ? null
+            : document.querySelector('#faq [style*="flex-direction:column"]');
+        if (!container) return;
+
+        defaults.forEach(function(d) {
+            var el = document.createElement('div');
+            el.className = 'faq-item reveal-on-scroll';
+            el.style.cssText = 'border:1px solid rgba(0,122,255,0.15);border-radius:12px;background:rgba(42,42,45,0.15);overflow:hidden;transition:border-color .25s;';
+            el.innerHTML =
+                '<button class="faq-trigger" onclick="toggleFaq(this)" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:20px 24px;background:none;border:none;cursor:pointer;text-align:left;gap:16px;">' +
+                    '<span style="color:#fff;font-size:.95rem;font-weight:600;line-height:1.4;">' + d.q + '</span>' +
+                    '<span class="faq-icon" style="width:28px;height:28px;flex-shrink:0;border-radius:7px;background:rgba(0,122,255,0.1);border:1px solid rgba(0,122,255,0.25);display:flex;align-items:center;justify-content:center;transition:transform .3s ease,background .25s;">' +
+                        '<i class="fas fa-plus" style="font-size:.65rem;color:#007AFF;transition:transform .3s ease;"></i>' +
+                    '</span>' +
+                '</button>' +
+                '<div class="faq-body" style="max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.16,1,.3,1);">' +
+                    '<div style="padding:0 24px 20px;">' +
+                        '<div style="height:1px;background:rgba(0,122,255,0.12);margin-bottom:16px;"></div>' +
+                        '<p style="color:#9ca3af;font-size:.9rem;line-height:1.75;">' + d.a + '</p>' +
+                    '</div>' +
+                '</div>';
+            container.appendChild(el);
+        });
+    }
+})();
+
+/* ── Toggle accordion ─────────────────────────────────────────── */
+function toggleFaq(btn) {
+    var item  = btn.closest('.faq-item');
+    var body  = item.querySelector('.faq-body');
+    var icon  = item.querySelector('.faq-icon i');
+    var iconWrap = item.querySelector('.faq-icon');
+    var isOpen = body.style.maxHeight && body.style.maxHeight !== '0px';
+
+    /* Close all others */
+    document.querySelectorAll('.faq-item').forEach(function(el) {
+        var b = el.querySelector('.faq-body');
+        var i = el.querySelector('.faq-icon i');
+        var iw = el.querySelector('.faq-icon');
+        b.style.maxHeight = '0px';
+        i.style.transform = 'rotate(0deg)';
+        iw.style.background = 'rgba(0,122,255,0.1)';
+        el.style.borderColor = 'rgba(0,122,255,0.15)';
+    });
+
+    /* Open clicked if was closed */
+    if (!isOpen) {
+        body.style.maxHeight = body.scrollHeight + 48 + 'px';
+        icon.style.transform = 'rotate(45deg)';
+        iconWrap.style.background = 'rgba(0,122,255,0.2)';
+        item.style.borderColor = 'rgba(0,122,255,0.4)';
+    }
+}
+</script>

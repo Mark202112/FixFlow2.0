@@ -137,3 +137,36 @@ input:-webkit-autofill:focus {
     -webkit-text-fill-color: #ffffff;
     caret-color: #ffffff;
 }
+
+/* ── Online indicator dot ─────────────────────────────────────── */
+.online-dot-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+.online-dot-core {
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #34c759;
+    box-shadow: 0 0 6px rgba(52,199,89,0.8);
+    z-index: 1;
+}
+.online-dot-ring {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: rgba(52,199,89,0.35);
+    animation: onlinePulse 2s ease-out infinite;
+}
+@keyframes onlinePulse {
+    0%   { transform: scale(0.6); opacity: 1; }
+    70%  { transform: scale(1.8); opacity: 0; }
+    100% { transform: scale(0.6); opacity: 0; }
+}
