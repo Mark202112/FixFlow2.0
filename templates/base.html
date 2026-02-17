@@ -217,7 +217,7 @@ function smoothScrollTo(id){
     var target=document.getElementById(id);
     if(!target) return;
     var hdrH=document.getElementById('hdr')?document.getElementById('hdr').offsetHeight:72;
-    var top=target.getBoundingClientRect().top+window.pageYOffset-hdrH;
+    var top=target.getBoundingClientRect().top+window.pageYOffset-hdrH-8;
     window.scrollTo({top:top,behavior:'smooth'});
 }
 
@@ -249,14 +249,23 @@ document.addEventListener('click', function(e){
     var a = e.target.closest('a[href*="#"]');
     if(!a) return;
     var href = a.getAttribute('href');
-    var hash = href.indexOf('#') !== -1 ? href.split('#')[1] : null;
+    if(!href) return;
+
+    // Extract hash
+    var hashIdx = href.lastIndexOf('#');
+    if(hashIdx === -1) return;
+    var hash = href.slice(hashIdx + 1);
     if(!hash) return;
+
+    // Only handle if we're on the same page OR it's a pure anchor
     var target = document.getElementById(hash);
     if(!target) return;
+
     e.preventDefault();
     closeMobileMenu();
+
     var hdrH = document.getElementById('hdr') ? document.getElementById('hdr').offsetHeight : 72;
-    var top = target.getBoundingClientRect().top + window.pageYOffset - hdrH;
+    var top = target.getBoundingClientRect().top + window.pageYOffset - hdrH - 8;
     window.scrollTo({top: top, behavior: 'smooth'});
 });
 
