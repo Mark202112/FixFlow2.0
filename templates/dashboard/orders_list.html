@@ -1,28 +1,48 @@
 {% extends 'dashboard/base_dashboard.html' %}
-{% block title %}Замовлення — FixFlow{% endblock %}
-{% block page_title %}Замовлення{% endblock %}
+{% block title %}Заявки — FixFlow{% endblock %}
+{% block page_title %}Заявки на ремонт{% endblock %}
 {% block nav_orders %}active{% endblock %}
 
-{% block content %}
+{% block topbar_actions %}
+<a href="{% url 'dashboard:order_create' %}" class="tb-btn tb-btn-primary">
+    <i class="fas fa-plus" style="font-size:.75rem;"></i> Нова заявка
+</a>
+{% endblock %}
 
-<!-- Search & filters -->
-<div class="dash-section" style="margin-bottom:20px;">
-    <form method="GET" style="padding:16px 22px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-        <input type="text" name="search" placeholder="Пошук за номером, пристроєм, клієнтом..."
-               value="{{ search_query }}" class="dash-input" style="flex:1;min-width:200px;">
-        <select name="status" class="dash-input" style="width:160px;cursor:pointer;">
+{% block content %}
+<!-- Quick status tabs -->
+<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+    <a href="{% url 'dashboard:orders_list' %}" class="tb-btn {% if not current_status %}tb-btn-primary{% else %}tb-btn-ghost{% endif %}" style="font-size:.78rem;padding:7px 14px;">
+        Всі <span style="margin-left:5px;opacity:.6;">{{ counts.all }}</span>
+    </a>
+    <a href="?status=new" class="tb-btn {% if current_status == 'new' %}tb-btn-primary{% else %}tb-btn-ghost{% endif %}" style="font-size:.78rem;padding:7px 14px;">
+        Нові <span style="margin-left:5px;opacity:.6;">{{ counts.new }}</span>
+    </a>
+    <a href="?status=in_progress" class="tb-btn {% if current_status == 'in_progress' %}tb-btn-primary{% else %}tb-btn-ghost{% endif %}" style="font-size:.78rem;padding:7px 14px;">
+        В роботі <span style="margin-left:5px;opacity:.6;">{{ counts.in_progress }}</span>
+    </a>
+    <a href="?status=ready" class="tb-btn {% if current_status == 'ready' %}tb-btn-primary{% else %}tb-btn-ghost{% endif %}" style="font-size:.78rem;padding:7px 14px;">
+        Готові <span style="margin-left:5px;opacity:.6;">{{ counts.ready }}</span>
+    </a>
+</div>
+
+<!-- Filters -->
+<div class="dash-section" style="margin-bottom:16px;">
+    <form method="GET" style="padding:14px 20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+        <input type="text" name="search" placeholder="Пошук..." value="{{ search_query }}" class="dash-input" style="flex:1;min-width:180px;">
+        <select name="status" class="dash-input" style="width:145px;cursor:pointer;">
             <option value="">Всі статуси</option>
-            {% for val, label in status_choices %}
-            <option value="{{ val }}" {% if current_status == val %}selected{% endif %}>{{ label }}</option>
-            {% endfor %}
+            {% for val,label in status_choices %}<option value="{{ val }}" {% if current_status == val %}selected{% endif %}>{{ label }}</option>{% endfor %}
         </select>
-        <button type="submit" class="tb-btn tb-btn-primary">
-            <i class="fas fa-search" style="font-size:.75rem;"></i> Знайти
-        </button>
-        {% if search_query or current_status %}
-        <a href="{% url 'dashboard:orders_list' %}" class="tb-btn tb-btn-ghost">
-            <i class="fas fa-times" style="font-size:.75rem;"></i> Скинути
-        </a>
+        <select name="master" class="dash-input" style="width:145px;cursor:pointer;">
+            <option value="">Всі майстри</option>
+            {% for m in masters %}<option value="{{ m.pk }}" {% if master_filter == m.pk|stringformat:'s' %}selected{% endif %}>{{ m.name }}</option>{% endfor %}
+        </select>
+        <input type="date" name="date_from" value="{{ date_from }}" class="dash-input" style="width:140px;" title="Від">
+        <input type="date" name="date_to"   value="{{ date_to }}"   class="dash-input" style="width:140px;" title="До">
+        <button type="submit" class="tb-btn tb-btn-primary"><i class="fas fa-search" style="font-size:.7rem;"></i></button>
+        {% if search_query or current_status or master_filter or date_from or date_to %}
+        <a href="{% url 'dashboard:orders_list' %}" class="tb-btn tb-btn-ghost"><i class="fas fa-times" style="font-size:.7rem;"></i></a>
         {% endif %}
     </form>
 </div>
@@ -30,57 +50,32 @@
 <!-- Table -->
 <div class="dash-section">
     <div class="dash-section-header">
-        <span class="dash-section-title">
-            Замовлення
-            <span style="font-size:.75rem;color:#4b5563;font-weight:400;margin-left:8px;">{{ orders|length }} записів</span>
-        </span>
+        <span class="dash-section-title">Результати <span style="font-size:.72rem;color:#4b5563;font-weight:400;margin-left:6px;">{{ orders|length }}</span></span>
     </div>
-
     {% if orders %}
     <div style="overflow-x:auto;">
         <table class="dash-table">
-            <thead>
-                <tr>
-                    <th>№</th>
-                    <th>Клієнт</th>
-                    <th>Пристрій</th>
-                    <th>Проблема</th>
-                    <th>Статус</th>
-                    <th>Ціна</th>
-                    <th>Дата</th>
-                    <th></th>
-                </tr>
-            </thead>
+            <thead><tr><th>№</th><th>Клієнт</th><th>Пристрій</th><th>Майстер</th><th>Статус</th><th>Ціна</th><th>Дата</th><th></th></tr></thead>
             <tbody>
-                {% for order in orders %}
-                <tr>
-                    <td style="font-family:monospace;color:#007AFF;font-weight:600;font-size:.78rem;white-space:nowrap;">{{ order.order_number }}</td>
-                    <td>
-                        <div style="font-weight:500;color:#fff;white-space:nowrap;">{{ order.client.name }}</div>
-                        <div style="font-size:.72rem;color:#4b5563;">{{ order.client.phone }}</div>
-                    </td>
-                    <td style="max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ order.device }}</td>
-                    <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#6b7280;font-size:.82rem;">{{ order.problem|truncatechars:50 }}</td>
-                    <td>
-                        <span class="status-chip status-{{ order.status }}">{{ order.get_status_display }}</span>
-                    </td>
-                    <td style="white-space:nowrap;color:#fff;font-weight:500;">{% if order.price %}{{ order.price }} ₴{% else %}—{% endif %}</td>
-                    <td style="font-size:.75rem;color:#4b5563;white-space:nowrap;">{{ order.created_at|date:"d.m.Y" }}</td>
-                    <td>
-                        <a href="{% url 'dashboard:order_detail' order.order_number %}" class="tb-btn tb-btn-ghost" style="padding:6px 12px;font-size:.75rem;">
-                            Відкрити
-                        </a>
-                    </td>
-                </tr>
-                {% endfor %}
+            {% for o in orders %}
+            <tr>
+                <td style="font-family:monospace;color:#007AFF;font-weight:600;font-size:.78rem;white-space:nowrap;">{{ o.order_number }}</td>
+                <td><div style="font-weight:500;color:#fff;">{{ o.client.name }}</div><div style="font-size:.72rem;color:#4b5563;">{{ o.client.phone }}</div></td>
+                <td style="max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ o.device }}</td>
+                <td style="color:#6b7280;font-size:.82rem;">{{ o.assigned_master.name|default:"—" }}</td>
+                <td><span class="status-chip status-{{ o.status }}">{{ o.get_status_display }}</span></td>
+                <td style="white-space:nowrap;color:#fff;font-weight:500;">{% if o.price %}{{ o.price }} ₴{% else %}—{% endif %}</td>
+                <td style="font-size:.75rem;color:#4b5563;white-space:nowrap;">{{ o.created_at|date:"d.m.Y" }}</td>
+                <td><a href="{% url 'dashboard:order_detail' o.order_number %}" class="tb-btn tb-btn-ghost" style="padding:5px 10px;font-size:.72rem;">Відкрити</a></td>
+            </tr>
+            {% endfor %}
             </tbody>
         </table>
     </div>
     {% else %}
     <div style="padding:56px;text-align:center;color:#4b5563;">
-        <i class="fas fa-clipboard" style="font-size:2.2rem;margin-bottom:14px;display:block;opacity:.4;"></i>
-        <p style="font-size:.9rem;font-weight:500;margin-bottom:4px;">Замовлень не знайдено</p>
-        <p style="font-size:.78rem;">Спробуйте інший пошуковий запит</p>
+        <i class="fas fa-clipboard" style="font-size:2rem;margin-bottom:12px;display:block;opacity:.3;"></i>
+        <p style="font-size:.9rem;font-weight:500;margin-bottom:4px;">Заявок не знайдено</p>
     </div>
     {% endif %}
 </div>

@@ -1,0 +1,53 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% block title %}Нова заявка — FixFlow{% endblock %}
+{% block page_title %}Нова заявка{% endblock %}
+{% block nav_orders %}active{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'dashboard:orders_list' %}" class="tb-btn tb-btn-ghost"><i class="fas fa-arrow-left" style="font-size:.75rem;"></i> Назад</a>
+{% endblock %}
+{% block content %}
+<div style="max-width:640px;">
+    {% if error %}<div style="padding:12px 16px;margin-bottom:16px;border-radius:8px;background:rgba(255,59,48,.1);border:1px solid rgba(255,59,48,.3);color:#ff3b30;font-size:.875rem;"><i class="fas fa-exclamation-circle" style="margin-right:8px;"></i>{{ error }}</div>{% endif %}
+    <div class="dash-section">
+        <div class="dash-section-header"><span class="dash-section-title">Дані клієнта</span></div>
+        <form method="POST" style="padding:22px;display:flex;flex-direction:column;gap:16px;">
+            {% csrf_token %}
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                <div>
+                    <p class="ord-label-d">Ім'я клієнта *</p>
+                    <input type="text" name="name" required placeholder="Іван Петренко" class="dash-input">
+                </div>
+                <div>
+                    <p class="ord-label-d">Телефон *</p>
+                    <input type="tel" name="phone" required placeholder="0501234567" class="dash-input">
+                </div>
+            </div>
+            <div>
+                <p class="ord-label-d">Пристрій *</p>
+                <input type="text" name="device" required placeholder="iPhone 15 Pro, Samsung S24, ноутбук ASUS..." class="dash-input">
+            </div>
+            <div>
+                <p class="ord-label-d">Опис проблеми *</p>
+                <textarea name="problem" rows="3" required placeholder="Опишіть несправність..." class="dash-input" style="resize:vertical;"></textarea>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                <div>
+                    <p class="ord-label-d">Призначити майстра</p>
+                    <select name="master" class="dash-input" style="cursor:pointer;">
+                        <option value="">— Без майстра —</option>
+                        {% for m in masters %}<option value="{{ m.pk }}">{{ m.name }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <p class="ord-label-d">Орієнтовна ціна (₴)</p>
+                    <input type="number" name="price" placeholder="0.00" step="0.01" class="dash-input">
+                </div>
+            </div>
+            <button type="submit" class="tb-btn tb-btn-primary" style="align-self:flex-start;padding:11px 28px;">
+                <i class="fas fa-plus" style="font-size:.75rem;margin-right:6px;"></i> Створити заявку
+            </button>
+        </form>
+    </div>
+</div>
+<style>.ord-label-d{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:#007AFF;margin-bottom:7px;}</style>
+{% endblock %}

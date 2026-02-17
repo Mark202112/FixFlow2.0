@@ -1,21 +1,17 @@
 {% extends 'dashboard/base_dashboard.html' %}
 {% block title %}{{ order.order_number }} — FixFlow{% endblock %}
-{% block page_title %}Замовлення {{ order.order_number }}{% endblock %}
+{% block page_title %}{{ order.order_number }}{% endblock %}
 {% block nav_orders %}active{% endblock %}
-
 {% block topbar_actions %}
-<a href="{% url 'dashboard:orders_list' %}" class="tb-btn tb-btn-ghost">
-    <i class="fas fa-arrow-left" style="font-size:.75rem;"></i> Назад
-</a>
+<a href="{% url 'dashboard:orders_list' %}" class="tb-btn tb-btn-ghost"><i class="fas fa-arrow-left" style="font-size:.75rem;"></i> Назад</a>
 {% endblock %}
-
 {% block content %}
-<div style="display:grid;grid-template-columns:1fr 320px;gap:20px;">
+<div style="display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start;">
 
-    <!-- Left: main info -->
+    <!-- Left -->
     <div style="display:flex;flex-direction:column;gap:20px;">
 
-        <!-- Client & device -->
+        <!-- Info -->
         <div class="dash-section">
             <div class="dash-section-header">
                 <span class="dash-section-title">Інформація</span>
@@ -23,81 +19,79 @@
             </div>
             <div style="padding:22px;display:grid;grid-template-columns:1fr 1fr;gap:18px;">
                 <div>
-                    <p style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:#007AFF;margin-bottom:6px;">Клієнт</p>
+                    <p class="det-label">Клієнт</p>
                     <p style="color:#fff;font-weight:600;margin-bottom:3px;">{{ order.client.name }}</p>
                     <p style="color:#6b7280;font-size:.85rem;">{{ order.client.phone }}</p>
+                    {% if order.client.email %}<p style="color:#6b7280;font-size:.82rem;">{{ order.client.email }}</p>{% endif %}
                 </div>
                 <div>
-                    <p style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:#007AFF;margin-bottom:6px;">Пристрій</p>
+                    <p class="det-label">Пристрій</p>
                     <p style="color:#fff;font-weight:600;">{{ order.device }}</p>
                 </div>
                 <div style="grid-column:1/-1;">
-                    <p style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:#007AFF;margin-bottom:6px;">Проблема</p>
-                    <p style="color:#d1d5db;font-size:.9rem;line-height:1.6;">{{ order.problem }}</p>
+                    <p class="det-label">Проблема</p>
+                    <p style="color:#d1d5db;font-size:.9rem;line-height:1.7;">{{ order.problem }}</p>
                 </div>
-                {% if order.notes %}
-                <div style="grid-column:1/-1;">
-                    <p style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:#6b7280;margin-bottom:6px;">Нотатки майстра</p>
-                    <p style="color:#9ca3af;font-size:.875rem;line-height:1.6;">{{ order.notes }}</p>
-                </div>
-                {% endif %}
             </div>
         </div>
 
-        <!-- Update status form -->
+        <!-- Edit form -->
         <div class="dash-section">
-            <div class="dash-section-header">
-                <span class="dash-section-title">Оновити статус</span>
-            </div>
-            <form method="POST" action="{% url 'dashboard:order_detail' order.order_number %}"
-                  style="padding:22px;display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
+            <div class="dash-section-header"><span class="dash-section-title">Редагувати заявку</span></div>
+            <form method="POST" style="padding:22px;display:flex;flex-direction:column;gap:14px;">
                 {% csrf_token %}
-                <div style="flex:1;min-width:160px;">
-                    <p style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:#007AFF;margin-bottom:8px;">Статус</p>
-                    <select name="status" class="dash-input" style="cursor:pointer;">
-                        {% for val, label in order.STATUS_CHOICES %}
-                        <option value="{{ val }}" {% if order.status == val %}selected{% endif %}>{{ label }}</option>
-                        {% endfor %}
-                    </select>
+                <input type="hidden" name="action" value="update">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                    <div>
+                        <p class="det-label">Статус</p>
+                        <select name="status" class="dash-input" style="cursor:pointer;">
+                            {% for val,label in order.STATUS_CHOICES %}<option value="{{ val }}" {% if order.status == val %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <p class="det-label">Майстер</p>
+                        <select name="master" class="dash-input" style="cursor:pointer;">
+                            <option value="">— Без майстра —</option>
+                            {% for m in masters %}<option value="{{ m.pk }}" {% if order.assigned_master == m %}selected{% endif %}>{{ m.name }}</option>{% endfor %}
+                        </select>
+                    </div>
                 </div>
-                <div style="flex:1;min-width:120px;">
-                    <p style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:#007AFF;margin-bottom:8px;">Ціна (₴)</p>
-                    <input type="number" name="price" value="{{ order.price|default:'' }}"
-                           placeholder="0.00" class="dash-input">
+                <div>
+                    <p class="det-label">Ціна (₴)</p>
+                    <input type="number" name="price" value="{{ order.price|default:'' }}" placeholder="0.00" step="0.01" class="dash-input" style="max-width:200px;">
                 </div>
-                <button type="submit" class="tb-btn tb-btn-primary" style="padding:10px 20px;">
-                    <i class="fas fa-save" style="font-size:.75rem;"></i> Зберегти
+                <button type="submit" class="tb-btn tb-btn-primary" style="align-self:flex-start;padding:10px 24px;">
+                    <i class="fas fa-save" style="font-size:.75rem;margin-right:6px;"></i> Зберегти
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- Right: status timeline -->
-    <div class="dash-section" style="height:fit-content;">
-        <div class="dash-section-header">
-            <span class="dash-section-title">Статус</span>
-        </div>
-        <div style="padding:22px;">
-            {% for val, label in order.STATUS_CHOICES %}
-            <div class="timeline-item {% if not forloop.last %}timeline-item--spaced{% endif %}"
-                 style="display:flex;align-items:flex-start;gap:12px;">
+    <!-- Right: timeline -->
+    <div class="dash-section" style="position:sticky;top:80px;">
+        <div class="dash-section-header"><span class="dash-section-title">Статус</span></div>
+        <div style="padding:20px;">
+            {% for val,label in order.STATUS_CHOICES %}
+            <div class="timeline-item {% if not forloop.last %}timeline-item--spaced{% endif %}" style="display:flex;align-items:flex-start;gap:12px;">
                 <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
                     <div class="timeline-dot {% if order.status == val %}timeline-dot--active{% endif %}">
                         <i class="fas {% if order.status == val %}fa-circle-dot{% else %}fa-circle{% endif %} timeline-dot-icon"></i>
                     </div>
-                    {% if not forloop.last %}
-                    <div style="width:1px;height:20px;background:rgba(255,255,255,.06);margin-top:4px;"></div>
-                    {% endif %}
+                    {% if not forloop.last %}<div style="width:1px;height:20px;background:rgba(255,255,255,.06);margin-top:4px;"></div>{% endif %}
                 </div>
                 <div style="padding-top:4px;">
                     <p class="timeline-label {% if order.status == val %}timeline-label--active{% endif %}">{{ label }}</p>
-                    {% if order.status == val %}
-                    <p style="font-size:.7rem;color:#007AFF;margin-top:2px;">Поточний</p>
-                    {% endif %}
+                    {% if order.status == val %}<p style="font-size:.7rem;color:#007AFF;margin-top:2px;">← Поточний</p>{% endif %}
                 </div>
             </div>
             {% endfor %}
         </div>
+        <div style="padding:0 20px 20px;">
+            <div style="height:1px;background:rgba(255,255,255,.05);margin-bottom:16px;"></div>
+            <p style="font-size:.68rem;color:#4b5563;margin-bottom:4px;">Оновлено</p>
+            <p style="font-size:.8rem;color:#6b7280;">{{ order.updated_at|date:"d.m.Y H:i" }}</p>
+        </div>
     </div>
 </div>
+<style>.det-label{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:#007AFF;margin-bottom:6px;}</style>
 {% endblock %}

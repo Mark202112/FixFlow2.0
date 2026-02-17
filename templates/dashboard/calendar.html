@@ -1,29 +1,179 @@
-{% extends 'base.html' %}
+{% extends 'dashboard/base_dashboard.html' %}
+{% block title %}Календар — FixFlow{% endblock %}
+{% block page_title %}Планування робіт{% endblock %}
+{% block nav_calendar %}active{% endblock %}
+
 {% block content %}
-<div class="container dashboard-layout">
-    <div class="sidebar">
-        <a href="{% url 'dashboard:home' %}" class="sidebar-link">📊 Головна</a>
-        <a href="{% url 'dashboard:orders_list' %}" class="sidebar-link">📋 Замовлення</a>
-        <a href="{% url 'dashboard:clients_list' %}" class="sidebar-link">👥 Клієнти</a>
-        <a href="{% url 'dashboard:calendar' %}" class="sidebar-link active">📅 Календар</a>
-        <a href="{% url 'dashboard:reports' %}" class="sidebar-link">📈 Звіти</a>
-        <a href="/admin/" class="sidebar-link">⚙️ Адмін</a>
+
+<div style="display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:start;">
+
+    <!-- Calendar -->
+    <div class="dash-section">
+        <div class="dash-section-header">
+            <span class="dash-section-title">
+                <button id="prev-btn" onclick="prevMonth()" class="tb-btn tb-btn-ghost" style="padding:5px 10px;font-size:.75rem;margin-right:8px;"><i class="fas fa-chevron-left"></i></button>
+                <span id="month-label" style="font-size:.95rem;font-weight:600;color:#fff;"></span>
+                <button id="next-btn" onclick="nextMonth()" class="tb-btn tb-btn-ghost" style="padding:5px 10px;font-size:.75rem;margin-left:8px;"><i class="fas fa-chevron-right"></i></button>
+            </span>
+            <span style="font-size:.72rem;color:#4b5563;">{{ month_orders }} заявок у місяці</span>
+        </div>
+        <div style="padding:20px;">
+            <!-- Day headers -->
+            <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:8px;">
+                {% for d in 'ПнВтСрЧтПтСбНд'|make_list %}{% cycle '<span style="text-align:center;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#4b5563;padding:6px 0;">Пн</span>' '<span style="text-align:center;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#4b5563;padding:6px 0;">Вт</span>' '<span style="text-align:center;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#4b5563;padding:6px 0;">Ср</span>' '<span style="text-align:center;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#4b5563;padding:6px 0;">Чт</span>' '<span style="text-align:center;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#4b5563;padding:6px 0;">Пт</span>' '<span style="text-align:center;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#4b5563;padding:6px 0;color:#6b7280;">Сб</span>' '<span style="text-align:center;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#ff3b30;padding:6px 0;">Нд</span>' %}{% endfor %}
+            </div>
+            <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;"></div>
+        </div>
     </div>
-    <div class="main-content">
-        <h1 style="font-size: 42px; margin-bottom: 40px;">Календар (тиждень)</h1>
-        <div class="card">
-            <table class="table">
-                <thead><tr><th>Дата</th><th>Замовлення</th></tr></thead>
-                <tbody>
-                {% for date, orders in calendar_data.items %}
-                <tr>
-                    <td><strong>{{ date|date:"d.m.Y (D)" }}</strong></td>
-                    <td>{{ orders.count }} замовлень</td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+
+    <!-- Sidebar: today's events -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="dash-section">
+            <div class="dash-section-header"><span class="dash-section-title" id="day-title">Сьогодні</span></div>
+            <div id="day-events" style="padding:12px 16px;max-height:320px;overflow-y:auto;">
+                <p style="color:#4b5563;font-size:.82rem;text-align:center;padding:20px 0;">Оберіть день</p>
+            </div>
+        </div>
+        <div class="dash-section">
+            <div class="dash-section-header"><span class="dash-section-title">Цей місяць</span></div>
+            <div style="padding:16px;">
+                <div id="month-summary" style="display:flex;flex-direction:column;gap:8px;"></div>
+            </div>
         </div>
     </div>
 </div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+var EVENTS = {{ events_json|safe }};
+var TODAY  = '{{ today }}';
+var currentYear, currentMonth;
+
+(function init(){
+    var d = new Date(TODAY);
+    currentYear  = d.getFullYear();
+    currentMonth = d.getMonth();
+    renderCalendar();
+    selectDay(TODAY);
+    renderMonthSummary();
+})();
+
+function renderCalendar(){
+    var months = ['Січень','Лютий','Березень','Квітень','Травень','Червень',
+                  'Липень','Серпень','Вересень','Жовтень','Листопад','Грудень'];
+    document.getElementById('month-label').textContent = months[currentMonth] + ' ' + currentYear;
+
+    var grid   = document.getElementById('cal-grid');
+    grid.innerHTML = '';
+
+    var first  = new Date(currentYear, currentMonth, 1).getDay(); // 0=Sun
+    var start  = (first === 0) ? 6 : first - 1; // Mon=0
+    var days   = new Date(currentYear, currentMonth+1, 0).getDate();
+
+    // Event map
+    var evMap = {};
+    EVENTS.forEach(function(e){
+        if(!evMap[e.date]) evMap[e.date] = [];
+        evMap[e.date].push(e);
+    });
+
+    // Empty cells
+    for(var i=0;i<start;i++){
+        var blank = document.createElement('div');
+        blank.style.cssText = 'min-height:56px;border-radius:8px;';
+        grid.appendChild(blank);
+    }
+
+    for(var day=1;day<=days;day++){
+        var dateStr = currentYear+'-'+String(currentMonth+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+        var evs     = evMap[dateStr] || [];
+        var isToday = dateStr === TODAY;
+
+        var cell = document.createElement('div');
+        cell.dataset.date = dateStr;
+        cell.onclick = function(){ selectDay(this.dataset.date); };
+        cell.style.cssText = 'min-height:56px;border-radius:8px;padding:6px;cursor:pointer;'+
+            'border:1px solid '+(isToday?'rgba(0,122,255,.5)':'rgba(255,255,255,.05)')+';'+
+            'background:'+(isToday?'rgba(0,122,255,.1)':'rgba(42,42,45,.2)')+';'+
+            'transition:border-color .15s,background .15s;';
+
+        var num = document.createElement('span');
+        num.textContent = day;
+        num.style.cssText = 'display:block;font-size:.78rem;font-weight:'+(isToday?'700':'400')+';'+
+            'color:'+(isToday?'#007AFF':'#d1d5db')+';margin-bottom:3px;';
+        cell.appendChild(num);
+
+        // Event dots
+        evs.slice(0,3).forEach(function(ev){
+            var dot = document.createElement('div');
+            dot.style.cssText = 'width:100%;height:3px;border-radius:2px;background:'+ev.color+';margin-bottom:2px;';
+            cell.appendChild(dot);
+        });
+        if(evs.length>3){
+            var more = document.createElement('span');
+            more.textContent = '+' + (evs.length-3);
+            more.style.cssText = 'font-size:.58rem;color:#6b7280;';
+            cell.appendChild(more);
+        }
+        grid.appendChild(cell);
+    }
+}
+
+function selectDay(dateStr){
+    // Highlight selected
+    document.querySelectorAll('#cal-grid div[data-date]').forEach(function(c){
+        c.style.outline = c.dataset.date === dateStr ? '2px solid rgba(0,122,255,.6)' : 'none';
+    });
+
+    var parts = dateStr.split('-');
+    document.getElementById('day-title').textContent = parts[2]+'.'+parts[1]+'.'+parts[0];
+
+    var evs = EVENTS.filter(function(e){ return e.date === dateStr; });
+    var box = document.getElementById('day-events');
+    if(!evs.length){
+        box.innerHTML = '<p style="color:#4b5563;font-size:.82rem;text-align:center;padding:20px 0;">Заявок немає</p>';
+        return;
+    }
+    box.innerHTML = evs.map(function(e){
+        return '<a href="/dashboard/orders/'+e.id+'/" style="display:block;padding:10px 12px;border-radius:8px;background:rgba(42,42,45,.4);border:1px solid rgba(255,255,255,.06);margin-bottom:8px;text-decoration:none;">'+
+            '<p style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:'+e.color+';margin-bottom:3px;">'+e.id+'</p>'+
+            '<p style="color:#fff;font-size:.82rem;font-weight:500;margin-bottom:2px;">'+e.title+'</p>'+
+            '<span style="padding:2px 8px;border-radius:4px;font-size:.65rem;font-weight:600;background:'+e.color+'22;color:'+e.color+';">'+e.status+'</span>'+
+        '</a>';
+    }).join('');
+}
+
+function renderMonthSummary(){
+    var counts = {};
+    var colorMap = {};
+    EVENTS.forEach(function(e){
+        if(!counts[e.status]) { counts[e.status]=0; colorMap[e.status]=e.color; }
+        counts[e.status]++;
+    });
+    var box = document.getElementById('month-summary');
+    Object.keys(counts).forEach(function(s){
+        box.innerHTML += '<div style="display:flex;align-items:center;justify-content:space-between;">'+
+            '<div style="display:flex;align-items:center;gap:8px;">'+
+                '<div style="width:8px;height:8px;border-radius:50%;background:'+colorMap[s]+';flex-shrink:0;"></div>'+
+                '<span style="font-size:.8rem;color:#9ca3af;">'+s+'</span>'+
+            '</div>'+
+            '<span style="font-size:.8rem;font-weight:600;color:#fff;">'+counts[s]+'</span>'+
+        '</div>';
+    });
+    if(!Object.keys(counts).length) box.innerHTML = '<p style="font-size:.8rem;color:#4b5563;text-align:center;">Немає даних</p>';
+}
+
+function prevMonth(){
+    currentMonth--;
+    if(currentMonth<0){ currentMonth=11; currentYear--; }
+    renderCalendar();
+}
+function nextMonth(){
+    currentMonth++;
+    if(currentMonth>11){ currentMonth=0; currentYear++; }
+    renderCalendar();
+}
+</script>
 {% endblock %}

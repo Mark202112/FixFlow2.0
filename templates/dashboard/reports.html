@@ -1,35 +1,154 @@
-{% extends 'base.html' %}
+{% extends 'dashboard/base_dashboard.html' %}
+{% block title %}Звіти — FixFlow{% endblock %}
+{% block page_title %}Звіти та статистика{% endblock %}
+{% block nav_reports %}active{% endblock %}
+
 {% block content %}
-<div class="container dashboard-layout">
-    <div class="sidebar">
-        <a href="{% url 'dashboard:home' %}" class="sidebar-link">📊 Головна</a>
-        <a href="{% url 'dashboard:orders_list' %}" class="sidebar-link">📋 Замовлення</a>
-        <a href="{% url 'dashboard:clients_list' %}" class="sidebar-link">👥 Клієнти</a>
-        <a href="{% url 'dashboard:calendar' %}" class="sidebar-link">📅 Календар</a>
-        <a href="{% url 'dashboard:reports' %}" class="sidebar-link active">📈 Звіти</a>
-        <a href="/admin/" class="sidebar-link">⚙️ Адмін</a>
+
+<!-- Period selector -->
+<div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;align-items:center;">
+    <span style="font-size:.78rem;color:#6b7280;margin-right:4px;">Період:</span>
+    {% for p,label in period_choices %}
+    <a href="?period={{ p }}" class="tb-btn {% if period == p %}tb-btn-primary{% else %}tb-btn-ghost{% endif %}" style="font-size:.78rem;padding:7px 14px;">{{ label }}</a>
+    {% endfor %}
+    <span style="font-size:.72rem;color:#4b5563;margin-left:8px;">з {{ date_from|date:"d.m.Y" }}</span>
+</div>
+
+<!-- KPI cards -->
+<div class="stat-grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));margin-bottom:24px;">
+    <div class="stat-card">
+        <p class="stat-card-label">Всього заявок</p>
+        <p class="stat-card-value">{{ total_orders }}</p>
+        <i class="fas fa-clipboard-list stat-card-icon"></i>
     </div>
-    <div class="main-content">
-        <h1 style="font-size: 42px; margin-bottom: 40px;">Звіти</h1>
-        <div class="card">
-            <form method="get" style="display: flex; gap: 10px; margin-bottom: 30px;">
-                <input type="date" name="start_date" class="form-control" value="{{ request.GET.start_date }}">
-                <input type="date" name="end_date" class="form-control" value="{{ request.GET.end_date }}">
-                <button type="submit" class="btn btn-primary">Фільтр</button>
-            </form>
-            <h3>Статистика по майстрам</h3>
-            <table class="table">
-                <thead><tr><th>Майстер</th><th>Завершено</th></tr></thead>
-                <tbody>
-                {% for master in masters_stats %}
-                <tr>
-                    <td>{{ master.name }}</td>
-                    <td>{{ master.total_orders }}</td>
-                </tr>
+    <div class="stat-card">
+        <p class="stat-card-label">Виконано</p>
+        <p class="stat-card-value" style="color:#34c759;">{{ completed }}</p>
+        <i class="fas fa-check-double stat-card-icon" style="color:#34c759;opacity:.12;"></i>
+    </div>
+    <div class="stat-card">
+        <p class="stat-card-label">Виручка</p>
+        <p class="stat-card-value" style="color:#34c759;font-size:1.5rem;">{{ total_revenue }} ₴</p>
+        <i class="fas fa-hryvnia-sign stat-card-icon" style="color:#34c759;opacity:.12;"></i>
+    </div>
+    <div class="stat-card">
+        <p class="stat-card-label">Середній чек</p>
+        <p class="stat-card-value" style="font-size:1.5rem;">{{ avg_price }} ₴</p>
+        <i class="fas fa-calculator stat-card-icon" style="opacity:.08;"></i>
+    </div>
+</div>
+
+<!-- Charts row -->
+<div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:20px;">
+
+    <!-- Revenue chart -->
+    <div class="dash-section">
+        <div class="dash-section-header">
+            <span class="dash-section-title">Виручка по днях</span>
+        </div>
+        <div style="padding:20px;">
+            <canvas id="revenueChart" height="100"></canvas>
+        </div>
+    </div>
+
+    <!-- Status donut -->
+    <div class="dash-section">
+        <div class="dash-section-header">
+            <span class="dash-section-title">По статусах</span>
+        </div>
+        <div style="padding:20px;display:flex;flex-direction:column;align-items:center;gap:16px;">
+            <canvas id="statusChart" height="160" style="max-width:160px;"></canvas>
+            <div style="width:100%;display:flex;flex-direction:column;gap:6px;">
+                {% for label,count in by_status.items %}
+                <div style="display:flex;align-items:center;justify-content:space-between;font-size:.78rem;">
+                    <span style="color:#9ca3af;">{{ label }}</span>
+                    <span style="color:#fff;font-weight:600;">{{ count }}</span>
+                </div>
                 {% endfor %}
-                </tbody>
-            </table>
+            </div>
         </div>
     </div>
 </div>
+
+<!-- Masters table -->
+<div class="dash-section">
+    <div class="dash-section-header">
+        <span class="dash-section-title">Статистика по майстрах</span>
+    </div>
+    {% if by_master %}
+    <div style="overflow-x:auto;">
+        <table class="dash-table">
+            <thead><tr><th>Майстер</th><th>Роль</th><th>Виконано</th><th>Виручка</th></tr></thead>
+            <tbody>
+            {% for m in by_master %}
+            <tr>
+                <td>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <div style="width:30px;height:30px;border-radius:8px;background:rgba(0,122,255,.15);display:flex;align-items:center;justify-content:center;color:#007AFF;font-size:.72rem;font-weight:700;flex-shrink:0;">{{ m.name|slice:":1"|upper }}</div>
+                        <span style="color:#fff;font-weight:500;">{{ m.name }}</span>
+                    </div>
+                </td>
+                <td style="color:#6b7280;font-size:.82rem;">{{ m.get_role_display }}</td>
+                <td><span style="color:#34c759;font-weight:600;">{{ m.done|default:"0" }}</span></td>
+                <td style="color:#34c759;font-weight:500;">{% if m.revenue %}{{ m.revenue }} ₴{% else %}—{% endif %}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="padding:40px;text-align:center;color:#4b5563;"><i class="fas fa-users" style="font-size:1.8rem;display:block;margin-bottom:10px;opacity:.3;"></i><p>Майстрів не додано</p></div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+// Revenue line chart
+new Chart(document.getElementById('revenueChart'), {
+    type: 'line',
+    data: {
+        labels: {{ revenue_labels|safe }},
+        datasets: [{
+            label: 'Виручка ₴',
+            data: {{ revenue_data|safe }},
+            borderColor: '#34c759',
+            backgroundColor: 'rgba(52,199,89,0.08)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 3,
+            pointBackgroundColor: '#34c759',
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#4b5563', font: { size: 10 }, maxTicksLimit: 10 } },
+            y: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#4b5563', font: { size: 10 } }, beginAtZero: true }
+        }
+    }
+});
+
+// Status donut
+new Chart(document.getElementById('statusChart'), {
+    type: 'doughnut',
+    data: {
+        labels: {{ status_labels|safe }},
+        datasets: [{
+            data: {{ status_counts|safe }},
+            backgroundColor: ['#007AFF','#ff9500','#34c759','#86868b','#ff3b30'],
+            borderWidth: 0,
+            hoverOffset: 4,
+        }]
+    },
+    options: {
+        responsive: true,
+        cutout: '68%',
+        plugins: { legend: { display: false } }
+    }
+});
+</script>
 {% endblock %}

@@ -1,0 +1,55 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% block title %}{{ client.name }} — FixFlow{% endblock %}
+{% block page_title %}Клієнт: {{ client.name }}{% endblock %}
+{% block nav_clients %}active{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'dashboard:clients_list' %}" class="tb-btn tb-btn-ghost"><i class="fas fa-arrow-left" style="font-size:.75rem;"></i> Назад</a>
+{% endblock %}
+{% block content %}
+<div style="display:grid;grid-template-columns:300px 1fr;gap:20px;align-items:start;">
+    <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="dash-section">
+            <div class="dash-section-header"><span class="dash-section-title">Профіль</span></div>
+            <form method="POST" style="padding:20px;display:flex;flex-direction:column;gap:13px;">
+                {% csrf_token %}
+                <div style="text-align:center;margin-bottom:8px;">
+                    <div style="width:56px;height:56px;border-radius:14px;background:rgba(0,122,255,.15);display:inline-flex;align-items:center;justify-content:center;color:#007AFF;font-size:1.4rem;font-weight:700;">{{ client.name|slice:":1"|upper }}</div>
+                </div>
+                <div><p class="det-label-c">Ім'я</p><input type="text" name="name" value="{{ client.name }}" class="dash-input"></div>
+                <div><p class="det-label-c">Телефон</p><p style="color:#007AFF;font-family:monospace;font-size:.9rem;padding:10px 14px;background:rgba(42,42,45,.5);border-radius:8px;border:1px solid rgba(255,255,255,.06);">{{ client.phone }}</p></div>
+                <div><p class="det-label-c">Email</p><input type="email" name="email" value="{{ client.email }}" placeholder="email@example.com" class="dash-input"></div>
+                <button type="submit" class="tb-btn tb-btn-primary" style="width:100%;justify-content:center;padding:10px;"><i class="fas fa-save" style="font-size:.75rem;margin-right:6px;"></i>Зберегти</button>
+            </form>
+        </div>
+        <div class="dash-section">
+            <div style="padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div style="text-align:center;padding:12px;background:rgba(0,122,255,.06);border-radius:8px;border:1px solid rgba(0,122,255,.15);"><p style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#4b5563;margin-bottom:5px;">Замовлень</p><p style="color:#fff;font-size:1.3rem;font-weight:700;">{{ orders.count }}</p></div>
+                <div style="text-align:center;padding:12px;background:rgba(52,199,89,.05);border-radius:8px;border:1px solid rgba(52,199,89,.15);"><p style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#4b5563;margin-bottom:5px;">Витрат</p><p style="color:#34c759;font-size:1.1rem;font-weight:700;">{{ orders.filter.count|default:"—" }}</p></div>
+            </div>
+        </div>
+    </div>
+    <div class="dash-section">
+        <div class="dash-section-header"><span class="dash-section-title">Замовлення клієнта</span></div>
+        {% if orders %}
+        <div style="overflow-x:auto;">
+            <table class="dash-table">
+                <thead><tr><th>№</th><th>Пристрій</th><th>Статус</th><th>Ціна</th><th>Дата</th><th></th></tr></thead>
+                <tbody>
+                {% for o in orders %}
+                <tr>
+                    <td style="font-family:monospace;color:#007AFF;font-weight:600;font-size:.78rem;">{{ o.order_number }}</td>
+                    <td>{{ o.device }}</td>
+                    <td><span class="status-chip status-{{ o.status }}">{{ o.get_status_display }}</span></td>
+                    <td style="color:#fff;font-weight:500;">{% if o.price %}{{ o.price }} ₴{% else %}—{% endif %}</td>
+                    <td style="font-size:.75rem;color:#4b5563;">{{ o.created_at|date:"d.m.Y" }}</td>
+                    <td><a href="{% url 'dashboard:order_detail' o.order_number %}" class="tb-btn tb-btn-ghost" style="padding:5px 10px;font-size:.72rem;">Відкрити</a></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}<div style="padding:40px;text-align:center;color:#4b5563;"><i class="fas fa-inbox" style="font-size:1.8rem;display:block;margin-bottom:10px;opacity:.3;"></i><p>Замовлень немає</p></div>{% endif %}
+    </div>
+</div>
+<style>.det-label-c{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:#007AFF;margin-bottom:6px;}</style>
+{% endblock %}
