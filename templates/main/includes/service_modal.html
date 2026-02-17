@@ -120,7 +120,7 @@ function openServiceModal(id){
             );}).join('')+
         '</div>';
     modal.style.display='block';
-    document.body.style.overflow='hidden';
+    lockScroll();
     cnt.scrollTop=0;
     requestAnimationFrame(function(){requestAnimationFrame(function(){
         ovl.style.background='rgba(0,0,0,0.72)';
@@ -138,7 +138,7 @@ function closeServiceModal(){
     ovl.style.backdropFilter='blur(0px)';
     cnt.style.opacity='0';
     cnt.style.transform='scale(.94) translateY(16px)';
-    setTimeout(function(){modal.style.display='none';document.body.style.overflow='';},340);
+    setTimeout(function(){modal.style.display='none';unlockScroll();},340);
 }
 
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeServiceModal();});
