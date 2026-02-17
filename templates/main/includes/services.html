@@ -14,6 +14,13 @@
             <span class="block text-[10px] font-bold uppercase tracking-[0.3em] mb-4" style="color:#007AFF;">Наші послуги</span>
             <h2 class="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4">Професійний сервіс</h2>
             <p class="text-gray-400 text-lg max-w-2xl mx-auto">Повний спектр послуг з ремонту та обслуговування електроніки</p>
+            <!-- Click hint -->
+            <div style="display:inline-flex;align-items:center;gap:8px;margin-top:18px;
+                        padding:8px 18px;border-radius:20px;
+                        background:rgba(0,122,255,0.07);border:1px solid rgba(0,122,255,0.18);">
+                <i class="fas fa-hand-pointer" style="color:#007AFF;font-size:.8rem;"></i>
+                <span style="color:#6b7280;font-size:.78rem;">Натисніть на картку щоб дізнатись деталі та вартість</span>
+            </div>
         </div>
 
         <!-- Main services — photo cards -->
@@ -23,7 +30,7 @@
             <div class="group relative overflow-hidden cursor-pointer transition-transform duration-300 hover:-translate-y-1"
                  onclick="openServiceModal('phones')">
                 <div class="relative h-72 overflow-hidden">
-                    <img src="{% static 'images/site/phones.jpg' %}"
+                    <img src="https://images.unsplash.com/photo-1736628274358-f020fa50b7a8?w=800&q=80&fit=crop"
                          alt="Ремонт смартфонів"
                          class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                          loading="lazy">
@@ -42,6 +49,10 @@
                     <div class="absolute bottom-0 left-0 right-0 h-0.5 transition-transform duration-300 scale-x-0 group-hover:scale-x-100 origin-left"
                          style="background: linear-gradient(to right, #007AFF, #0056CC);"></div>
                 </div>
+                <!-- Click hint badge -->
+                <span class="svc-hint-badge group-hover:opacity-0">
+                    <i class="fas fa-arrow-up-right-from-square" style="font-size:.6rem;"></i> Деталі
+                </span>
                 <span class="absolute top-5 right-5 text-xs font-black text-white/10 group-hover:text-brand/30 transition-colors select-none">01</span>
             </div>
 
@@ -49,7 +60,7 @@
             <div class="group relative overflow-hidden cursor-pointer transition-transform duration-300 hover:-translate-y-1"
                  onclick="openServiceModal('laptops')">
                 <div class="relative h-72 overflow-hidden">
-                    <img src="{% static 'images/site/laptops.jpg' %}"
+                    <img src="https://images.unsplash.com/photo-1659543038938-c31e75428b97?w=800&q=80&fit=crop"
                          alt="Ремонт ноутбуків"
                          class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                          loading="lazy">
@@ -67,6 +78,9 @@
                     <div class="absolute bottom-0 left-0 right-0 h-0.5 transition-transform duration-300 scale-x-0 group-hover:scale-x-100 origin-left"
                          style="background: linear-gradient(to right, #007AFF, #0056CC);"></div>
                 </div>
+                <span class="svc-hint-badge group-hover:opacity-0">
+                    <i class="fas fa-arrow-up-right-from-square" style="font-size:.6rem;"></i> Деталі
+                </span>
                 <span class="absolute top-5 right-5 text-xs font-black text-white/10 group-hover:text-brand/30 transition-colors select-none">02</span>
             </div>
 
@@ -74,7 +88,7 @@
             <div class="group relative overflow-hidden cursor-pointer transition-transform duration-300 hover:-translate-y-1"
                  onclick="openServiceModal('pc')">
                 <div class="relative h-72 overflow-hidden">
-                    <img src="{% static 'images/site/pc.jpg' %}"
+                    <img src="https://images.unsplash.com/photo-1760114333188-a1a8b50b5d94?w=800&q=80&fit=crop"
                          alt="Ремонт ПК"
                          class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                          loading="lazy">
@@ -92,6 +106,9 @@
                     <div class="absolute bottom-0 left-0 right-0 h-0.5 transition-transform duration-300 scale-x-0 group-hover:scale-x-100 origin-left"
                          style="background: linear-gradient(to right, #007AFF, #0056CC);"></div>
                 </div>
+                <span class="svc-hint-badge group-hover:opacity-0">
+                    <i class="fas fa-arrow-up-right-from-square" style="font-size:.6rem;"></i> Деталі
+                </span>
                 <span class="absolute top-5 right-5 text-xs font-black text-white/10 group-hover:text-brand/30 transition-colors select-none">03</span>
             </div>
         </div>
@@ -168,3 +185,30 @@
     <!-- Bottom divider -->
     <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-1/2 divider-line"></div>
 </section>
+
+<style>
+.svc-hint-badge {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 11px;
+    border-radius: 20px;
+    font-size: .7rem;
+    font-weight: 600;
+    color: #fff;
+    background: rgba(0,122,255,0.55);
+    border: 1px solid rgba(0,122,255,0.6);
+    backdrop-filter: blur(6px);
+    animation: hintPulse 2.4s ease-in-out infinite;
+    transition: opacity .25s ease;
+    pointer-events: none;
+    z-index: 10;
+}
+@keyframes hintPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(0,122,255,0.5); }
+    50%       { box-shadow: 0 0 0 6px rgba(0,122,255,0); }
+}
+</style>
