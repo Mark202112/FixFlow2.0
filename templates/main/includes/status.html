@@ -15,11 +15,9 @@
         </div>
 
         <div class="reveal-on-scroll max-w-2xl mx-auto">
-            <form method="POST" action="{% url 'main:check_status' %}" id="status-form"
+            <form id="status-form"
                   style="background:rgba(26,26,27,0.85); border:1px solid rgba(0,122,255,0.25);
-                         padding:40px; border-radius:14px; backdrop-filter:blur(8px);"
-                  onsubmit="return submitStatus(event)">
-                {% csrf_token %}
+                         padding:40px; border-radius:14px; backdrop-filter:blur(8px);">
 
                 <div class="flex flex-col sm:flex-row gap-3">
                     <div class="relative flex-1">
@@ -42,7 +40,7 @@
                 <div style="display:flex; flex-wrap:wrap; gap:16px; margin-top:12px;">
                     <span style="font-size:.72rem; color:#4b5563;">
                         <i class="fas fa-circle-info" style="color:#007AFF; margin-right:5px; font-size:.65rem;"></i>
-                        Приклад по номеру: <span style="color:#6b7280; font-family:monospace;">FF-2024-0042</span>
+                        Приклад по номеру: <span style="color:#6b7280; font-family:monospace;">RM12345678</span>
                     </span>
                     <span style="font-size:.72rem; color:#4b5563;">
                         <i class="fas fa-circle-info" style="color:#007AFF; margin-right:5px; font-size:.65rem;"></i>
@@ -50,84 +48,9 @@
                     </span>
                 </div>
 
-                <!-- Results rendered by Django -->
-                {% if orders is not None %}
-                    {% if orders %}
-                        <div style="border-top:1px solid rgba(0,122,255,0.15);margin-top:24px;padding-top:24px;display:flex;flex-direction:column;gap:12px;">
-                            {% for order in orders %}
-                            <div style="padding:20px;background:rgba(42,42,45,0.25);border:1px solid rgba(0,122,255,0.2);border-radius:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
-                                <div>
-                                    <p style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:#007AFF;margin-bottom:6px;">{{ order.order_number }}</p>
-                                    <p style="color:#fff;font-size:1rem;font-weight:600;margin-bottom:4px;">{{ order.device }}</p>
-                                    <p style="color:#6b7280;font-size:.8rem;">{{ order.client.phone }}</p>
-                                </div>
-                                <div>
-                                    <span class="status-badge
-                                        {% if order.status == 'new' %}badge-new
-                                        {% elif order.status == 'in_progress' %}badge-progress
-                                        {% elif order.status == 'ready' %}badge-ready
-                                        {% elif order.status == 'completed' %}badge-completed
-                                        {% else %}badge-cancelled{% endif %}">
-                                        {{ order.get_status_display }}
-                                    </span>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <div style="border-top:1px solid rgba(0,122,255,0.15);margin-top:24px;padding-top:24px;">
-                            <div style="padding:16px;background:rgba(255,149,0,.08);border:1px solid rgba(255,149,0,.25);border-radius:10px;display:flex;align-items:center;gap:12px;">
-                                <i class="fas fa-exclamation-circle" style="color:#ff9500;font-size:1.1rem;flex-shrink:0;"></i>
-                                <div>
-                                    <p style="color:#ff9500;font-size:.875rem;font-weight:600;margin-bottom:2px;">Замовлення не знайдено</p>
-                                    <p style="color:#9ca3af;font-size:.8rem;">Перевірте правильність введеного номера</p>
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
-                {% endif %}
-            </form>
-        </div>
+                <!-- Results container (filled by JS) -->
+                <div id="status-results"></div>
 
-    </div>
-
-    <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-1/2 divider-line"></div>
-</section>
-                {% if orders is not None %}
-                    {% if orders %}
-                        <div style="border-top:1px solid rgba(0,122,255,0.15);padding-top:24px;display:flex;flex-direction:column;gap:12px;">
-                            {% for order in orders %}
-                            <div style="padding:20px;background:rgba(42,42,45,0.25);border:1px solid rgba(0,122,255,0.2);border-radius:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
-                                <div>
-                                    <p style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:#007AFF;margin-bottom:6px;">{{ order.order_number }}</p>
-                                    <p style="color:#fff;font-size:1rem;font-weight:600;margin-bottom:4px;">{{ order.device }}</p>
-                                    <p style="color:#6b7280;font-size:.8rem;">{{ order.client.phone }}</p>
-                                </div>
-                                <div>
-                                    <span class="status-badge
-                                        {% if order.status == 'new' %}badge-new
-                                        {% elif order.status == 'in_progress' %}badge-progress
-                                        {% elif order.status == 'ready' %}badge-ready
-                                        {% elif order.status == 'completed' %}badge-completed
-                                        {% else %}badge-cancelled{% endif %}">
-                                        {{ order.get_status_display }}
-                                    </span>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <div style="border-top:1px solid rgba(0,122,255,0.15);padding-top:24px;">
-                            <div style="padding:16px;background:rgba(255,149,0,.08);border:1px solid rgba(255,149,0,.25);border-radius:10px;display:flex;align-items:center;gap:12px;">
-                                <i class="fas fa-exclamation-circle" style="color:#ff9500;font-size:1.1rem;flex-shrink:0;"></i>
-                                <div>
-                                    <p style="color:#ff9500;font-size:.875rem;font-weight:600;margin-bottom:2px;">Замовлення не знайдено</p>
-                                    <p style="color:#9ca3af;font-size:.8rem;">Перевірте правильність введеного номера</p>
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
-                {% endif %}
             </form>
         </div>
 
@@ -150,4 +73,95 @@
 .badge-ready     { background: rgba(52,199,89,.12);    color: #34c759;  border: 1px solid rgba(52,199,89,.3); }
 .badge-completed { background: rgba(134,134,139,.12);  color: #86868b;  border: 1px solid rgba(134,134,139,.3); }
 .badge-cancelled { background: rgba(255,59,48,.12);    color: #ff3b30;  border: 1px solid rgba(255,59,48,.3); }
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.result-item {
+    animation: fadeInUp 0.4s ease-out;
+}
 </style>
+
+<script>
+document.getElementById('status-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    
+    var searchInput = document.getElementById('status-input');
+    var searchBtn   = document.getElementById('status-btn');
+    var resultsBox  = document.getElementById('status-results');
+    var query       = searchInput.value.trim();
+
+    if (!query) return;
+
+    // Show loading state
+    searchBtn.disabled = true;
+    searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i>Шукаємо...';
+    resultsBox.innerHTML = '';
+
+    // Fetch results
+    fetch('{% url "main:check_status_api" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: 'search=' + encodeURIComponent(query)
+    })
+    .then(function(response){ return response.json(); })
+    .then(function(data){
+        // Reset button
+        searchBtn.disabled = false;
+        searchBtn.innerHTML = 'Знайти';
+
+        if (data.orders && data.orders.length > 0) {
+            // Show results
+            var html = '<div style="border-top:1px solid rgba(0,122,255,0.15);margin-top:24px;padding-top:24px;display:flex;flex-direction:column;gap:12px;">';
+            
+            data.orders.forEach(function(order, index){
+                var badgeClass = 'badge-new';
+                if (order.status === 'in_progress') badgeClass = 'badge-progress';
+                else if (order.status === 'ready') badgeClass = 'badge-ready';
+                else if (order.status === 'completed') badgeClass = 'badge-completed';
+                else if (order.status === 'cancelled') badgeClass = 'badge-cancelled';
+
+                html += '<div class="result-item" style="padding:20px;background:rgba(42,42,45,0.25);border:1px solid rgba(0,122,255,0.2);border-radius:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;animation-delay:' + (index * 0.1) + 's;">';
+                html += '<div>';
+                html += '<p style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:#007AFF;margin-bottom:6px;">' + order.order_number + '</p>';
+                html += '<p style="color:#fff;font-size:1rem;font-weight:600;margin-bottom:4px;">' + order.device + '</p>';
+                html += '<p style="color:#6b7280;font-size:.8rem;">' + order.phone + '</p>';
+                html += '</div>';
+                html += '<div><span class="status-badge ' + badgeClass + '">' + order.status_display + '</span></div>';
+                html += '</div>';
+            });
+
+            html += '</div>';
+            resultsBox.innerHTML = html;
+
+        } else {
+            // No results
+            resultsBox.innerHTML = '<div style="border-top:1px solid rgba(0,122,255,0.15);margin-top:24px;padding-top:24px;">' +
+                '<div style="padding:16px;background:rgba(255,149,0,.08);border:1px solid rgba(255,149,0,.25);border-radius:10px;display:flex;align-items:center;gap:12px;animation:fadeInUp 0.4s ease-out;">' +
+                '<i class="fas fa-exclamation-circle" style="color:#ff9500;font-size:1.1rem;flex-shrink:0;"></i>' +
+                '<div><p style="color:#ff9500;font-size:.875rem;font-weight:600;margin-bottom:2px;">Замовлення не знайдено</p>' +
+                '<p style="color:#9ca3af;font-size:.8rem;">Перевірте правильність введеного номера</p></div>' +
+                '</div></div>';
+        }
+    })
+    .catch(function(err){
+        searchBtn.disabled = false;
+        searchBtn.innerHTML = 'Знайти';
+        resultsBox.innerHTML = '<div style="border-top:1px solid rgba(0,122,255,0.15);margin-top:24px;padding-top:24px;">' +
+            '<div style="padding:16px;background:rgba(255,59,48,.08);border:1px solid rgba(255,59,48,.25);border-radius:10px;display:flex;align-items:center;gap:12px;">' +
+            '<i class="fas fa-times-circle" style="color:#ff3b30;font-size:1.1rem;flex-shrink:0;"></i>' +
+            '<div><p style="color:#ff3b30;font-size:.875rem;font-weight:600;">Помилка пошуку</p></div>' +
+            '</div></div>';
+    });
+});
+
+function getCookie(name) {
+    var value = '; ' + document.cookie;
+    var parts = value.split('; ' + name + '=');
+    if (parts.length === 2) return parts.pop().split(';').shift();
+}
+</script>

@@ -57,3 +57,37 @@ def check_status(request):
             )
     
     return render(request, 'main/home.html', {'orders': orders})
+
+@require_POST
+def check_status_api(request):
+    """API endpoint для перевірки статусу (без перезавантаження сторінки)"""
+    try:
+        search = request.POST.get('search', '').strip()
+        
+        if not search:
+            return JsonResponse({'orders': []})
+        
+        # Шукаємо по номеру замовлення або телефону
+        orders = Order.objects.filter(
+            order_number__icontains=search
+        ) | Order.objects.filter(
+            client__phone__icontains=search
+        )
+        
+        orders = orders.select_related('client')[:10]  # макс 10 результатів
+        
+        # Серіалізуємо в JSON
+        results = []
+        for order in orders:
+            results.append({
+                'order_number': order.order_number,
+                'device': order.device,
+                'phone': order.client.phone,
+                'status': order.status,
+                'status_display': order.get_status_display(),
+            })
+        
+        return JsonResponse({'orders': results})
+        
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
