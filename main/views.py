@@ -1,20 +1,23 @@
-"""Публічні сторінки - ПРОСТІ ФУНКЦІЇ"""
 from django.shortcuts import render, redirect
-from orders.models import Client, Order
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from orders.models import Order, Client
 
 def home(request):
-    """Головна сторінка"""
     return render(request, 'main/home.html')
 
+@require_POST
 def create_order(request):
-    """Створення замовлення"""
-    if request.method == 'POST':
-        # Отримуємо дані
-        name = request.POST.get('name')
-        phone = request.POST.get('phone')
-        email = request.POST.get('email', '')
-        device = request.POST.get('device')
-        problem = request.POST.get('problem')
+    """Створення замовлення через форму на сайті"""
+    try:
+        name    = request.POST.get('name', '').strip()
+        phone   = request.POST.get('phone', '').strip()
+        email   = request.POST.get('email', '').strip()
+        device  = request.POST.get('device', '').strip()
+        problem = request.POST.get('problem', '').strip()
+        
+        if not (name and phone and device and problem):
+            return JsonResponse({'success': False, 'error': 'Заповніть всі поля'}, status=400)
         
         # Створюємо або знаходимо клієнта
         client, _ = Client.objects.get_or_create(
@@ -29,28 +32,28 @@ def create_order(request):
             problem=problem
         )
         
-        # Зберігаємо в сесії
-        request.session['last_order'] = order.order_number
-        return redirect('order_success')
-    
-    return render(request, 'main/create_order.html')
-
-def order_success(request):
-    """Успіх"""
-    number = request.session.get('last_order')
-    order = Order.objects.filter(order_number=number).first() if number else None
-    return render(request, 'main/order_success.html', {'order': order})
+        # Повертаємо успішну відповідь
+        return JsonResponse({
+            'success': True,
+            'order_number': order.order_number,
+            'message': 'Заявку успішно створено'
+        })
+        
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
 def check_status(request):
-    """Перевірка статусу — вбудована в головну сторінку"""
+    """Перевірка статусу замовлення"""
     orders = None
+    
     if request.method == 'POST':
         search = request.POST.get('search', '').strip()
         if search:
-            orders = list(
-                Order.objects.filter(order_number__icontains=search) |
-                Order.objects.filter(client__phone__icontains=search)
+            # Шукаємо по номеру замовлення або телефону
+            orders = Order.objects.filter(
+                order_number__icontains=search
+            ) | Order.objects.filter(
+                client__phone__icontains=search
             )
-        else:
-            orders = []
+    
     return render(request, 'main/home.html', {'orders': orders})
