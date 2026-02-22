@@ -75,8 +75,8 @@
                             <input type="text" name="device" required placeholder="iPhone 15 Pro, Samsung S24..." class="ord-input">
                         </div>
                         <div style="margin-bottom:18px;">
-                            <label style="display:block; font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:#007AFF; margin-bottom:8px;">Опис проблеми *</label>
-                            <textarea name="problem" required rows="3" placeholder="Не вмикається, розбитий екран, не заряджається..." class="ord-input" style="resize:vertical;"></textarea>
+                            <label style="display:block; font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:#007AFF; margin-bottom:8px;">Опис проблеми / Коментар *</label>
+                            <textarea name="problem" required rows="3" placeholder="Не вмикається, розбитий екран, потрібен апгрейд..." class="ord-input" style="resize:vertical;"></textarea>
                         </div>
                     </div>
 
@@ -190,13 +190,18 @@ document.getElementById('ord-form').addEventListener('submit', function(e){
         headers: { 'X-CSRFToken': csrf }
     })
     .then(function(response){
-        if(response.ok || response.redirected){
+        return response.json().then(function(data){
+            return { status: response.status, data: data };
+        });
+    })
+    .then(function(result){
+        if(result.status === 200 && result.data.success){
             // Success - show success state
             document.getElementById('ord-form-state').style.display = 'none';
             document.getElementById('ord-success-state').style.display = 'block';
             form.reset();
         } else {
-            throw new Error('Network error');
+            throw new Error(result.data.error || 'Помилка відправки');
         }
     })
     .catch(function(err){
