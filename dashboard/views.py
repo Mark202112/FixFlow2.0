@@ -108,6 +108,15 @@ def order_detail(request, order_number):
                     text=comment_text
                 )
 
+        elif action == 'delete_comment':
+            comment_id = request.POST.get('comment_id')
+            if comment_id:
+                try:
+                    comment = Comment.objects.get(pk=comment_id, order=order)
+                    comment.delete()
+                except Comment.DoesNotExist:
+                    pass
+
         return redirect('dashboard:order_detail', order_number=order.order_number)
 
     return render(request, 'dashboard/order_detail.html', {
