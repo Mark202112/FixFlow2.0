@@ -116,7 +116,7 @@ document.getElementById('status-form').addEventListener('submit', function(e){
 
         if (data.orders && data.orders.length > 0) {
             // Show results
-            var html = '<div style="border-top:1px solid rgba(0,122,255,0.15);margin-top:24px;padding-top:24px;display:flex;flex-direction:column;gap:12px;">';
+            var html = '<div style="border-top:1px solid rgba(0,122,255,0.15);margin-top:24px;padding-top:24px;display:flex;flex-direction:column;gap:16px;">';
             
             data.orders.forEach(function(order, index){
                 var badgeClass = 'badge-new';
@@ -125,13 +125,37 @@ document.getElementById('status-form').addEventListener('submit', function(e){
                 else if (order.status === 'completed') badgeClass = 'badge-completed';
                 else if (order.status === 'cancelled') badgeClass = 'badge-cancelled';
 
-                html += '<div class="result-item" style="padding:20px;background:rgba(42,42,45,0.25);border:1px solid rgba(0,122,255,0.2);border-radius:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;animation-delay:' + (index * 0.1) + 's;">';
+                html += '<div class="result-item" style="padding:20px;background:rgba(42,42,45,0.25);border:1px solid rgba(0,122,255,0.2);border-radius:10px;animation-delay:' + (index * 0.1) + 's;">';
+                
+                // Header
+                html += '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;">';
                 html += '<div>';
                 html += '<p style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:#007AFF;margin-bottom:6px;">' + order.order_number + '</p>';
                 html += '<p style="color:#fff;font-size:1rem;font-weight:600;margin-bottom:4px;">' + order.device + '</p>';
-                html += '<p style="color:#6b7280;font-size:.8rem;">' + order.phone + '</p>';
+                html += '<p style="color:#6b7280;font-size:.8rem;">Створено: ' + order.created + '</p>';
                 html += '</div>';
                 html += '<div><span class="status-badge ' + badgeClass + '">' + order.status_display + '</span></div>';
+                html += '</div>';
+
+                // Comments
+                if (order.comments && order.comments.length > 0) {
+                    html += '<div style="border-top:1px solid rgba(0,122,255,0.1);padding-top:16px;margin-top:12px;">';
+                    html += '<p style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#007AFF;margin-bottom:12px;">Коментарі майстра:</p>';
+                    html += '<div style="display:flex;flex-direction:column;gap:10px;">';
+                    
+                    order.comments.forEach(function(comment){
+                        html += '<div style="padding:12px;background:rgba(42,42,45,0.4);border:1px solid rgba(0,122,255,0.08);border-radius:8px;border-left:3px solid #007AFF;">';
+                        html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">';
+                        html += '<span style="font-size:.75rem;font-weight:600;color:#007AFF;">' + comment.author + '</span>';
+                        html += '<span style="font-size:.7rem;color:#4b5563;">' + comment.date + '</span>';
+                        html += '</div>';
+                        html += '<p style="color:#9ca3af;font-size:.85rem;line-height:1.6;margin:0;">' + comment.text + '</p>';
+                        html += '</div>';
+                    });
+                    
+                    html += '</div></div>';
+                }
+
                 html += '</div>';
             });
 

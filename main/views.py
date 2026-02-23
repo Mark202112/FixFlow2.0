@@ -62,6 +62,8 @@ def check_status(request):
 def check_status_api(request):
     """API endpoint для перевірки статусу (без перезавантаження сторінки)"""
     try:
+        from orders.models import Comment
+        
         search = request.POST.get('search', '').strip()
         
         if not search:
@@ -74,17 +76,28 @@ def check_status_api(request):
             client__phone__icontains=search
         )
         
-        orders = orders.select_related('client')[:10]  # макс 10 результатів
+        orders = orders.select_related('client').prefetch_related('comments__author')[:10]
         
         # Серіалізуємо в JSON
         results = []
         for order in orders:
+            # Коментарі для клієнта
+            comments_data = []
+            for comment in order.comments.all():
+                comments_data.append({
+                    'text': comment.text,
+                    'author': comment.author.name if comment.author else 'Майстер',
+                    'date': comment.created_at.strftime('%d.%m.%Y %H:%M'),
+                })
+            
             results.append({
                 'order_number': order.order_number,
                 'device': order.device,
                 'phone': order.client.phone,
                 'status': order.status,
                 'status_display': order.get_status_display(),
+                'comments': comments_data,
+                'created': order.created_at.strftime('%d.%m.%Y'),
             })
         
         return JsonResponse({'orders': results})

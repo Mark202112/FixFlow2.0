@@ -88,3 +88,19 @@ class Order(models.Model):
             return stages.index(self.status)
         except ValueError:
             return 0
+
+
+class Comment(models.Model):
+    """Коментар майстра до замовлення"""
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='comments')
+    author = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, blank=True)
+    text = models.TextField(verbose_name="Текст коментаря")
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Коментар"
+        verbose_name_plural = "Коментарі"
+        ordering = ['created_at']  # старіші першими (хронологічно)
+    
+    def __str__(self):
+        return f"Коментар до {self.order.order_number}"

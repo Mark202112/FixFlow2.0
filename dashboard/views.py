@@ -69,24 +69,52 @@ def orders_list(request):
 
 @login_required
 def order_detail(request, order_number):
-    order=get_object_or_404(Order,order_number=order_number)
-    masters=Employee.objects.filter(role='master')
-    if request.method=='POST':
-        status=request.POST.get('status')
-        price=request.POST.get('price','').strip()
-        master=request.POST.get('master','')
-        if status: order.status=status
-        if price:
-            try: order.price=float(price)
-            except ValueError: pass
-        if master:
-            try: order.assigned_master_id=int(master)
-            except: pass
-        elif 'master' in request.POST and master=='':
-            order.assigned_master=None
-        order.save()
-        return redirect('dashboard:order_detail',order_number=order.order_number)
-    return render(request,'dashboard/order_detail.html',{'order':order,'masters':masters})
+    from orders.models import Comment
+    
+    order = get_object_or_404(Order, order_number=order_number)
+    masters = Employee.objects.filter(role='master')
+    comments = order.comments.all().select_related('author')
+
+    if request.method == 'POST':
+        action = request.POST.get('action', 'update')
+
+        if action == 'update':
+            status = request.POST.get('status')
+            price  = request.POST.get('price', '').strip()
+            master = request.POST.get('master', '')
+
+            if status:
+                order.status = status
+            if price:
+                try:
+                    order.price = float(price)
+                except ValueError:
+                    pass
+            if master:
+                try:
+                    order.assigned_master_id = int(master)
+                except (ValueError, TypeError):
+                    pass
+            elif 'master' in request.POST and master == '':
+                order.assigned_master = None
+            order.save()
+
+        elif action == 'add_comment':
+            comment_text = request.POST.get('comment', '').strip()
+            if comment_text:
+                Comment.objects.create(
+                    order=order,
+                    author=get_employee(request),
+                    text=comment_text
+                )
+
+        return redirect('dashboard:order_detail', order_number=order.order_number)
+
+    return render(request, 'dashboard/order_detail.html', {
+        'order':    order,
+        'masters':  masters,
+        'comments': comments,
+    })
 
 @login_required
 def order_create(request):

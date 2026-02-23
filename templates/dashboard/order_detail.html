@@ -65,6 +65,52 @@
                 </button>
             </form>
         </div>
+
+        <!-- Comments section -->
+        <div class="dash-section">
+            <div class="dash-section-header">
+                <span class="dash-section-title">Коментарі майстра</span>
+                <span style="font-size:.72rem;color:#4b5563;">{{ comments.count }}</span>
+            </div>
+            
+            <!-- Comments list -->
+            <div style="padding:16px 22px;">
+                {% if comments %}
+                    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px;">
+                    {% for c in comments %}
+                        <div style="padding:14px 16px;background:rgba(42,42,45,0.3);border:1px solid rgba(0,122,255,0.1);border-radius:8px;border-left:3px solid #007AFF;">
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                                <div style="display:flex;align-items:center;gap:8px;">
+                                    <div style="width:24px;height:24px;border-radius:6px;background:rgba(0,122,255,0.15);display:flex;align-items:center;justify-content:center;color:#007AFF;font-size:.7rem;font-weight:700;">
+                                        {{ c.author.name|slice:":1"|upper|default:"?" }}
+                                    </div>
+                                    <span style="font-size:.8rem;font-weight:600;color:#d1d5db;">{{ c.author.name|default:"Система" }}</span>
+                                </div>
+                                <span style="font-size:.7rem;color:#4b5563;">{{ c.created_at|date:"d.m.Y H:i" }}</span>
+                            </div>
+                            <p style="color:#9ca3af;font-size:.875rem;line-height:1.6;margin:0;">{{ c.text }}</p>
+                        </div>
+                    {% endfor %}
+                    </div>
+                {% else %}
+                    <p style="color:#4b5563;font-size:.875rem;text-align:center;padding:20px 0;">Коментарів ще немає</p>
+                {% endif %}
+
+                <!-- Add comment form -->
+                <form method="POST" style="margin-top:16px;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="add_comment">
+                    <div style="margin-bottom:12px;">
+                        <p class="det-label">Додати коментар</p>
+                        <textarea name="comment" rows="3" required placeholder="Виконується діагностика... / Виявлено несправність... / Запчастина замовлена..." class="dash-input" style="resize:vertical;"></textarea>
+                    </div>
+                    <button type="submit" class="tb-btn tb-btn-primary" style="padding:8px 20px;">
+                        <i class="fas fa-comment" style="font-size:.75rem;margin-right:6px;"></i> Додати коментар
+                    </button>
+                </form>
+            </div>
+        </div>
+
     </div>
 
     <!-- Right: timeline -->
