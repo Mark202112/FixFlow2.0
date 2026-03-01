@@ -5,50 +5,262 @@
 
 {% block content %}
 
-<div style="display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:start;">
+<div style="display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start;">
 
     <!-- Calendar -->
     <div class="dash-section">
-        <div class="dash-section-header">
-            <span class="dash-section-title">
-                <button id="prev-btn" onclick="prevMonth()" class="tb-btn tb-btn-ghost" style="padding:5px 10px;font-size:.75rem;margin-right:8px;"><i class="fas fa-chevron-left"></i></button>
-                <span id="month-label" style="font-size:.95rem;font-weight:600;color:#fff;"></span>
-                <button id="next-btn" onclick="nextMonth()" class="tb-btn tb-btn-ghost" style="padding:5px 10px;font-size:.75rem;margin-left:8px;"><i class="fas fa-chevron-right"></i></button>
-            </span>
-            <span style="font-size:.72rem;color:#4b5563;">{{ month_orders }} заявок у місяці</span>
-        </div>
-        <div style="padding:20px;">
-            <!-- Day headers -->
-            <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:8px;">
-                {% for d in 'ПнВтСрЧтПтСбНд'|make_list %}{% cycle '<span style="text-align:center;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#4b5563;padding:6px 0;">Пн</span>' '<span style="text-align:center;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#4b5563;padding:6px 0;">Вт</span>' '<span style="text-align:center;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#4b5563;padding:6px 0;">Ср</span>' '<span style="text-align:center;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#4b5563;padding:6px 0;">Чт</span>' '<span style="text-align:center;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#4b5563;padding:6px 0;">Пт</span>' '<span style="text-align:center;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#4b5563;padding:6px 0;color:#6b7280;">Сб</span>' '<span style="text-align:center;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#ff3b30;padding:6px 0;">Нд</span>' %}{% endfor %}
+        <div class="calendar-header">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <button onclick="prevMonth()" class="calendar-nav-btn">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <h2 id="month-label" style="font-size:1.4rem;font-weight:700;color:#fff;margin:0;min-width:200px;text-align:center;"></h2>
+                <button onclick="nextMonth()" class="calendar-nav-btn">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
             </div>
-            <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;"></div>
+            <button onclick="goToday()" class="tb-btn tb-btn-ghost" style="padding:8px 16px;">
+                <i class="fas fa-calendar-day" style="margin-right:6px;font-size:.75rem;"></i>
+                Сьогодні
+            </button>
+        </div>
+
+        <div style="padding:24px;">
+            <!-- Day headers -->
+            <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:10px;">
+                <div class="calendar-day-header">Пн</div>
+                <div class="calendar-day-header">Вт</div>
+                <div class="calendar-day-header">Ср</div>
+                <div class="calendar-day-header">Чт</div>
+                <div class="calendar-day-header">Пт</div>
+                <div class="calendar-day-header" style="color:#6b7280;">Сб</div>
+                <div class="calendar-day-header" style="color:#ff3b30;">Нд</div>
+            </div>
+
+            <!-- Calendar grid -->
+            <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;"></div>
         </div>
     </div>
 
-    <!-- Sidebar: today's events -->
-    <div style="display:flex;flex-direction:column;gap:16px;">
-        <div class="dash-section">
-            <div class="dash-section-header"><span class="dash-section-title" id="day-title">Сьогодні</span></div>
-            <div id="day-events" style="padding:12px 16px;max-height:320px;overflow-y:auto;">
-                <p style="color:#4b5563;font-size:.82rem;text-align:center;padding:20px 0;">Оберіть день</p>
-            </div>
+    <!-- Sidebar -->
+    <div class="calendar-sidebar">
+        <!-- Month summary -->
+        <div class="month-summary">
+            <p class="summary-title">Підсумок місяця</p>
+            <div id="month-summary" style="display:flex;flex-direction:column;gap:10px;"></div>
         </div>
-        <div class="dash-section">
-            <div class="dash-section-header"><span class="dash-section-title">Цей місяць</span></div>
-            <div style="padding:16px;">
-                <div id="month-summary" style="display:flex;flex-direction:column;gap:8px;"></div>
+
+        <!-- Selected day events -->
+        <div>
+            <h3 id="day-title" style="font-size:1.1rem;font-weight:700;color:#fff;margin:0 0 16px;">Оберіть день</h3>
+            <div id="day-events">
+                <p style="color:#4b5563;font-size:.875rem;text-align:center;padding:40px 0;">
+                    <i class="fas fa-calendar-check" style="font-size:2rem;display:block;margin-bottom:12px;color:#2a2a2d;"></i>
+                    Клікніть на день<br>для перегляду подій
+                </p>
             </div>
         </div>
     </div>
 </div>
 
+<style>
+/* Calendar Header */
+.calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+}
+
+/* Calendar Navigation Buttons */
+.calendar-nav-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(42,42,45,0.6);
+    border: 1px solid rgba(0,122,255,0.2);
+    color: #007AFF;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.calendar-nav-btn:hover {
+    background: rgba(0,122,255,0.15);
+    border-color: rgba(0,122,255,0.4);
+    transform: scale(1.05);
+}
+
+/* Day Headers */
+.calendar-day-header {
+    text-align: center;
+    padding: 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #4b5563;
+}
+
+/* Calendar Day Cells */
+.calendar-day {
+    aspect-ratio: 1;
+    padding: 12px;
+    background: rgba(42,42,45,0.3);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.calendar-day:hover {
+    background: rgba(42,42,45,0.5);
+    border-color: rgba(0,122,255,0.3);
+    transform: translateY(-2px);
+}
+
+.calendar-day.today {
+    border: 2px solid #007AFF;
+    background: rgba(0,122,255,0.08);
+}
+
+.calendar-day.selected {
+    background: rgba(0,122,255,0.15);
+    border-color: rgba(0,122,255,0.5);
+    outline: 2px solid rgba(0,122,255,0.3);
+    outline-offset: 2px;
+}
+
+.calendar-day-number {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #d1d5db;
+    margin-bottom: 6px;
+}
+
+.calendar-day.today .calendar-day-number {
+    color: #007AFF;
+    font-weight: 700;
+}
+
+/* Event dots */
+.calendar-event-dot {
+    height: 4px;
+    border-radius: 2px;
+    width: 100%;
+    margin-bottom: 3px;
+}
+
+.calendar-event-more {
+    font-size: 0.65rem;
+    color: #6b7280;
+    margin-top: 4px;
+}
+
+/* Sidebar */
+.calendar-sidebar {
+    padding: 24px;
+    background: rgba(26,26,27,0.5);
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 12px;
+    max-height: calc(100vh - 180px);
+    overflow-y: auto;
+}
+
+/* Month Summary */
+.month-summary {
+    padding: 20px;
+    background: rgba(42,42,45,0.3);
+    border: 1px solid rgba(0,122,255,0.1);
+    border-radius: 10px;
+    margin-bottom: 24px;
+}
+
+.summary-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #4b5563;
+    margin-bottom: 14px;
+}
+
+.summary-stat {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.summary-stat-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.summary-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* Event Item */
+.event-item {
+    padding: 12px;
+    background: rgba(42,42,45,0.4);
+    border: 1px solid rgba(0,122,255,0.15);
+    border-left: 3px solid #007AFF;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    text-decoration: none;
+    display: block;
+    transition: all 0.3s;
+}
+
+.event-item:hover {
+    background: rgba(42,42,45,0.6);
+    border-color: rgba(0,122,255,0.3);
+    transform: translateX(4px);
+}
+
+.event-order {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    margin-bottom: 4px;
+}
+
+.event-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 6px;
+}
+
+.event-status {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 5px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+</style>
+
 {% endblock %}
 
 {% block extra_js %}
+<script type="application/json" id="cal-events">{{ events_json|safe }}</script>
+<script type="application/json" id="cal-today">"{{ today }}"</script>
 <script>
-var EVENTS = {{ events_json|safe }};
-var TODAY  = '{{ today }}';
+var EVENTS = JSON.parse(document.getElementById('cal-events').textContent);
+var TODAY  = JSON.parse(document.getElementById('cal-today').textContent);
 var currentYear, currentMonth;
 
 (function init(){
@@ -65,82 +277,100 @@ function renderCalendar(){
                   'Липень','Серпень','Вересень','Жовтень','Листопад','Грудень'];
     document.getElementById('month-label').textContent = months[currentMonth] + ' ' + currentYear;
 
-    var grid   = document.getElementById('cal-grid');
-    grid.innerHTML = '';
+    var grid = document.getElementById('cal-grid');
+    grid.style.opacity = '0';
+    grid.style.transition = 'opacity 0.2s';
+    
+    setTimeout(function(){
+        grid.innerHTML = '';
 
-    var first  = new Date(currentYear, currentMonth, 1).getDay(); // 0=Sun
-    var start  = (first === 0) ? 6 : first - 1; // Mon=0
-    var days   = new Date(currentYear, currentMonth+1, 0).getDate();
+        var first  = new Date(currentYear, currentMonth, 1).getDay();
+        var start  = (first === 0) ? 6 : first - 1;
+        var days   = new Date(currentYear, currentMonth+1, 0).getDate();
 
-    // Event map
-    var evMap = {};
-    EVENTS.forEach(function(e){
-        if(!evMap[e.date]) evMap[e.date] = [];
-        evMap[e.date].push(e);
-    });
-
-    // Empty cells
-    for(var i=0;i<start;i++){
-        var blank = document.createElement('div');
-        blank.style.cssText = 'min-height:56px;border-radius:8px;';
-        grid.appendChild(blank);
-    }
-
-    for(var day=1;day<=days;day++){
-        var dateStr = currentYear+'-'+String(currentMonth+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
-        var evs     = evMap[dateStr] || [];
-        var isToday = dateStr === TODAY;
-
-        var cell = document.createElement('div');
-        cell.dataset.date = dateStr;
-        cell.onclick = function(){ selectDay(this.dataset.date); };
-        cell.style.cssText = 'min-height:56px;border-radius:8px;padding:6px;cursor:pointer;'+
-            'border:1px solid '+(isToday?'rgba(0,122,255,.5)':'rgba(255,255,255,.05)')+';'+
-            'background:'+(isToday?'rgba(0,122,255,.1)':'rgba(42,42,45,.2)')+';'+
-            'transition:border-color .15s,background .15s;';
-
-        var num = document.createElement('span');
-        num.textContent = day;
-        num.style.cssText = 'display:block;font-size:.78rem;font-weight:'+(isToday?'700':'400')+';'+
-            'color:'+(isToday?'#007AFF':'#d1d5db')+';margin-bottom:3px;';
-        cell.appendChild(num);
-
-        // Event dots
-        evs.slice(0,3).forEach(function(ev){
-            var dot = document.createElement('div');
-            dot.style.cssText = 'width:100%;height:3px;border-radius:2px;background:'+ev.color+';margin-bottom:2px;';
-            cell.appendChild(dot);
+        // Event map
+        var evMap = {};
+        EVENTS.forEach(function(e){
+            if(!evMap[e.date]) evMap[e.date] = [];
+            evMap[e.date].push(e);
         });
-        if(evs.length>3){
-            var more = document.createElement('span');
-            more.textContent = '+' + (evs.length-3);
-            more.style.cssText = 'font-size:.58rem;color:#6b7280;';
-            cell.appendChild(more);
+
+        // Empty cells
+        for(var i=0;i<start;i++){
+            var blank = document.createElement('div');
+            blank.style.cssText = 'aspect-ratio:1;';
+            grid.appendChild(blank);
         }
-        grid.appendChild(cell);
-    }
+
+        // Day cells
+        for(var day=1;day<=days;day++){
+            var dateStr = currentYear+'-'+String(currentMonth+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+            var evs     = evMap[dateStr] || [];
+            var isToday = dateStr === TODAY;
+
+            var cell = document.createElement('div');
+            cell.classList.add('calendar-day');
+            if(isToday) cell.classList.add('today');
+            cell.dataset.date = dateStr;
+            cell.onclick = function(){ selectDay(this.dataset.date); };
+
+            var num = document.createElement('div');
+            num.className = 'calendar-day-number';
+            num.textContent = day;
+            cell.appendChild(num);
+
+            // Event dots (max 3)
+            evs.slice(0,3).forEach(function(ev){
+                var dot = document.createElement('div');
+                dot.className = 'calendar-event-dot';
+                dot.style.background = ev.color;
+                cell.appendChild(dot);
+            });
+            
+            if(evs.length>3){
+                var more = document.createElement('div');
+                more.className = 'calendar-event-more';
+                more.textContent = '+' + (evs.length-3);
+                cell.appendChild(more);
+            }
+            
+            grid.appendChild(cell);
+        }
+        
+        grid.style.opacity = '1';
+    }, 150);
 }
 
 function selectDay(dateStr){
-    // Highlight selected
-    document.querySelectorAll('#cal-grid div[data-date]').forEach(function(c){
-        c.style.outline = c.dataset.date === dateStr ? '2px solid rgba(0,122,255,.6)' : 'none';
+    // Remove previous selection
+    document.querySelectorAll('.calendar-day').forEach(function(c){
+        c.classList.remove('selected');
     });
+    
+    // Add selection to clicked day
+    var selectedCell = document.querySelector('[data-date="'+dateStr+'"]');
+    if(selectedCell) selectedCell.classList.add('selected');
 
+    // Update sidebar title
     var parts = dateStr.split('-');
-    document.getElementById('day-title').textContent = parts[2]+'.'+parts[1]+'.'+parts[0];
+    var months = ['Січня','Лютого','Березня','Квітня','Травня','Червня',
+                  'Липня','Серпня','Вересня','Жовтня','Листопада','Грудня'];
+    document.getElementById('day-title').textContent = parts[2]+' '+months[parseInt(parts[1])-1]+' '+parts[0];
 
+    // Show events for selected day
     var evs = EVENTS.filter(function(e){ return e.date === dateStr; });
     var box = document.getElementById('day-events');
+    
     if(!evs.length){
-        box.innerHTML = '<p style="color:#4b5563;font-size:.82rem;text-align:center;padding:20px 0;">Заявок немає</p>';
+        box.innerHTML = '<p style="color:#4b5563;font-size:.875rem;text-align:center;padding:40px 0;"><i class="fas fa-inbox" style="font-size:2rem;display:block;margin-bottom:12px;color:#2a2a2d;"></i>Заявок немає</p>';
         return;
     }
+    
     box.innerHTML = evs.map(function(e){
-        return '<a href="/dashboard/orders/'+e.id+'/" style="display:block;padding:10px 12px;border-radius:8px;background:rgba(42,42,45,.4);border:1px solid rgba(255,255,255,.06);margin-bottom:8px;text-decoration:none;">'+
-            '<p style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:'+e.color+';margin-bottom:3px;">'+e.id+'</p>'+
-            '<p style="color:#fff;font-size:.82rem;font-weight:500;margin-bottom:2px;">'+e.title+'</p>'+
-            '<span style="padding:2px 8px;border-radius:4px;font-size:.65rem;font-weight:600;background:'+e.color+'22;color:'+e.color+';">'+e.status+'</span>'+
+        return '<a href="/dashboard/orders/'+e.id+'/" class="event-item">'+
+            '<p class="event-order" style="color:'+e.color+';">'+e.id+'</p>'+
+            '<p class="event-title">'+e.title+'</p>'+
+            '<span class="event-status" style="background:'+e.color+'22;color:'+e.color+';">'+e.status+'</span>'+
         '</a>';
     }).join('');
 }
@@ -148,32 +378,59 @@ function selectDay(dateStr){
 function renderMonthSummary(){
     var counts = {};
     var colorMap = {};
+    
     EVENTS.forEach(function(e){
-        if(!counts[e.status]) { counts[e.status]=0; colorMap[e.status]=e.color; }
-        counts[e.status]++;
+        var eDate = new Date(e.date);
+        if(eDate.getMonth() === currentMonth && eDate.getFullYear() === currentYear){
+            if(!counts[e.status]) { 
+                counts[e.status]=0; 
+                colorMap[e.status]=e.color; 
+            }
+            counts[e.status]++;
+        }
     });
+    
     var box = document.getElementById('month-summary');
+    box.innerHTML = '';
+    
+    if(!Object.keys(counts).length){
+        box.innerHTML = '<p style="font-size:.875rem;color:#4b5563;text-align:center;">Немає заявок</p>';
+        return;
+    }
+    
     Object.keys(counts).forEach(function(s){
-        box.innerHTML += '<div style="display:flex;align-items:center;justify-content:space-between;">'+
-            '<div style="display:flex;align-items:center;gap:8px;">'+
-                '<div style="width:8px;height:8px;border-radius:50%;background:'+colorMap[s]+';flex-shrink:0;"></div>'+
-                '<span style="font-size:.8rem;color:#9ca3af;">'+s+'</span>'+
-            '</div>'+
-            '<span style="font-size:.8rem;font-weight:600;color:#fff;">'+counts[s]+'</span>'+
-        '</div>';
+        var stat = document.createElement('div');
+        stat.className = 'summary-stat';
+        stat.innerHTML = '<div class="summary-stat-left">'+
+            '<div class="summary-dot" style="background:'+colorMap[s]+';"></div>'+
+            '<span style="font-size:0.875rem;color:#9ca3af;">'+s+'</span>'+
+        '</div>'+
+        '<span style="font-size:0.95rem;font-weight:700;color:'+colorMap[s]+';">'+counts[s]+'</span>';
+        box.appendChild(stat);
     });
-    if(!Object.keys(counts).length) box.innerHTML = '<p style="font-size:.8rem;color:#4b5563;text-align:center;">Немає даних</p>';
 }
 
 function prevMonth(){
     currentMonth--;
     if(currentMonth<0){ currentMonth=11; currentYear--; }
     renderCalendar();
+    renderMonthSummary();
 }
+
 function nextMonth(){
     currentMonth++;
     if(currentMonth>11){ currentMonth=0; currentYear++; }
     renderCalendar();
+    renderMonthSummary();
+}
+
+function goToday(){
+    var d = new Date(TODAY);
+    currentYear  = d.getFullYear();
+    currentMonth = d.getMonth();
+    renderCalendar();
+    renderMonthSummary();
+    selectDay(TODAY);
 }
 </script>
 {% endblock %}
