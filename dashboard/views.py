@@ -128,6 +128,14 @@ def order_detail(request, order_number):
     })
 
 @login_required
+def order_delete(request, order_number):
+    """Видалення заявки"""
+    if request.method == 'POST':
+        order = get_object_or_404(Order, order_number=order_number)
+        order.delete()
+    return redirect('dashboard:orders_list')
+
+@login_required
 def order_create(request):
     masters=Employee.objects.filter(role='master')
     error=None
@@ -212,19 +220,17 @@ def reports_view(request):
     
     # Визначити діапазон дат
     if date_from_str and date_to_str:
-        # Користувацький діапазон
         try:
             date_from = datetime.strptime(date_from_str, '%Y-%m-%d').date()
             date_to = datetime.strptime(date_to_str, '%Y-%m-%d').date()
             period = 'custom'
             days = (date_to - date_from).days + 1
         except:
-            date_from = today - timedelta(days=30)
+            date_from = today - timedelta(days=29)
             date_to = today
             period = '30'
             days = 30
     elif period:
-        # Швидкі періоди
         try:
             days = int(period)
         except:
@@ -232,7 +238,6 @@ def reports_view(request):
         date_from = today - timedelta(days=days-1)
         date_to = today
     else:
-        # За замовчуванням 30 днів
         period = '30'
         days = 30
         date_from = today - timedelta(days=29)
@@ -263,7 +268,7 @@ def reports_view(request):
         ))
     )
     
-    # Виручка по днях (для графіка)
+    # Виручка по днях
     revenue_labels = []
     revenue_data = []
     orders_count_data = []
@@ -335,7 +340,6 @@ def export_report_csv(request):
     
     today = timezone.now().date()
     
-    # Визначити діапазон
     if date_from_str and date_to_str:
         try:
             date_from = datetime.strptime(date_from_str, '%Y-%m-%d').date()
@@ -356,10 +360,9 @@ def export_report_csv(request):
         created_at__date__lte=date_to
     ).select_related('client', 'assigned_master').order_by('-created_at')
     
-    # Створити CSV
     response = HttpResponse(content_type='text/csv; charset=utf-8')
     response['Content-Disposition'] = f'attachment; filename="report_{date_from}_{date_to}.csv"'
-    response.write('\ufeff')  # UTF-8 BOM для Excel
+    response.write('\ufeff')
     
     writer = csv.writer(response)
     writer.writerow(['Номер', 'Дата', 'Клієнт', 'Телефон', 'Пристрій', 'Статус', 'Майстер', 'Ціна'])
