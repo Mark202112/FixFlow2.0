@@ -3,8 +3,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Sum, Count, Q
 from django.utils import timezone
-from datetime import timedelta
+from django.http import HttpResponse
+from datetime import timedelta, datetime
 import json
+import csv
 from orders.models import Order, Client, Employee
 
 def get_employee(request):
@@ -199,36 +201,182 @@ def calendar_view(request):
 
 @login_required
 def reports_view(request):
-    period=request.GET.get('period','30')
-    try: days=int(period)
-    except: days=30
-    today=timezone.now().date()
-    date_from=today-timedelta(days=days)
-    orders=Order.objects.filter(created_at__date__gte=date_from)
-    by_status={}
-    for val,label in Order.STATUS_CHOICES: by_status[label]=orders.filter(status=val).count()
-    by_master=Employee.objects.filter(role='master').annotate(
-        done=Count('order',filter=Q(order__status__in=['ready','completed'],order__created_at__date__gte=date_from)),
-        revenue=Sum('order__price',filter=Q(order__status='completed',order__created_at__date__gte=date_from))
+    """Звіти з фільтрами періоду та діапазону дат"""
+    
+    # Отримати параметри фільтрів
+    period = request.GET.get('period', '')
+    date_from_str = request.GET.get('date_from', '')
+    date_to_str = request.GET.get('date_to', '')
+    
+    today = timezone.now().date()
+    
+    # Визначити діапазон дат
+    if date_from_str and date_to_str:
+        # Користувацький діапазон
+        try:
+            date_from = datetime.strptime(date_from_str, '%Y-%m-%d').date()
+            date_to = datetime.strptime(date_to_str, '%Y-%m-%d').date()
+            period = 'custom'
+            days = (date_to - date_from).days + 1
+        except:
+            date_from = today - timedelta(days=30)
+            date_to = today
+            period = '30'
+            days = 30
+    elif period:
+        # Швидкі періоди
+        try:
+            days = int(period)
+        except:
+            days = 30
+        date_from = today - timedelta(days=days-1)
+        date_to = today
+    else:
+        # За замовчуванням 30 днів
+        period = '30'
+        days = 30
+        date_from = today - timedelta(days=29)
+        date_to = today
+    
+    # Отримати заявки за період
+    orders = Order.objects.filter(
+        created_at__date__gte=date_from,
+        created_at__date__lte=date_to
+    ).select_related('client', 'assigned_master')
+    
+    # Статистика по статусах
+    by_status = {}
+    for val, label in Order.STATUS_CHOICES:
+        by_status[label] = orders.filter(status=val).count()
+    
+    # Статистика по майстрах
+    by_master = Employee.objects.filter(role='master').annotate(
+        done=Count('order', filter=Q(
+            order__status__in=['ready', 'completed'],
+            order__created_at__date__gte=date_from,
+            order__created_at__date__lte=date_to
+        )),
+        revenue=Sum('order__price', filter=Q(
+            order__status='completed',
+            order__created_at__date__gte=date_from,
+            order__created_at__date__lte=date_to
+        ))
     )
-    revenue_labels,revenue_data=[],[]
-    for i in range(days-1,-1,-1):
-        d=today-timedelta(days=i)
-        rev=orders.filter(created_at__date=d,status='completed').aggregate(s=Sum('price'))['s'] or 0
-        revenue_labels.append(d.strftime('%d.%m'))
+    
+    # Виручка по днях (для графіка)
+    revenue_labels = []
+    revenue_data = []
+    orders_count_data = []
+    
+    current_date = date_from
+    while current_date <= date_to:
+        day_orders = orders.filter(created_at__date=current_date)
+        rev = day_orders.filter(status='completed').aggregate(s=Sum('price'))['s'] or 0
+        
+        revenue_labels.append(current_date.strftime('%d.%m'))
         revenue_data.append(float(rev))
-    total_revenue=orders.filter(status='completed').aggregate(s=Sum('price'))['s'] or 0
-    completed_count=orders.filter(status='completed').count()
-    avg_price=round(total_revenue/completed_count,2) if completed_count else 0
-    return render(request,'dashboard/reports.html',{
-        'period':period,'days':days,'date_from':date_from,
-        'total_orders':orders.count(),'completed':completed_count,
-        'total_revenue':total_revenue,'avg_price':avg_price,
-        'by_status':by_status,'by_master':by_master,
-        'revenue_labels':json.dumps(revenue_labels),'revenue_data':json.dumps(revenue_data),
-        'status_labels':json.dumps(list(by_status.keys())),'status_counts':json.dumps(list(by_status.values())),
-        'period_choices': [('7','7 днів'),('30','30 днів'),('90','90 днів'),('365','Рік')],
-    })
+        orders_count_data.append(day_orders.count())
+        
+        current_date += timedelta(days=1)
+    
+    # Загальна статистика
+    total_revenue = orders.filter(status='completed').aggregate(s=Sum('price'))['s'] or 0
+    completed_count = orders.filter(status='completed').count()
+    avg_price = round(total_revenue / completed_count, 2) if completed_count else 0
+    
+    # Топ клієнтів
+    top_clients = Client.objects.annotate(
+        orders_count=Count('orders', filter=Q(
+            orders__created_at__date__gte=date_from,
+            orders__created_at__date__lte=date_to
+        )),
+        total_spent=Sum('orders__price', filter=Q(
+            orders__status='completed',
+            orders__created_at__date__gte=date_from,
+            orders__created_at__date__lte=date_to
+        ))
+    ).filter(orders_count__gt=0).order_by('-total_spent')[:5]
+    
+    context = {
+        'period': period,
+        'days': days,
+        'date_from': date_from,
+        'date_to': date_to,
+        'date_from_str': date_from.strftime('%Y-%m-%d'),
+        'date_to_str': date_to.strftime('%Y-%m-%d'),
+        'total_orders': orders.count(),
+        'completed': completed_count,
+        'total_revenue': total_revenue,
+        'avg_price': avg_price,
+        'by_status': by_status,
+        'by_master': by_master,
+        'top_clients': top_clients,
+        'revenue_labels': json.dumps(revenue_labels),
+        'revenue_data': json.dumps(revenue_data),
+        'orders_count_data': json.dumps(orders_count_data),
+        'status_labels': json.dumps(list(by_status.keys())),
+        'status_counts': json.dumps(list(by_status.values())),
+        'period_choices': [
+            ('7', '7 днів'),
+            ('30', '30 днів'),
+            ('90', '90 днів'),
+            ('365', 'Рік'),
+        ],
+    }
+    
+    return render(request, 'dashboard/reports.html', context)
+
+@login_required
+def export_report_csv(request):
+    """Експорт звіту в CSV"""
+    period = request.GET.get('period', '30')
+    date_from_str = request.GET.get('date_from', '')
+    date_to_str = request.GET.get('date_to', '')
+    
+    today = timezone.now().date()
+    
+    # Визначити діапазон
+    if date_from_str and date_to_str:
+        try:
+            date_from = datetime.strptime(date_from_str, '%Y-%m-%d').date()
+            date_to = datetime.strptime(date_to_str, '%Y-%m-%d').date()
+        except:
+            date_from = today - timedelta(days=30)
+            date_to = today
+    else:
+        try:
+            days = int(period)
+        except:
+            days = 30
+        date_from = today - timedelta(days=days-1)
+        date_to = today
+    
+    orders = Order.objects.filter(
+        created_at__date__gte=date_from,
+        created_at__date__lte=date_to
+    ).select_related('client', 'assigned_master').order_by('-created_at')
+    
+    # Створити CSV
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = f'attachment; filename="report_{date_from}_{date_to}.csv"'
+    response.write('\ufeff')  # UTF-8 BOM для Excel
+    
+    writer = csv.writer(response)
+    writer.writerow(['Номер', 'Дата', 'Клієнт', 'Телефон', 'Пристрій', 'Статус', 'Майстер', 'Ціна'])
+    
+    for order in orders:
+        writer.writerow([
+            order.order_number,
+            order.created_at.strftime('%d.%m.%Y %H:%M'),
+            order.client.name,
+            order.client.phone,
+            order.device,
+            order.get_status_display(),
+            order.assigned_master.name if order.assigned_master else '—',
+            f'{order.price} ₴' if order.price else '—',
+        ])
+    
+    return response
 
 @login_required
 def admin_view(request):

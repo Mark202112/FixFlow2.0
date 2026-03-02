@@ -5,17 +5,53 @@
 
 {% block content %}
 
-<!-- Period selector -->
-<div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;align-items:center;">
-    <span style="font-size:.78rem;color:#6b7280;margin-right:4px;">Період:</span>
-    {% for p,label in period_choices %}
-    <a href="?period={{ p }}" class="tb-btn {% if period == p %}tb-btn-primary{% else %}tb-btn-ghost{% endif %}" style="font-size:.78rem;padding:7px 14px;">{{ label }}</a>
-    {% endfor %}
-    <span style="font-size:.72rem;color:#4b5563;margin-left:8px;">з {{ date_from|date:"d.m.Y" }}</span>
+<!-- Filters -->
+<div class="dash-section" style="margin-bottom:20px;">
+    <div style="padding:20px;">
+        <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:end;">
+            <!-- Quick periods -->
+            <div style="flex:1;min-width:300px;">
+                <p style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#4b5563;margin-bottom:10px;">Швидкий вибір</p>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    {% for p,label in period_choices %}
+                    <a href="?period={{ p }}" class="tb-btn {% if period == p %}tb-btn-primary{% else %}tb-btn-ghost{% endif %}" style="font-size:.8rem;padding:8px 16px;">{{ label }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Custom range -->
+            <div style="flex:1;min-width:300px;">
+                <p style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#4b5563;margin-bottom:10px;">Або оберіть діапазон</p>
+                <form method="GET" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                    <input type="date" name="date_from" value="{{ date_from_str }}" class="dash-input" style="flex:1;min-width:140px;">
+                    <span style="color:#4b5563;">—</span>
+                    <input type="date" name="date_to" value="{{ date_to_str }}" class="dash-input" style="flex:1;min-width:140px;">
+                    <button type="submit" class="tb-btn tb-btn-primary" style="padding:8px 16px;">
+                        <i class="fas fa-search" style="margin-right:6px;font-size:.75rem;"></i>
+                        Показати
+                    </button>
+                </form>
+            </div>
+
+            <!-- Export -->
+            <div>
+                <p style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#4b5563;margin-bottom:10px;">Експорт</p>
+                <a href="{% url 'dashboard:export_report' %}?{% if period %}period={{ period }}{% else %}date_from={{ date_from_str }}&date_to={{ date_to_str }}{% endif %}" class="tb-btn tb-btn-ghost" style="padding:8px 16px;" download>
+                    <i class="fas fa-download" style="margin-right:6px;font-size:.75rem;"></i>
+                    CSV
+                </a>
+            </div>
+        </div>
+        
+        <p style="font-size:.75rem;color:#6b7280;margin-top:12px;">
+            <i class="fas fa-calendar-alt" style="margin-right:6px;color:#007AFF;"></i>
+            Період: <strong style="color:#fff;">{{ date_from|date:"d.m.Y" }}</strong> — <strong style="color:#fff;">{{ date_to|date:"d.m.Y" }}</strong> ({{ days }} {% if days == 1 %}день{% elif days < 5 %}дні{% else %}днів{% endif %})
+        </p>
+    </div>
 </div>
 
 <!-- KPI cards -->
-<div class="stat-grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));margin-bottom:24px;">
+<div class="stat-grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin-bottom:24px;">
     <div class="stat-card">
         <p class="stat-card-label">Всього заявок</p>
         <p class="stat-card-value">{{ total_orders }}</p>
@@ -28,12 +64,12 @@
     </div>
     <div class="stat-card">
         <p class="stat-card-label">Виручка</p>
-        <p class="stat-card-value" style="color:#34c759;font-size:1.5rem;">{{ total_revenue }} ₴</p>
+        <p class="stat-card-value" style="color:#34c759;font-size:1.6rem;">{{ total_revenue|floatformat:0 }} ₴</p>
         <i class="fas fa-hryvnia-sign stat-card-icon" style="color:#34c759;opacity:.12;"></i>
     </div>
     <div class="stat-card">
         <p class="stat-card-label">Середній чек</p>
-        <p class="stat-card-value" style="font-size:1.5rem;">{{ avg_price }} ₴</p>
+        <p class="stat-card-value" style="font-size:1.5rem;">{{ avg_price|floatformat:0 }} ₴</p>
         <i class="fas fa-calculator stat-card-icon" style="opacity:.08;"></i>
     </div>
 </div>
@@ -44,10 +80,13 @@
     <!-- Revenue chart -->
     <div class="dash-section">
         <div class="dash-section-header">
-            <span class="dash-section-title">Виручка по днях</span>
+            <span class="dash-section-title">
+                <i class="fas fa-chart-line" style="margin-right:8px;color:#34c759;font-size:.9rem;"></i>
+                Виручка та заявки по днях
+            </span>
         </div>
         <div style="padding:20px;">
-            <canvas id="revenueChart" height="100"></canvas>
+            <canvas id="revenueChart" height="90"></canvas>
         </div>
     </div>
 
@@ -57,10 +96,10 @@
             <span class="dash-section-title">По статусах</span>
         </div>
         <div style="padding:20px;display:flex;flex-direction:column;align-items:center;gap:16px;">
-            <canvas id="statusChart" height="160" style="max-width:160px;"></canvas>
-            <div style="width:100%;display:flex;flex-direction:column;gap:6px;">
+            <canvas id="statusChart" height="180" style="max-width:180px;"></canvas>
+            <div style="width:100%;display:flex;flex-direction:column;gap:8px;">
                 {% for label,count in by_status.items %}
-                <div style="display:flex;align-items:center;justify-content:space-between;font-size:.78rem;">
+                <div style="display:flex;align-items:center;justify-content:space-between;font-size:.82rem;">
                     <span style="color:#9ca3af;">{{ label }}</span>
                     <span style="color:#fff;font-weight:600;">{{ count }}</span>
                 </div>
@@ -70,64 +109,192 @@
     </div>
 </div>
 
-<!-- Masters table -->
-<div class="dash-section">
-    <div class="dash-section-header">
-        <span class="dash-section-title">Статистика по майстрах</span>
+<!-- Bottom row -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+
+    <!-- Masters table -->
+    <div class="dash-section">
+        <div class="dash-section-header">
+            <span class="dash-section-title">
+                <i class="fas fa-users" style="margin-right:8px;color:#007AFF;font-size:.9rem;"></i>
+                Статистика по майстрах
+            </span>
+        </div>
+        {% if by_master %}
+        <div style="overflow-x:auto;">
+            <table class="dash-table">
+                <thead>
+                    <tr>
+                        <th>Майстер</th>
+                        <th style="text-align:center;">Виконано</th>
+                        <th style="text-align:right;">Виручка</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for m in by_master %}
+                <tr>
+                    <td>
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <div style="width:32px;height:32px;border-radius:8px;background:rgba(0,122,255,.15);display:flex;align-items:center;justify-content:center;color:#007AFF;font-size:.75rem;font-weight:700;flex-shrink:0;">
+                                {{ m.name|slice:":1"|upper }}
+                            </div>
+                            <span style="color:#fff;font-weight:500;font-size:.875rem;">{{ m.name }}</span>
+                        </div>
+                    </td>
+                    <td style="text-align:center;">
+                        <span style="color:#34c759;font-weight:600;font-size:.9rem;">{{ m.done|default:"0" }}</span>
+                    </td>
+                    <td style="text-align:right;">
+                        <span style="color:#34c759;font-weight:500;font-size:.9rem;">
+                            {% if m.revenue %}{{ m.revenue|floatformat:0 }} ₴{% else %}—{% endif %}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="padding:40px;text-align:center;color:#4b5563;">
+            <i class="fas fa-users-slash" style="font-size:2rem;display:block;margin-bottom:12px;opacity:.3;"></i>
+            <p style="font-size:.875rem;">Майстрів не додано</p>
+        </div>
+        {% endif %}
     </div>
-    {% if by_master %}
-    <div style="overflow-x:auto;">
-        <table class="dash-table">
-            <thead><tr><th>Майстер</th><th>Роль</th><th>Виконано</th><th>Виручка</th></tr></thead>
-            <tbody>
-            {% for m in by_master %}
-            <tr>
-                <td>
-                    <div style="display:flex;align-items:center;gap:10px;">
-                        <div style="width:30px;height:30px;border-radius:8px;background:rgba(0,122,255,.15);display:flex;align-items:center;justify-content:center;color:#007AFF;font-size:.72rem;font-weight:700;flex-shrink:0;">{{ m.name|slice:":1"|upper }}</div>
-                        <span style="color:#fff;font-weight:500;">{{ m.name }}</span>
-                    </div>
-                </td>
-                <td style="color:#6b7280;font-size:.82rem;">{{ m.get_role_display }}</td>
-                <td><span style="color:#34c759;font-weight:600;">{{ m.done|default:"0" }}</span></td>
-                <td style="color:#34c759;font-weight:500;">{% if m.revenue %}{{ m.revenue }} ₴{% else %}—{% endif %}</td>
-            </tr>
+
+    <!-- Top clients -->
+    <div class="dash-section">
+        <div class="dash-section-header">
+            <span class="dash-section-title">
+                <i class="fas fa-crown" style="margin-right:8px;color:#ff9500;font-size:.9rem;"></i>
+                Топ клієнтів
+            </span>
+        </div>
+        {% if top_clients %}
+        <div style="padding:16px 20px;">
+            {% for client in top_clients %}
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:rgba(42,42,45,0.3);border:1px solid rgba(255,255,255,0.06);border-radius:8px;margin-bottom:10px;">
+                <div>
+                    <p style="color:#fff;font-weight:600;font-size:.875rem;margin-bottom:2px;">{{ client.name }}</p>
+                    <p style="color:#6b7280;font-size:.75rem;">{{ client.phone }} • {{ client.orders_count }} заяв{% if client.orders_count > 1 %}ок{% else %}ка{% endif %}</p>
+                </div>
+                <div style="text-align:right;">
+                    <p style="color:#34c759;font-weight:700;font-size:1rem;">
+                        {% if client.total_spent %}{{ client.total_spent|floatformat:0 }} ₴{% else %}—{% endif %}
+                    </p>
+                </div>
+            </div>
             {% endfor %}
-            </tbody>
-        </table>
+        </div>
+        {% else %}
+        <div style="padding:40px;text-align:center;color:#4b5563;">
+            <i class="fas fa-user-slash" style="font-size:2rem;display:block;margin-bottom:12px;opacity:.3;"></i>
+            <p style="font-size:.875rem;">Немає завершених заявок</p>
+        </div>
+        {% endif %}
     </div>
-    {% else %}
-    <div style="padding:40px;text-align:center;color:#4b5563;"><i class="fas fa-users" style="font-size:1.8rem;display:block;margin-bottom:10px;opacity:.3;"></i><p>Майстрів не додано</p></div>
-    {% endif %}
+
 </div>
+
 {% endblock %}
 
 {% block extra_js %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script type="application/json" id="revenue-labels">{{ revenue_labels|safe }}</script>
+<script type="application/json" id="revenue-data">{{ revenue_data|safe }}</script>
+<script type="application/json" id="orders-count-data">{{ orders_count_data|safe }}</script>
+<script type="application/json" id="status-labels">{{ status_labels|safe }}</script>
+<script type="application/json" id="status-counts">{{ status_counts|safe }}</script>
 <script>
-// Revenue line chart
+// Revenue + Orders line chart
 new Chart(document.getElementById('revenueChart'), {
     type: 'line',
     data: {
-        labels: {{ revenue_labels|safe }},
-        datasets: [{
-            label: 'Виручка ₴',
-            data: {{ revenue_data|safe }},
-            borderColor: '#34c759',
-            backgroundColor: 'rgba(52,199,89,0.08)',
-            borderWidth: 2,
-            fill: true,
-            tension: 0.4,
-            pointRadius: 3,
-            pointBackgroundColor: '#34c759',
-        }]
+        labels: JSON.parse(document.getElementById('revenue-labels').textContent),
+        datasets: [
+            {
+                label: 'Виручка ₴',
+                data: JSON.parse(document.getElementById('revenue-data').textContent),
+                borderColor: '#34c759',
+                backgroundColor: 'rgba(52,199,89,0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4,
+                pointBackgroundColor: '#34c759',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                yAxisID: 'y',
+            },
+            {
+                label: 'Заявки',
+                data: JSON.parse(document.getElementById('orders-count-data').textContent),
+                borderColor: '#007AFF',
+                backgroundColor: 'rgba(0,122,255,0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4,
+                pointBackgroundColor: '#007AFF',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                yAxisID: 'y1',
+            }
+        ]
     },
     options: {
         responsive: true,
-        plugins: { legend: { display: false } },
+        interaction: {
+            mode: 'index',
+            intersect: false,
+        },
+        plugins: {
+            legend: {
+                display: true,
+                position: 'top',
+                labels: {
+                    color: '#9ca3af',
+                    font: { size: 11 },
+                    usePointStyle: true,
+                    padding: 15,
+                }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(26,26,27,0.95)',
+                titleColor: '#fff',
+                bodyColor: '#d1d5db',
+                borderColor: 'rgba(0,122,255,0.3)',
+                borderWidth: 1,
+                padding: 12,
+                displayColors: true,
+            }
+        },
         scales: {
-            x: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#4b5563', font: { size: 10 }, maxTicksLimit: 10 } },
-            y: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#4b5563', font: { size: 10 } }, beginAtZero: true }
+            x: {
+                grid: { color: 'rgba(255,255,255,.04)' },
+                ticks: { color: '#4b5563', font: { size: 10 }, maxTicksLimit: 12 }
+            },
+            y: {
+                type: 'linear',
+                position: 'left',
+                grid: { color: 'rgba(255,255,255,.04)' },
+                ticks: {
+                    color: '#34c759',
+                    font: { size: 10 },
+                    callback: function(value) { return value + ' ₴'; }
+                },
+                beginAtZero: true
+            },
+            y1: {
+                type: 'linear',
+                position: 'right',
+                grid: { drawOnChartArea: false },
+                ticks: {
+                    color: '#007AFF',
+                    font: { size: 10 },
+                },
+                beginAtZero: true
+            }
         }
     }
 });
@@ -136,18 +303,28 @@ new Chart(document.getElementById('revenueChart'), {
 new Chart(document.getElementById('statusChart'), {
     type: 'doughnut',
     data: {
-        labels: {{ status_labels|safe }},
+        labels: JSON.parse(document.getElementById('status-labels').textContent),
         datasets: [{
-            data: {{ status_counts|safe }},
+            data: JSON.parse(document.getElementById('status-counts').textContent),
             backgroundColor: ['#007AFF','#ff9500','#34c759','#86868b','#ff3b30'],
             borderWidth: 0,
-            hoverOffset: 4,
+            hoverOffset: 8,
         }]
     },
     options: {
         responsive: true,
-        cutout: '68%',
-        plugins: { legend: { display: false } }
+        cutout: '70%',
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                backgroundColor: 'rgba(26,26,27,0.95)',
+                titleColor: '#fff',
+                bodyColor: '#d1d5db',
+                borderColor: 'rgba(0,122,255,0.3)',
+                borderWidth: 1,
+                padding: 10,
+            }
+        }
     }
 });
 </script>
