@@ -17,17 +17,29 @@ def get_employee(request):
 
 @login_required
 def dashboard_home(request):
-    orders  = Order.objects.select_related('client','assigned_master')
-    today   = timezone.now().date()
-    week_ago = today - timedelta(days=7)
+    orders = Order.objects.select_related('client','assigned_master')
+    
+    now = timezone.now()
+    today = now.date()
+    week_ago = now - timedelta(days=7)
+
     masters = Employee.objects.filter(role='master').annotate(
         active=Count('order', filter=Q(order__status='in_progress'))
     )
+
     chart_labels, chart_data = [], []
-    for i in range(6,-1,-1):
+
+    for i in range(6, -1, -1):
         d = today - timedelta(days=i)
+
+        start = timezone.make_aware(datetime.combine(d, datetime.min.time()))
+        end = timezone.make_aware(datetime.combine(d, datetime.max.time()))
+
         chart_labels.append(d.strftime('%d.%m'))
-        chart_data.append(orders.filter(created_at__date=d).count())
+        chart_data.append(
+            orders.filter(created_at__range=(start, end)).count()
+        )
+
     context = {
         'employee':    get_employee(request),
         'total':       orders.count(),
@@ -35,13 +47,14 @@ def dashboard_home(request):
         'in_progress': orders.filter(status='in_progress').count(),
         'ready':       orders.filter(status='ready').count(),
         'revenue':     orders.filter(status='completed').aggregate(s=Sum('price'))['s'] or 0,
-        'week_orders': orders.filter(created_at__date__gte=week_ago).count(),
+        'week_orders': orders.filter(created_at__gte=week_ago).count(),
         'recent':      orders.order_by('-created_at')[:8],
         'masters':     masters,
         'chart_labels': json.dumps(chart_labels),
         'chart_data':   json.dumps(chart_data),
         'status_choices': Order.STATUS_CHOICES,
     }
+
     return render(request, 'dashboard/home.html', context)
 
 @login_required
@@ -209,16 +222,13 @@ def calendar_view(request):
 
 @login_required
 def reports_view(request):
-    """Звіти з фільтрами періоду та діапазону дат"""
     
-    # Отримати параметри фільтрів
-    period = request.GET.get('period', '')
+    period = request.GET.get('period', '30')
     date_from_str = request.GET.get('date_from', '')
     date_to_str = request.GET.get('date_to', '')
     
     today = timezone.now().date()
     
-    # Визначити діапазон дат
     if date_from_str and date_to_str:
         try:
             date_from = datetime.strptime(date_from_str, '%Y-%m-%d').date()
@@ -226,82 +236,75 @@ def reports_view(request):
             period = 'custom'
             days = (date_to - date_from).days + 1
         except:
+            days = 30
             date_from = today - timedelta(days=29)
             date_to = today
             period = '30'
-            days = 30
-    elif period:
+    else:
         try:
             days = int(period)
         except:
             days = 30
         date_from = today - timedelta(days=days-1)
         date_to = today
-    else:
-        period = '30'
-        days = 30
-        date_from = today - timedelta(days=29)
-        date_to = today
-    
-    # Отримати заявки за період
+
+    start_dt = timezone.make_aware(datetime.combine(date_from, datetime.min.time()))
+    end_dt = timezone.make_aware(datetime.combine(date_to, datetime.max.time()))
+
     orders = Order.objects.filter(
-        created_at__date__gte=date_from,
-        created_at__date__lte=date_to
+        created_at__range=(start_dt, end_dt)
     ).select_related('client', 'assigned_master')
-    
-    # Статистика по статусах
+
+    total_orders_count = orders.count()
+
     by_status = {}
     for val, label in Order.STATUS_CHOICES:
-        by_status[label] = orders.filter(status=val).count()
-    
-    # Статистика по майстрах
+        count = orders.filter(status=val).count()
+        if count > 0:
+            by_status[label] = count
+
     by_master = Employee.objects.filter(role='master').annotate(
         done=Count('order', filter=Q(
             order__status__in=['ready', 'completed'],
-            order__created_at__date__gte=date_from,
-            order__created_at__date__lte=date_to
+            order__created_at__range=(start_dt, end_dt)
         )),
         revenue=Sum('order__price', filter=Q(
             order__status='completed',
-            order__created_at__date__gte=date_from,
-            order__created_at__date__lte=date_to
+            order__created_at__range=(start_dt, end_dt)
         ))
-    )
-    
-    # Виручка по днях
-    revenue_labels = []
-    revenue_data = []
-    orders_count_data = []
-    
+    ).filter(done__gt=0)
+
+    revenue_labels, revenue_data, orders_count_data = [], [], []
+
     current_date = date_from
     while current_date <= date_to:
-        day_orders = orders.filter(created_at__date=current_date)
+        day_start = timezone.make_aware(datetime.combine(current_date, datetime.min.time()))
+        day_end = timezone.make_aware(datetime.combine(current_date, datetime.max.time()))
+
+        day_orders = orders.filter(created_at__range=(day_start, day_end))
         rev = day_orders.filter(status='completed').aggregate(s=Sum('price'))['s'] or 0
-        
+
         revenue_labels.append(current_date.strftime('%d.%m'))
         revenue_data.append(float(rev))
         orders_count_data.append(day_orders.count())
-        
+
         current_date += timedelta(days=1)
-    
-    # Загальна статистика
-    total_revenue = orders.filter(status='completed').aggregate(s=Sum('price'))['s'] or 0
-    completed_count = orders.filter(status='completed').count()
-    avg_price = round(total_revenue / completed_count, 2) if completed_count else 0
-    
-    # Топ клієнтів
+
+    completed_orders = orders.filter(status='completed')
+    total_revenue = completed_orders.aggregate(s=Sum('price'))['s'] or 0
+    completed_count = completed_orders.count()
+    avg_price = round(total_revenue / completed_count, 2) if completed_count > 0 else 0
+
     top_clients = Client.objects.annotate(
         orders_count=Count('orders', filter=Q(
-            orders__created_at__date__gte=date_from,
-            orders__created_at__date__lte=date_to
+            orders__created_at__range=(start_dt, end_dt)
         )),
         total_spent=Sum('orders__price', filter=Q(
             orders__status='completed',
-            orders__created_at__date__gte=date_from,
-            orders__created_at__date__lte=date_to
+            orders__created_at__range=(start_dt, end_dt)
         ))
     ).filter(orders_count__gt=0).order_by('-total_spent')[:5]
-    
+
     context = {
         'period': period,
         'days': days,
@@ -309,7 +312,7 @@ def reports_view(request):
         'date_to': date_to,
         'date_from_str': date_from.strftime('%Y-%m-%d'),
         'date_to_str': date_to.strftime('%Y-%m-%d'),
-        'total_orders': orders.count(),
+        'total_orders': total_orders_count,
         'completed': completed_count,
         'total_revenue': total_revenue,
         'avg_price': avg_price,
@@ -321,23 +324,15 @@ def reports_view(request):
         'orders_count_data': json.dumps(orders_count_data),
         'status_labels': json.dumps(list(by_status.keys())),
         'status_counts': json.dumps(list(by_status.values())),
-        'period_choices': [
-            ('7', '7 днів'),
-            ('30', '30 днів'),
-            ('90', '90 днів'),
-            ('365', 'Рік'),
-        ],
+        'period_choices': [('7','7 днів'),('30','30 днів'),('90','90 днів'),('365','Рік')],
     }
-    
-    return render(request, 'dashboard/reports.html', context)
 
+    return render(request, 'dashboard/reports.html', context)
 @login_required
 def export_report_csv(request):
-    """Експорт звіту в CSV"""
     period = request.GET.get('period', '30')
     date_from_str = request.GET.get('date_from', '')
     date_to_str = request.GET.get('date_to', '')
-    
     today = timezone.now().date()
     
     if date_from_str and date_to_str:
@@ -378,7 +373,6 @@ def export_report_csv(request):
             order.assigned_master.name if order.assigned_master else '—',
             f'{order.price} ₴' if order.price else '—',
         ])
-    
     return response
 
 @login_required
