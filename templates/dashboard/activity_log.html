@@ -1,0 +1,112 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% block title %}Журнал дій — FixFlow{% endblock %}
+{% block page_title %}Журнал дій користувачів{% endblock %}
+{% block nav_admin %}active{% endblock %}
+
+{% block content %}
+
+<div class="dash-section">
+    <div class="dash-section-header">
+        <span class="dash-section-title">
+            <i class="fas fa-history" style="margin-right:8px;color:#007AFF;font-size:.9rem;"></i>
+            Останні 100 записів
+        </span>
+    </div>
+
+    {% if logs %}
+    <div style="overflow-x:auto;">
+        <table class="dash-table">
+            <thead>
+                <tr>
+                    <th style="width:140px;">Час</th>
+                    <th style="width:120px;">Користувач</th>
+                    <th style="width:100px;">Дія</th>
+                    <th style="width:100px;">Модель</th>
+                    <th>Опис</th>
+                    <th style="width:120px;">IP адреса</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for log in logs %}
+            <tr>
+                <td style="color:#6b7280;font-size:.8rem;">
+                    {{ log.timestamp|date:"d.m.Y H:i:s" }}
+                </td>
+                <td>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <div style="width:28px;height:28px;border-radius:7px;background:rgba(0,122,255,.15);display:flex;align-items:center;justify-content:center;color:#007AFF;font-size:.7rem;font-weight:700;">
+                            {% if log.user %}{{ log.user.username|slice:":1"|upper }}{% else %}S{% endif %}
+                        </div>
+                        <span style="font-size:.85rem;color:#d1d5db;">
+                            {% if log.user %}{{ log.user.username }}{% else %}Система{% endif %}
+                        </span>
+                    </div>
+                </td>
+                <td>
+                    <span class="action-badge action-{{ log.action }}">
+                        {{ log.get_action_display }}
+                    </span>
+                </td>
+                <td style="color:#9ca3af;font-size:.82rem;">
+                    {{ log.model }}
+                </td>
+                <td style="color:#d1d5db;font-size:.85rem;">
+                    {{ log.description }}
+                </td>
+                <td style="color:#6b7280;font-size:.75rem;font-family:monospace;">
+                    {{ log.ip_address|default:"—" }}
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="padding:60px 0;text-align:center;">
+        <i class="fas fa-clipboard-list" style="font-size:3rem;color:#2a2a2d;margin-bottom:16px;display:block;"></i>
+        <p style="color:#4b5563;font-size:.95rem;">Журнал дій порожній</p>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.action-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    border-radius: 5px;
+}
+
+.action-create {
+    background: rgba(52,199,89,0.12);
+    color: #34c759;
+    border: 1px solid rgba(52,199,89,0.3);
+}
+
+.action-update {
+    background: rgba(0,122,255,0.12);
+    color: #007AFF;
+    border: 1px solid rgba(0,122,255,0.3);
+}
+
+.action-delete {
+    background: rgba(255,59,48,0.12);
+    color: #ff3b30;
+    border: 1px solid rgba(255,59,48,0.3);
+}
+
+.action-assign {
+    background: rgba(255,149,0,0.12);
+    color: #ff9500;
+    border: 1px solid rgba(255,149,0,0.3);
+}
+
+.action-status_change {
+    background: rgba(134,134,139,0.12);
+    color: #86868b;
+    border: 1px solid rgba(134,134,139,0.3);
+}
+</style>
+
+{% endblock %}

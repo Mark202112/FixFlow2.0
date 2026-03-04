@@ -104,3 +104,4 @@ class Comment(models.Model):
     
     def __str__(self):
         return f"Коментар до {self.order.order_number}"
+
