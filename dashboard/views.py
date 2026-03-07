@@ -330,38 +330,72 @@ def reports_view(request):
     return render(request, 'dashboard/reports.html', context)
 @login_required
 def export_report_csv(request):
+    """Експорт звіту в CSV - РОБОЧА ВЕРСІЯ"""
+    import csv
+    from django.http import HttpResponse
+    from django.utils import timezone
+    from datetime import datetime, timedelta
+    from orders.models import Order
+    
+    # Отримати параметри
     period = request.GET.get('period', '30')
     date_from_str = request.GET.get('date_from', '')
     date_to_str = request.GET.get('date_to', '')
+    
     today = timezone.now().date()
     
-    if date_from_str and date_to_str:
-        try:
-            date_from = datetime.strptime(date_from_str, '%Y-%m-%d').date()
-            date_to = datetime.strptime(date_to_str, '%Y-%m-%d').date()
-        except:
-            date_from = today - timedelta(days=30)
-            date_to = today
-    else:
+    # Якщо НЕ вказано діапазон - взяти за period
+    if not date_from_str or not date_to_str:
         try:
             days = int(period)
         except:
             days = 30
+        
         date_from = today - timedelta(days=days-1)
         date_to = today
+    else:
+        # Якщо вказано діапазон
+        try:
+            date_from = datetime.strptime(date_from_str, '%Y-%m-%d').date()
+            date_to = datetime.strptime(date_to_str, '%Y-%m-%d').date()
+        except:
+            # Якщо помилка парсингу - взяти 30 днів
+            date_from = today - timedelta(days=29)
+            date_to = today
     
+    # КРИТИЧНО: Отримати ВСІ заявки за період
     orders = Order.objects.filter(
         created_at__date__gte=date_from,
         created_at__date__lte=date_to
     ).select_related('client', 'assigned_master').order_by('-created_at')
     
+    # DEBUG: Вивести в консоль скільки знайдено
+    print(f"DEBUG Export CSV: from={date_from}, to={date_to}, found={orders.count()}")
+    
+    # Створити HTTP відповідь для CSV
     response = HttpResponse(content_type='text/csv; charset=utf-8')
-    response['Content-Disposition'] = f'attachment; filename="report_{date_from}_{date_to}.csv"'
+    response['Content-Disposition'] = f'attachment; filename="zvit_{date_from}_{date_to}.csv"'
+    
+    # UTF-8 BOM для Excel
     response.write('\ufeff')
     
-    writer = csv.writer(response)
-    writer.writerow(['Номер', 'Дата', 'Клієнт', 'Телефон', 'Пристрій', 'Статус', 'Майстер', 'Ціна'])
+    # Створити writer з крапкою з комою (для Excel)
+    writer = csv.writer(response, delimiter=';')
     
+    # Записати заголовки
+    writer.writerow([
+        'Номер заявки',
+        'Дата',
+        'Клієнт',
+        'Телефон',
+        'Пристрій',
+        'Проблема',
+        'Статус',
+        'Майстер',
+        'Ціна'
+    ])
+    
+    # Записати дані
     for order in orders:
         writer.writerow([
             order.order_number,
@@ -369,11 +403,19 @@ def export_report_csv(request):
             order.client.name,
             order.client.phone,
             order.device,
+            (order.problem[:50] + '...') if len(order.problem) > 50 else order.problem,
             order.get_status_display(),
-            order.assigned_master.name if order.assigned_master else '—',
-            f'{order.price} ₴' if order.price else '—',
+            order.assigned_master.name if order.assigned_master else 'Не призначено',
+            f'{order.price}' if order.price else '0',
         ])
+    
+    # Якщо порожній - додати рядок з повідомленням
+    if orders.count() == 0:
+        writer.writerow(['Немає даних за обраний період', '', '', '', '', '', '', '', ''])
+    
     return response
+
+
 
 @login_required
 def admin_view(request):

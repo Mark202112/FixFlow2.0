@@ -33,14 +33,6 @@
                 </form>
             </div>
 
-            <!-- Export -->
-            <div>
-                <p style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#4b5563;margin-bottom:10px;">Експорт</p>
-                <a href="{% url 'dashboard:export_report' %}?{% if period %}period={{ period }}{% else %}date_from={{ date_from_str }}&date_to={{ date_to_str }}{% endif %}" class="tb-btn tb-btn-ghost" style="padding:8px 16px;" download>
-                    <i class="fas fa-download" style="margin-right:6px;font-size:.75rem;"></i>
-                    CSV
-                </a>
-            </div>
         </div>
         
         <p style="font-size:.75rem;color:#6b7280;margin-top:12px;">
