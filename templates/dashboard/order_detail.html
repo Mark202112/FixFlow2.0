@@ -65,9 +65,19 @@
                         </select>
                     </div>
                 </div>
-                <div>
-                    <p class="det-label">Ціна (₴)</p>
-                    <input type="number" name="price" value="{{ order.price|default:'' }}" placeholder="0.00" step="0.01" class="dash-input" style="max-width:200px;">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                    <div>
+                        <p class="det-label">Ціна (₴)</p>
+                        <input type="number" name="price" value="{{ order.price|default:'' }}" placeholder="0.00" step="0.01" class="dash-input">
+                    </div>
+                    <div>
+                        <p class="det-label">
+                            <i class="fas fa-calendar-alt" style="margin-right:4px;color:#ff9500;"></i>
+                            Дедлайн виконання
+                        </p>
+                        <input type="date" name="deadline" value="{{ order.deadline|date:'Y-m-d'|default:'' }}" min="{{ today|date:'Y-m-d' }}" class="dash-input" style="cursor:pointer;">
+                        <p style="font-size:.7rem;color:#6b7280;margin-top:4px;">Планова дата завершення</p>
+                    </div>
                 </div>
                 <button type="submit" class="tb-btn tb-btn-primary" style="align-self:flex-start;padding:10px 24px;">
                     <i class="fas fa-save" style="font-size:.75rem;margin-right:6px;"></i> Зберегти
@@ -86,7 +96,7 @@
             </div>
             
             <div style="padding:0 22px 22px;">
-                <!-- Add comment form (always on top) -->
+                <!-- Add comment form -->
                 <div class="comment-compose">
                     <div class="comment-compose-header">
                         <div class="comment-avatar comment-avatar-self">
@@ -100,226 +110,114 @@
                     <form method="POST" style="margin-top:12px;">
                         {% csrf_token %}
                         <input type="hidden" name="action" value="add_comment">
-                        <textarea name="comment" rows="3" required placeholder="Виконується діагностика... / Виявлено несправність блоку живлення... / Запчастина замовлена, очікуваний термін доставки 2 дні..." class="comment-textarea"></textarea>
-                        <div style="display:flex;justify-content:flex-end;margin-top:10px;">
-                            <button type="submit" class="tb-btn tb-btn-primary" style="padding:8px 20px;">
-                                <i class="fas fa-paper-plane" style="font-size:.7rem;margin-right:6px;"></i> Надіслати
-                            </button>
-                        </div>
+                        <textarea name="comment" rows="3" placeholder="Напишіть коментар для клієнта..." class="comment-textarea" required></textarea>
+                        <button type="submit" class="comment-submit-btn">
+                            <i class="fas fa-paper-plane" style="font-size:.75rem;margin-right:6px;"></i>
+                            Відправити
+                        </button>
                     </form>
                 </div>
 
-                <!-- Comments list -->
+                <!-- Existing comments -->
                 {% if comments %}
-                    <div class="comments-list">
-                        {% for c in comments %}
-                        <div class="comment-item">
-                            <div class="comment-header">
-                                <div style="display:flex;align-items:center;gap:10px;">
-                                    <div class="comment-avatar">{{ c.author.name|slice:":1"|upper|default:"?" }}</div>
-                                    <div>
-                                        <p class="comment-author">{{ c.author.name|default:"Система" }}</p>
-                                        <p class="comment-date">{{ c.created_at|date:"d.m.Y H:i" }}</p>
-                                    </div>
-                                </div>
-                                <form method="POST" style="display:inline;" onsubmit="return confirm('Видалити цей коментар?');">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="action" value="delete_comment">
-                                    <input type="hidden" name="comment_id" value="{{ c.pk }}">
-                                    <button type="submit" class="comment-delete-btn" title="Видалити">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </form>
+                <div class="comments-thread" style="margin-top:20px;">
+                    {% for comment in comments %}
+                    <div class="comment-item">
+                        <div class="comment-header">
+                            <div class="comment-avatar">{{ comment.author.name|slice:":1"|upper }}</div>
+                            <div style="flex:1;">
+                                <p class="comment-author">{{ comment.author.name }}</p>
+                                <p class="comment-time">{{ comment.created_at|date:"d.m.Y H:i" }}</p>
                             </div>
-                            <p class="comment-text">{{ c.text }}</p>
+                            <form method="POST" style="display:inline;" onsubmit="return confirm('Видалити коментар?');">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete_comment">
+                                <input type="hidden" name="comment_id" value="{{ comment.pk }}">
+                                <button type="submit" class="comment-delete-btn">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </form>
                         </div>
-                        {% endfor %}
+                        <div class="comment-body">{{ comment.text }}</div>
                     </div>
-                {% else %}
-                    <div style="padding:40px 0;text-align:center;">
-                        <i class="fas fa-comment-slash" style="font-size:2rem;color:#2a2a2d;margin-bottom:12px;display:block;"></i>
-                        <p style="color:#4b5563;font-size:.875rem;">Коментарів ще немає</p>
-                        <p style="color:#4b5563;font-size:.75rem;margin-top:4px;">Додайте перший коментар для клієнта</p>
-                    </div>
+                    {% endfor %}
+                </div>
                 {% endif %}
             </div>
         </div>
-
     </div>
 
-    <!-- Right: timeline -->
-    <div class="dash-section" style="position:sticky;top:80px;">
-        <div class="dash-section-header"><span class="dash-section-title">Статус</span></div>
-        <div style="padding:20px;">
-            {% for val,label in order.STATUS_CHOICES %}
-            <div class="timeline-item {% if not forloop.last %}timeline-item--spaced{% endif %}" style="display:flex;align-items:flex-start;gap:12px;">
-                <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
-                    <div class="timeline-dot {% if order.status == val %}timeline-dot--active{% endif %}">
-                        <i class="fas {% if order.status == val %}fa-circle-dot{% else %}fa-circle{% endif %} timeline-dot-icon"></i>
-                    </div>
-                    {% if not forloop.last %}<div style="width:1px;height:20px;background:rgba(255,255,255,.06);margin-top:4px;"></div>{% endif %}
+    <!-- Right sidebar -->
+    <div style="position:sticky;top:90px;">
+        <div class="dash-section">
+            <div style="padding:18px;">
+                <div class="status-badge status-{{ order.status }}" style="margin-bottom:16px;">
+                    {{ order.get_status_display }}
                 </div>
-                <div style="padding-top:4px;">
-                    <p class="timeline-label {% if order.status == val %}timeline-label--active{% endif %}">{{ label }}</p>
-                    {% if order.status == val %}<p style="font-size:.7rem;color:#007AFF;margin-top:2px;">← Поточний</p>{% endif %}
+                
+                {% if order.assigned_master %}
+                <div style="margin-bottom:14px;">
+                    <p class="det-label">Майстер</p>
+                    <p style="color:#fff;font-weight:500;font-size:.9rem;">{{ order.assigned_master.name }}</p>
+                </div>
+                {% endif %}
+                
+                {% if order.price %}
+                <div style="margin-bottom:14px;">
+                    <p class="det-label">Ціна</p>
+                    <p style="color:#34c759;font-weight:600;font-size:1.3rem;">{{ order.price }} ₴</p>
+                </div>
+                {% endif %}
+                
+                {% if order.deadline %}
+                <div style="margin-bottom:14px;">
+                    <p class="det-label">
+                        <i class="fas fa-calendar-check" style="margin-right:4px;"></i>
+                        Дедлайн
+                    </p>
+                    <p style="color:{% if order.deadline < today and order.status not in 'completed,cancelled' %}#ff3b30{% else %}#ff9500{% endif %};font-weight:600;font-size:.95rem;">
+                        {{ order.deadline|date:"d.m.Y" }}
+                        {% if order.deadline < today and order.status not in 'completed,cancelled' %}
+                        <span style="font-size:.75rem;display:block;margin-top:2px;">⚠️ Прострочено!</span>
+                        {% endif %}
+                    </p>
+                </div>
+                {% endif %}
+                
+                <div>
+                    <p class="det-label">Створено</p>
+                    <p style="color:#6b7280;font-size:.85rem;">{{ order.created_at|date:"d.m.Y H:i" }}</p>
                 </div>
             </div>
-            {% endfor %}
-        </div>
-        <div style="padding:0 20px 20px;">
-            <div style="height:1px;background:rgba(255,255,255,.05);margin-bottom:16px;"></div>
-            <p style="font-size:.68rem;color:#4b5563;margin-bottom:4px;">Оновлено</p>
-            <p style="font-size:.8rem;color:#6b7280;">{{ order.updated_at|date:"d.m.Y H:i" }}</p>
         </div>
     </div>
 </div>
 
 <style>
-.det-label{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:#007AFF;margin-bottom:6px;}
+.det-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.02em;color:#6b7280;margin:0 0 6px 0;font-weight:600;}
+.status-badge{padding:8px 16px;border-radius:8px;font-size:.82rem;font-weight:600;text-align:center;text-transform:uppercase;letter-spacing:.04em;}
+.status-new{background:rgba(0,122,255,0.15);color:#007AFF;}
+.status-in_progress{background:rgba(255,149,0,0.15);color:#ff9500;}
+.status-ready{background:rgba(52,199,89,0.15);color:#34c759;}
+.status-completed{background:rgba(134,134,139,0.15);color:#86868b;}
+.status-cancelled{background:rgba(255,59,48,0.15);color:#ff3b30;}
 
-/* Comment count badge */
-.comment-count {
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    min-width:24px;
-    height:24px;
-    padding:0 8px;
-    background:rgba(0,122,255,0.12);
-    border:1px solid rgba(0,122,255,0.25);
-    border-radius:6px;
-    font-size:.75rem;
-    font-weight:700;
-    color:#007AFF;
-}
-
-/* Comment compose box */
-.comment-compose {
-    padding:20px;
-    background:rgba(42,42,45,0.4);
-    border:1px solid rgba(0,122,255,0.15);
-    border-radius:12px;
-    margin-bottom:20px;
-}
-.comment-compose-header {
-    display:flex;
-    align-items:center;
-    gap:12px;
-}
-
-/* Comment avatar */
-.comment-avatar {
-    width:36px;
-    height:36px;
-    border-radius:10px;
-    background:rgba(0,122,255,0.15);
-    border:1px solid rgba(0,122,255,0.3);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:.85rem;
-    font-weight:700;
-    color:#007AFF;
-    flex-shrink:0;
-}
-.comment-avatar-self {
-    background:linear-gradient(135deg, rgba(0,122,255,0.2) 0%, rgba(0,122,255,0.1) 100%);
-    box-shadow:0 4px 12px rgba(0,122,255,0.15);
-}
-
-/* Comment textarea */
-.comment-textarea {
-    width:100%;
-    padding:12px 16px;
-    background:rgba(26,26,27,0.6);
-    border:1px solid rgba(0,122,255,0.2);
-    border-radius:10px;
-    color:#fff;
-    font-size:.875rem;
-    line-height:1.6;
-    outline:none;
-    resize:vertical;
-    transition:border-color .2s, box-shadow .2s;
-    font-family:inherit;
-}
-.comment-textarea::placeholder {
-    color:#4b5563;
-}
-.comment-textarea:focus {
-    border-color:rgba(0,122,255,0.5);
-    box-shadow:0 0 0 3px rgba(0,122,255,0.1);
-}
-
-/* Comments list */
-.comments-list {
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-    margin-top:20px;
-}
-
-/* Comment item */
-.comment-item {
-    padding:16px;
-    background:rgba(42,42,45,0.25);
-    border:1px solid rgba(0,122,255,0.1);
-    border-left:3px solid #007AFF;
-    border-radius:10px;
-    transition:all .3s;
-}
-.comment-item:hover {
-    background:rgba(42,42,45,0.35);
-    border-color:rgba(0,122,255,0.2);
-    box-shadow:0 4px 16px rgba(0,0,0,0.2);
-}
-
-.comment-header {
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:12px;
-}
-
-.comment-author {
-    font-size:.85rem;
-    font-weight:600;
-    color:#d1d5db;
-    margin:0;
-}
-
-.comment-date {
-    font-size:.7rem;
-    color:#4b5563;
-    margin:2px 0 0;
-}
-
-.comment-text {
-    color:#9ca3af;
-    font-size:.875rem;
-    line-height:1.7;
-    margin:0;
-    white-space:pre-wrap;
-}
-
-/* Delete button */
-.comment-delete-btn {
-    width:32px;
-    height:32px;
-    background:rgba(255,59,48,0.08);
-    border:1px solid rgba(255,59,48,0.15);
-    border-radius:8px;
-    color:#ff3b30;
-    font-size:.75rem;
-    cursor:pointer;
-    transition:all .2s;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-}
-.comment-delete-btn:hover {
-    background:rgba(255,59,48,0.15);
-    border-color:rgba(255,59,48,0.3);
-    transform:scale(1.05);
-}
+.comment-count{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;background:rgba(0,122,255,0.2);color:#007AFF;border-radius:10px;font-size:.7rem;font-weight:600;}
+.comment-compose{background:#2a2a2d;border-radius:10px;padding:14px;margin-bottom:16px;}
+.comment-compose-header{display:flex;align-items:center;gap:10px;}
+.comment-avatar{width:32px;height:32px;border-radius:50%;background:#007AFF;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:.8rem;}
+.comment-avatar-self{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);}
+.comment-textarea{width:100%;background:#1c1c1e;border:1px solid #3a3a3c;border-radius:8px;padding:10px 12px;color:#fff;font-size:.88rem;font-family:inherit;resize:vertical;transition:all .2s;}
+.comment-textarea:focus{outline:none;border-color:#007AFF;background:#252527;}
+.comment-submit-btn{margin-top:10px;padding:8px 18px;background:#007AFF;border:none;border-radius:6px;color:#fff;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s;}
+.comment-submit-btn:hover{background:#0051D5;transform:translateY(-1px);}
+.comments-thread{display:flex;flex-direction:column;gap:12px;}
+.comment-item{background:#2a2a2d;border-radius:10px;padding:14px;border-left:3px solid #007AFF;}
+.comment-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.comment-author{margin:0;font-size:.85rem;font-weight:600;color:#fff;}
+.comment-time{margin:0;font-size:.7rem;color:#6b7280;}
+.comment-body{color:#d1d5db;font-size:.88rem;line-height:1.6;white-space:pre-wrap;}
+.comment-delete-btn{background:rgba(255,59,48,0.1);border:1px solid rgba(255,59,48,0.3);color:#ff3b30;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:.7rem;transition:all .2s;}
+.comment-delete-btn:hover{background:rgba(255,59,48,0.2);}
 </style>
 {% endblock %}

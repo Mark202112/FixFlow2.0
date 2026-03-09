@@ -70,6 +70,15 @@ class Order(models.Model):
         limit_choices_to={'role': 'master'}
     )
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    
+    # ДЕДЛАЙН - НОВЕ ПОЛЕ
+    deadline = models.DateField(
+        verbose_name="Дедлайн виконання",
+        null=True,
+        blank=True,
+        help_text="Планова дата завершення ремонту"
+    )
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -100,8 +109,24 @@ class Comment(models.Model):
     class Meta:
         verbose_name = "Коментар"
         verbose_name_plural = "Коментарі"
-        ordering = ['created_at']  # старіші першими (хронологічно)
+        ordering = ['created_at']
     
     def __str__(self):
         return f"Коментар до {self.order.order_number}"
 
+
+class Notification(models.Model):
+    """Повідомлення про дедлайни"""
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='notifications')
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True, blank=True)
+    message = models.TextField(verbose_name="Повідомлення")
+    is_read = models.BooleanField(default=False, verbose_name="Прочитано")
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Повідомлення"
+        verbose_name_plural = "Повідомлення"
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.employee.name}: {self.message[:50]}"

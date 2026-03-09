@@ -1,436 +1,272 @@
 {% extends 'dashboard/base_dashboard.html' %}
 {% block title %}Календар — FixFlow{% endblock %}
-{% block page_title %}Планування робіт{% endblock %}
-{% block nav_calendar %}active{% endblock %}
-
 {% block content %}
 
-<div style="display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start;">
-
-    <!-- Calendar -->
-    <div class="dash-section">
-        <div class="calendar-header">
-            <div style="display:flex;align-items:center;gap:12px;">
-                <button onclick="prevMonth()" class="calendar-nav-btn">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <h2 id="month-label" style="font-size:1.4rem;font-weight:700;color:#fff;margin:0;min-width:200px;text-align:center;"></h2>
-                <button onclick="nextMonth()" class="calendar-nav-btn">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
-            <button onclick="goToday()" class="tb-btn tb-btn-ghost" style="padding:8px 16px;">
-                <i class="fas fa-calendar-day" style="margin-right:6px;font-size:.75rem;"></i>
-                Сьогодні
+<div style="padding:32px;">
+    <!-- Шапка -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;">
+        <div style="display:flex;align-items:center;gap:16px;">
+            <button onclick="previousMonth()" style="width:40px;height:40px;background:#2a2a2d;border:1px solid #3a3a3c;border-radius:8px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <h2 id="currentMonth" style="margin:0;font-size:1.5rem;font-weight:600;color:#fff;min-width:220px;text-align:center;"></h2>
+            <button onclick="nextMonth()" style="width:40px;height:40px;background:#2a2a2d;border:1px solid #3a3a3c;border-radius:8px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;">
+                <i class="fas fa-chevron-right"></i>
             </button>
         </div>
-
-        <div style="padding:24px;">
-            <!-- Day headers -->
-            <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:10px;">
-                <div class="calendar-day-header">Пн</div>
-                <div class="calendar-day-header">Вт</div>
-                <div class="calendar-day-header">Ср</div>
-                <div class="calendar-day-header">Чт</div>
-                <div class="calendar-day-header">Пт</div>
-                <div class="calendar-day-header" style="color:#6b7280;">Сб</div>
-                <div class="calendar-day-header" style="color:#ff3b30;">Нд</div>
+        
+        <!-- Легенда -->
+        <div style="display:flex;gap:20px;align-items:center;">
+            <div style="display:flex;align-items:center;gap:6px;">
+                <div style="width:12px;height:12px;background:#ff3b30;border-radius:3px;"></div>
+                <span style="color:#9ca3af;font-size:0.85rem;">Терміново</span>
             </div>
-
-            <!-- Calendar grid -->
-            <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;"></div>
-        </div>
-    </div>
-
-    <!-- Sidebar -->
-    <div class="calendar-sidebar">
-        <!-- Month summary -->
-        <div class="month-summary">
-            <p class="summary-title">Підсумок місяця</p>
-            <div id="month-summary" style="display:flex;flex-direction:column;gap:10px;"></div>
-        </div>
-
-        <!-- Selected day events -->
-        <div>
-            <h3 id="day-title" style="font-size:1.1rem;font-weight:700;color:#fff;margin:0 0 16px;">Оберіть день</h3>
-            <div id="day-events">
-                <p style="color:#4b5563;font-size:.875rem;text-align:center;padding:40px 0;">
-                    <i class="fas fa-calendar-check" style="font-size:2rem;display:block;margin-bottom:12px;color:#2a2a2d;"></i>
-                    Клікніть на день<br>для перегляду подій
-                </p>
+            <div style="display:flex;align-items:center;gap:6px;">
+                <div style="width:12px;height:12px;background:#007AFF;border-radius:3px;"></div>
+                <span style="color:#9ca3af;font-size:0.85rem;">В плані</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;">
+                <div style="width:12px;height:12px;background:#34c759;border-radius:3px;"></div>
+                <span style="color:#9ca3af;font-size:0.85rem;">Готово</span>
             </div>
         </div>
     </div>
+
+    <!-- Календар -->
+    <div id="calendar" style="display:grid;grid-template-columns:repeat(7, 1fr);gap:12px;"></div>
 </div>
 
 <style>
-/* Calendar Header */
-.calendar-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 24px;
-    border-bottom: 1px solid rgba(255,255,255,.06);
+.calendar-weekday {
+    text-align:center;
+    padding:12px;
+    font-size:0.75rem;
+    font-weight:600;
+    color:#6b7280;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
 }
 
-/* Calendar Navigation Buttons */
-.calendar-nav-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    background: rgba(42,42,45,0.6);
-    border: 1px solid rgba(0,122,255,0.2);
-    color: #007AFF;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s;
-}
-
-.calendar-nav-btn:hover {
-    background: rgba(0,122,255,0.15);
-    border-color: rgba(0,122,255,0.4);
-    transform: scale(1.05);
-}
-
-/* Day Headers */
-.calendar-day-header {
-    text-align: center;
-    padding: 12px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #4b5563;
-}
-
-/* Calendar Day Cells */
 .calendar-day {
-    aspect-ratio: 1;
-    padding: 12px;
-    background: rgba(42,42,45,0.3);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.3s;
-    position: relative;
-    display: flex;
-    flex-direction: column;
+    background:#2a2a2d;
+    border-radius:12px;
+    padding:14px;
+    min-height:140px;
+    cursor:pointer;
+    transition:all 0.2s;
+    border:1px solid #3a3a3c;
+    display:flex;
+    flex-direction:column;
 }
 
 .calendar-day:hover {
-    background: rgba(42,42,45,0.5);
-    border-color: rgba(0,122,255,0.3);
-    transform: translateY(-2px);
+    border-color:#007AFF;
+    transform:translateY(-2px);
 }
 
 .calendar-day.today {
-    border: 2px solid #007AFF;
-    background: rgba(0,122,255,0.08);
+    border-color:#007AFF;
+    box-shadow:0 0 0 2px rgba(0,122,255,0.2);
 }
 
-.calendar-day.selected {
-    background: rgba(0,122,255,0.15);
-    border-color: rgba(0,122,255,0.5);
-    outline: 2px solid rgba(0,122,255,0.3);
-    outline-offset: 2px;
+.calendar-day.other-month {
+    opacity:0.3;
+    cursor:default;
 }
 
-.calendar-day-number {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #d1d5db;
-    margin-bottom: 6px;
+.calendar-day.other-month:hover {
+    transform:none;
+    border-color:#3a3a3c;
 }
 
-.calendar-day.today .calendar-day-number {
-    color: #007AFF;
-    font-weight: 700;
+.day-number {
+    font-size:1.1rem;
+    font-weight:600;
+    color:#fff;
+    margin-bottom:10px;
 }
 
-/* Event dots */
-.calendar-event-dot {
-    height: 4px;
-    border-radius: 2px;
-    width: 100%;
-    margin-bottom: 3px;
+.day-events {
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    flex:1;
 }
 
-.calendar-event-more {
-    font-size: 0.65rem;
-    color: #6b7280;
-    margin-top: 4px;
-}
-
-/* Sidebar */
-.calendar-sidebar {
-    padding: 24px;
-    background: rgba(26,26,27,0.5);
-    border: 1px solid rgba(255,255,255,.06);
-    border-radius: 12px;
-    max-height: calc(100vh - 180px);
-    overflow-y: auto;
-}
-
-/* Month Summary */
-.month-summary {
-    padding: 20px;
-    background: rgba(42,42,45,0.3);
-    border: 1px solid rgba(0,122,255,0.1);
-    border-radius: 10px;
-    margin-bottom: 24px;
-}
-
-.summary-title {
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #4b5563;
-    margin-bottom: 14px;
-}
-
-.summary-stat {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.summary-stat-left {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.summary-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    flex-shrink: 0;
-}
-
-/* Event Item */
 .event-item {
-    padding: 12px;
-    background: rgba(42,42,45,0.4);
-    border: 1px solid rgba(0,122,255,0.15);
-    border-left: 3px solid #007AFF;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    text-decoration: none;
-    display: block;
-    transition: all 0.3s;
+    background:rgba(0,122,255,0.15);
+    border-left:3px solid #007AFF;
+    border-radius:6px;
+    padding:6px 8px;
+    font-size:0.75rem;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    transition:all 0.2s;
 }
 
 .event-item:hover {
-    background: rgba(42,42,45,0.6);
-    border-color: rgba(0,122,255,0.3);
-    transform: translateX(4px);
+    background:rgba(0,122,255,0.25);
 }
 
-.event-order {
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    margin-bottom: 4px;
+.event-item.deadline {
+    background:rgba(255,59,48,0.15);
+    border-left-color:#ff3b30;
+}
+
+.event-item.completed {
+    background:rgba(52,199,89,0.15);
+    border-left-color:#34c759;
+}
+
+.event-time {
+    font-size:0.7rem;
+    color:#9ca3af;
+    display:flex;
+    align-items:center;
+    gap:3px;
 }
 
 .event-title {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #fff;
-    margin-bottom: 6px;
+    flex:1;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
 }
 
-.event-status {
-    display: inline-block;
-    padding: 3px 10px;
-    border-radius: 5px;
-    font-size: 0.7rem;
-    font-weight: 600;
+.more-events {
+    font-size:0.7rem;
+    color:#007AFF;
+    margin-top:4px;
+    cursor:pointer;
 }
 </style>
 
-{% endblock %}
-
-{% block extra_js %}
-<script type="application/json" id="cal-events">{{ events_json|safe }}</script>
-<script type="application/json" id="cal-today">"{{ today }}"</script>
 <script>
-var EVENTS = JSON.parse(document.getElementById('cal-events').textContent);
-var TODAY  = JSON.parse(document.getElementById('cal-today').textContent);
-var currentYear, currentMonth;
+const events = {{ events_json|safe }};
+const today = new Date('{{ today }}');
+let currentYear = today.getFullYear();
+let currentMonth = today.getMonth();
 
-(function init(){
-    var d = new Date(TODAY);
-    currentYear  = d.getFullYear();
-    currentMonth = d.getMonth();
-    renderCalendar();
-    selectDay(TODAY);
-    renderMonthSummary();
-})();
+const monthNames = ["Січень","Лютий","Березень","Квітень","Травень","Червень","Липень","Серпень","Вересень","Жовтень","Листопад","Грудень"];
+const dayNames = ["ПН","ВТ","СР","ЧТ","ПТ","СБ","НД"];
 
-function renderCalendar(){
-    var months = ['Січень','Лютий','Березень','Квітень','Травень','Червень',
-                  'Липень','Серпень','Вересень','Жовтень','Листопад','Грудень'];
-    document.getElementById('month-label').textContent = months[currentMonth] + ' ' + currentYear;
-
-    var grid = document.getElementById('cal-grid');
-    grid.style.opacity = '0';
-    grid.style.transition = 'opacity 0.2s';
+function renderCalendar() {
+    const calendar = document.getElementById('calendar');
+    calendar.innerHTML = '';
     
-    setTimeout(function(){
-        grid.innerHTML = '';
+    dayNames.forEach(day => {
+        const el = document.createElement('div');
+        el.className = 'calendar-weekday';
+        el.textContent = day;
+        calendar.appendChild(el);
+    });
+    
+    const firstDay = new Date(currentYear, currentMonth, 1);
+    const lastDay = new Date(currentYear, currentMonth + 1, 0);
+    const prevLastDay = new Date(currentYear, currentMonth, 0);
+    
+    const firstDayIndex = (firstDay.getDay() + 6) % 7;
+    const lastDayDate = lastDay.getDate();
+    const prevLastDayDate = prevLastDay.getDate();
+    
+    for (let i = firstDayIndex; i > 0; i--) {
+        createDayElement(prevLastDayDate - i + 1, currentMonth - 1, true);
+    }
+    
+    for (let day = 1; day <= lastDayDate; day++) {
+        createDayElement(day, currentMonth, false);
+    }
+    
+    const remainingDays = 42 - (firstDayIndex + lastDayDate);
+    for (let day = 1; day <= remainingDays; day++) {
+        createDayElement(day, currentMonth + 1, true);
+    }
+    
+    document.getElementById('currentMonth').textContent = `${monthNames[currentMonth]} ${currentYear}`;
+}
 
-        var first  = new Date(currentYear, currentMonth, 1).getDay();
-        var start  = (first === 0) ? 6 : first - 1;
-        var days   = new Date(currentYear, currentMonth+1, 0).getDate();
-
-        // Event map
-        var evMap = {};
-        EVENTS.forEach(function(e){
-            if(!evMap[e.date]) evMap[e.date] = [];
-            evMap[e.date].push(e);
-        });
-
-        // Empty cells
-        for(var i=0;i<start;i++){
-            var blank = document.createElement('div');
-            blank.style.cssText = 'aspect-ratio:1;';
-            grid.appendChild(blank);
-        }
-
-        // Day cells
-        for(var day=1;day<=days;day++){
-            var dateStr = currentYear+'-'+String(currentMonth+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
-            var evs     = evMap[dateStr] || [];
-            var isToday = dateStr === TODAY;
-
-            var cell = document.createElement('div');
-            cell.classList.add('calendar-day');
-            if(isToday) cell.classList.add('today');
-            cell.dataset.date = dateStr;
-            cell.onclick = function(){ selectDay(this.dataset.date); };
-
-            var num = document.createElement('div');
-            num.className = 'calendar-day-number';
-            num.textContent = day;
-            cell.appendChild(num);
-
-            // Event dots (max 3)
-            evs.slice(0,3).forEach(function(ev){
-                var dot = document.createElement('div');
-                dot.className = 'calendar-event-dot';
-                dot.style.background = ev.color;
-                cell.appendChild(dot);
-            });
-            
-            if(evs.length>3){
-                var more = document.createElement('div');
-                more.className = 'calendar-event-more';
-                more.textContent = '+' + (evs.length-3);
-                cell.appendChild(more);
-            }
-            
-            grid.appendChild(cell);
-        }
+function createDayElement(day, month, isOtherMonth) {
+    const dayEl = document.createElement('div');
+    dayEl.className = 'calendar-day';
+    if (isOtherMonth) dayEl.classList.add('other-month');
+    
+    const dateStr = formatDate(currentYear, month, day);
+    const dayEvents = events.filter(e => e.date === dateStr);
+    
+    if (!isOtherMonth && day === today.getDate() && month === today.getMonth() && currentYear === today.getFullYear()) {
+        dayEl.classList.add('today');
+    }
+    
+    dayEl.innerHTML = `<div class="day-number">${day}</div><div class="day-events"></div>`;
+    
+    const eventsContainer = dayEl.querySelector('.day-events');
+    
+    if (dayEvents.length > 0) {
+        const visibleEvents = dayEvents.slice(0, 3);
         
-        grid.style.opacity = '1';
-    }, 150);
-}
-
-function selectDay(dateStr){
-    // Remove previous selection
-    document.querySelectorAll('.calendar-day').forEach(function(c){
-        c.classList.remove('selected');
-    });
-    
-    // Add selection to clicked day
-    var selectedCell = document.querySelector('[data-date="'+dateStr+'"]');
-    if(selectedCell) selectedCell.classList.add('selected');
-
-    // Update sidebar title
-    var parts = dateStr.split('-');
-    var months = ['Січня','Лютого','Березня','Квітня','Травня','Червня',
-                  'Липня','Серпня','Вересня','Жовтня','Листопада','Грудня'];
-    document.getElementById('day-title').textContent = parts[2]+' '+months[parseInt(parts[1])-1]+' '+parts[0];
-
-    // Show events for selected day
-    var evs = EVENTS.filter(function(e){ return e.date === dateStr; });
-    var box = document.getElementById('day-events');
-    
-    if(!evs.length){
-        box.innerHTML = '<p style="color:#4b5563;font-size:.875rem;text-align:center;padding:40px 0;"><i class="fas fa-inbox" style="font-size:2rem;display:block;margin-bottom:12px;color:#2a2a2d;"></i>Заявок немає</p>';
-        return;
-    }
-    
-    box.innerHTML = evs.map(function(e){
-        return '<a href="/dashboard/orders/'+e.id+'/" class="event-item">'+
-            '<p class="event-order" style="color:'+e.color+';">'+e.id+'</p>'+
-            '<p class="event-title">'+e.title+'</p>'+
-            '<span class="event-status" style="background:'+e.color+'22;color:'+e.color+';">'+e.status+'</span>'+
-        '</a>';
-    }).join('');
-}
-
-function renderMonthSummary(){
-    var counts = {};
-    var colorMap = {};
-    
-    EVENTS.forEach(function(e){
-        var eDate = new Date(e.date);
-        if(eDate.getMonth() === currentMonth && eDate.getFullYear() === currentYear){
-            if(!counts[e.status]) { 
-                counts[e.status]=0; 
-                colorMap[e.status]=e.color; 
+        visibleEvents.forEach(event => {
+            const eventEl = document.createElement('div');
+            eventEl.className = 'event-item';
+            
+            if (event.status_code === 'completed' || event.status_code === 'ready') {
+                eventEl.classList.add('completed');
+            } else if (event.has_deadline || event.is_overdue) {
+                eventEl.classList.add('deadline');
             }
-            counts[e.status]++;
+            
+            eventEl.innerHTML = `
+                <div class="event-time">
+                    <i class="fas fa-clock" style="font-size:0.65rem;"></i>
+                    ${event.time || '—'}
+                </div>
+                <div class="event-title">${event.title}</div>
+            `;
+            
+            eventEl.onclick = (e) => {
+                e.stopPropagation();
+                window.location.href = `/dashboard/orders/${event.id}/`;
+            };
+            
+            eventsContainer.appendChild(eventEl);
+        });
+        
+        if (dayEvents.length > 3) {
+            const moreEl = document.createElement('div');
+            moreEl.className = 'more-events';
+            moreEl.textContent = `Ще ${dayEvents.length - 3}...`;
+            eventsContainer.appendChild(moreEl);
         }
-    });
-    
-    var box = document.getElementById('month-summary');
-    box.innerHTML = '';
-    
-    if(!Object.keys(counts).length){
-        box.innerHTML = '<p style="font-size:.875rem;color:#4b5563;text-align:center;">Немає заявок</p>';
-        return;
     }
     
-    Object.keys(counts).forEach(function(s){
-        var stat = document.createElement('div');
-        stat.className = 'summary-stat';
-        stat.innerHTML = '<div class="summary-stat-left">'+
-            '<div class="summary-dot" style="background:'+colorMap[s]+';"></div>'+
-            '<span style="font-size:0.875rem;color:#9ca3af;">'+s+'</span>'+
-        '</div>'+
-        '<span style="font-size:0.95rem;font-weight:700;color:'+colorMap[s]+';">'+counts[s]+'</span>';
-        box.appendChild(stat);
-    });
+    calendar.appendChild(dayEl);
 }
 
-function prevMonth(){
+function formatDate(year, month, day) {
+    const m = month + 1;
+    return `${year}-${m.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+}
+
+function previousMonth() {
     currentMonth--;
-    if(currentMonth<0){ currentMonth=11; currentYear--; }
+    if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+    }
     renderCalendar();
-    renderMonthSummary();
 }
 
-function nextMonth(){
+function nextMonth() {
     currentMonth++;
-    if(currentMonth>11){ currentMonth=0; currentYear++; }
+    if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+    }
     renderCalendar();
-    renderMonthSummary();
 }
 
-function goToday(){
-    var d = new Date(TODAY);
-    currentYear  = d.getFullYear();
-    currentMonth = d.getMonth();
-    renderCalendar();
-    renderMonthSummary();
-    selectDay(TODAY);
-}
+renderCalendar();
 </script>
+
 {% endblock %}

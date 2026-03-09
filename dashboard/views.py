@@ -6,7 +6,6 @@ from django.utils import timezone
 from django.http import HttpResponse
 from datetime import timedelta, datetime
 import json
-import csv
 from orders.models import Order, Client, Employee
 
 def get_employee(request):
@@ -15,8 +14,79 @@ def get_employee(request):
     except Exception:
         return None
 
+def check_deadlines_and_notify():
+    """Автоматична перевірка дедлайнів і створення повідомлень"""
+    try:
+        from orders.models import Notification
+        
+        today = timezone.now().date()
+        tomorrow = today + timedelta(days=1)
+        
+        # Дедлайн сьогодні або завтра
+        upcoming = Order.objects.filter(
+            deadline__in=[today, tomorrow],
+            status__in=['new', 'in_progress']
+        ).select_related('assigned_master')
+        
+        for order in upcoming:
+            if not order.assigned_master:
+                continue
+            
+            # Перевірити чи вже є повідомлення сьогодні
+            exists = Notification.objects.filter(
+                employee=order.assigned_master,
+                order=order,
+                created_at__date=today
+            ).exists()
+            
+            if not exists:
+                days_left = (order.deadline - today).days
+                if days_left == 0:
+                    msg = f"⚠️ СЬОГОДНІ дедлайн: {order.order_number} ({order.device})"
+                else:
+                    msg = f"📅 ЗАВТРА дедлайн: {order.order_number} ({order.device})"
+                
+                Notification.objects.create(
+                    employee=order.assigned_master,
+                    order=order,
+                    message=msg
+                )
+        
+        # Прострочені дедлайни (кожні 3 дні)
+        overdue = Order.objects.filter(
+            deadline__lt=today,
+            status__in=['new', 'in_progress']
+        ).select_related('assigned_master')
+        
+        for order in overdue:
+            if not order.assigned_master:
+                continue
+            
+            days_overdue = (today - order.deadline).days
+            
+            if days_overdue % 3 == 0:
+                exists = Notification.objects.filter(
+                    employee=order.assigned_master,
+                    order=order,
+                    created_at__date=today
+                ).exists()
+                
+                if not exists:
+                    msg = f"🔴 ПРОСТРОЧЕНО {days_overdue} днів: {order.order_number}"
+                    
+                    Notification.objects.create(
+                        employee=order.assigned_master,
+                        order=order,
+                        message=msg
+                    )
+    except:
+        pass
+
 @login_required
 def dashboard_home(request):
+    # Перевірка дедлайнів
+    check_deadlines_and_notify()
+    
     orders = Order.objects.select_related('client','assigned_master')
     
     now = timezone.now()
@@ -31,14 +101,27 @@ def dashboard_home(request):
 
     for i in range(6, -1, -1):
         d = today - timedelta(days=i)
-
         start = timezone.make_aware(datetime.combine(d, datetime.min.time()))
         end = timezone.make_aware(datetime.combine(d, datetime.max.time()))
-
         chart_labels.append(d.strftime('%d.%m'))
-        chart_data.append(
-            orders.filter(created_at__range=(start, end)).count()
-        )
+        chart_data.append(orders.filter(created_at__range=(start, end)).count())
+    
+    # Отримати повідомлення
+    try:
+        from orders.models import Notification
+        emp = get_employee(request)
+        notifications = []
+        unread_count = 0
+        
+        if emp:
+            notifications = Notification.objects.filter(
+                employee=emp,
+                is_read=False
+            ).order_by('-created_at')[:5]
+            unread_count = notifications.count()
+    except:
+        notifications = []
+        unread_count = 0
 
     context = {
         'employee':    get_employee(request),
@@ -53,6 +136,8 @@ def dashboard_home(request):
         'chart_labels': json.dumps(chart_labels),
         'chart_data':   json.dumps(chart_data),
         'status_choices': Order.STATUS_CHOICES,
+        'notifications': notifications,
+        'unread_notifications': unread_count,
     }
 
     return render(request, 'dashboard/home.html', context)
@@ -97,6 +182,7 @@ def order_detail(request, order_number):
             status = request.POST.get('status')
             price  = request.POST.get('price', '').strip()
             master = request.POST.get('master', '')
+            deadline_str = request.POST.get('deadline', '').strip()
 
             if status:
                 order.status = status
@@ -112,6 +198,16 @@ def order_detail(request, order_number):
                     pass
             elif 'master' in request.POST and master == '':
                 order.assigned_master = None
+            
+            # Обробка дедлайну
+            if deadline_str:
+                try:
+                    order.deadline = datetime.strptime(deadline_str, '%Y-%m-%d').date()
+                except:
+                    pass
+            elif 'deadline' in request.POST and deadline_str == '':
+                order.deadline = None
+            
             order.save()
 
         elif action == 'add_comment':
@@ -138,11 +234,11 @@ def order_detail(request, order_number):
         'order':    order,
         'masters':  masters,
         'comments': comments,
+        'today':    timezone.now().date(),
     })
 
 @login_required
 def order_delete(request, order_number):
-    """Видалення заявки"""
     if request.method == 'POST':
         order = get_object_or_404(Order, order_number=order_number)
         order.delete()
@@ -207,22 +303,76 @@ def create_client(request):
                 c=Client.objects.create(name=name,phone=phone,email=email)
                 return redirect('dashboard:client_detail',pk=c.pk)
         else: error="Ім'я та телефон обов'язкові"
-    return render(request,'dashboard/client_form.html',{'error':error})
+    return render(request,'dashboard/create_client.html',{'error':error})
 
 @login_required
 def calendar_view(request):
-    today=timezone.now().date()
-    month_start=today.replace(day=1)
-    if today.month==12: month_end=today.replace(year=today.year+1,month=1,day=1)-timedelta(days=1)
-    else: month_end=today.replace(month=today.month+1,day=1)-timedelta(days=1)
-    orders=Order.objects.filter(created_at__date__gte=month_start,created_at__date__lte=month_end).select_related('client')
-    colors={'new':'#007AFF','in_progress':'#ff9500','ready':'#34c759','completed':'#86868b','cancelled':'#ff3b30'}
-    events=[{'id':o.order_number,'title':f'{o.device} — {o.client.name}','date':o.created_at.strftime('%Y-%m-%d'),'color':colors.get(o.status,'#007AFF'),'status':o.get_status_display()} for o in orders]
-    return render(request,'dashboard/calendar.html',{'events_json':json.dumps(events),'today':today.strftime('%Y-%m-%d'),'month_orders':orders.count()})
+    """Календар як на фото"""
+    today = timezone.now().date()
+    
+    month_start = today.replace(day=1)
+    if today.month == 12:
+        month_end = today.replace(year=today.year+1, month=1, day=1) - timedelta(days=1)
+    else:
+        month_end = today.replace(month=today.month+1, day=1) - timedelta(days=1)
+    
+    # Отримати заявки з дедлайнами в цьому місяці
+    orders = Order.objects.filter(
+        Q(created_at__date__gte=month_start, created_at__date__lte=month_end) |
+        Q(deadline__gte=month_start, deadline__lte=month_end)
+    ).select_related('client', 'assigned_master').distinct()
+    
+    colors = {
+        'new': '#5e8aee',
+        'in_progress': '#5e8aee',
+        'ready': '#34c759',
+        'completed': '#34c759',
+        'cancelled': '#ff3b30'
+    }
+    
+    events = []
+    for o in orders:
+        # Якщо є дедлайн - показати на день дедлайну
+        if o.deadline and month_start <= o.deadline <= month_end:
+            event = {
+                'id': o.order_number,
+                'title': f'{o.device[:20]}',
+                'date': o.deadline.strftime('%Y-%m-%d'),
+                'time': o.deadline.strftime('%H:%M') if hasattr(o.deadline, 'hour') else '—',
+                'color': colors.get(o.status, '#5e8aee'),
+                'status': o.get_status_display(),
+                'status_code': o.status,
+                'has_deadline': True,
+                'deadline': o.deadline.strftime('%d.%m.%Y'),
+                'is_overdue': o.deadline < today and o.status not in ['completed', 'cancelled']
+            }
+            events.append(event)
+        # Інакше показати на день створення
+        elif month_start <= o.created_at.date() <= month_end:
+            event = {
+                'id': o.order_number,
+                'title': f'{o.device[:20]}',
+                'date': o.created_at.strftime('%Y-%m-%d'),
+                'time': o.created_at.strftime('%H:%M'),
+                'color': colors.get(o.status, '#5e8aee'),
+                'status': o.get_status_display(),
+                'status_code': o.status,
+                'has_deadline': bool(o.deadline),
+                'deadline': o.deadline.strftime('%d.%m.%Y') if o.deadline else None,
+                'is_overdue': o.deadline < today if o.deadline else False
+            }
+            events.append(event)
+    
+    context = {
+        'events_json': json.dumps(events),
+        'today': today.strftime('%Y-%m-%d'),
+        'month_orders': len(events)
+    }
+    
+    return render(request, 'dashboard/calendar.html', context)
 
 @login_required
 def reports_view(request):
-    
     period = request.GET.get('period', '30')
     date_from_str = request.GET.get('date_from', '')
     date_to_str = request.GET.get('date_to', '')
@@ -247,14 +397,14 @@ def reports_view(request):
             days = 30
         date_from = today - timedelta(days=days-1)
         date_to = today
-
+    
     start_dt = timezone.make_aware(datetime.combine(date_from, datetime.min.time()))
     end_dt = timezone.make_aware(datetime.combine(date_to, datetime.max.time()))
-
+    
     orders = Order.objects.filter(
         created_at__range=(start_dt, end_dt)
     ).select_related('client', 'assigned_master')
-
+    
     total_orders_count = orders.count()
 
     by_status = {}
@@ -328,94 +478,6 @@ def reports_view(request):
     }
 
     return render(request, 'dashboard/reports.html', context)
-@login_required
-def export_report_csv(request):
-    """Експорт звіту в CSV - РОБОЧА ВЕРСІЯ"""
-    import csv
-    from django.http import HttpResponse
-    from django.utils import timezone
-    from datetime import datetime, timedelta
-    from orders.models import Order
-    
-    # Отримати параметри
-    period = request.GET.get('period', '30')
-    date_from_str = request.GET.get('date_from', '')
-    date_to_str = request.GET.get('date_to', '')
-    
-    today = timezone.now().date()
-    
-    # Якщо НЕ вказано діапазон - взяти за period
-    if not date_from_str or not date_to_str:
-        try:
-            days = int(period)
-        except:
-            days = 30
-        
-        date_from = today - timedelta(days=days-1)
-        date_to = today
-    else:
-        # Якщо вказано діапазон
-        try:
-            date_from = datetime.strptime(date_from_str, '%Y-%m-%d').date()
-            date_to = datetime.strptime(date_to_str, '%Y-%m-%d').date()
-        except:
-            # Якщо помилка парсингу - взяти 30 днів
-            date_from = today - timedelta(days=29)
-            date_to = today
-    
-    # КРИТИЧНО: Отримати ВСІ заявки за період
-    orders = Order.objects.filter(
-        created_at__date__gte=date_from,
-        created_at__date__lte=date_to
-    ).select_related('client', 'assigned_master').order_by('-created_at')
-    
-    # DEBUG: Вивести в консоль скільки знайдено
-    print(f"DEBUG Export CSV: from={date_from}, to={date_to}, found={orders.count()}")
-    
-    # Створити HTTP відповідь для CSV
-    response = HttpResponse(content_type='text/csv; charset=utf-8')
-    response['Content-Disposition'] = f'attachment; filename="zvit_{date_from}_{date_to}.csv"'
-    
-    # UTF-8 BOM для Excel
-    response.write('\ufeff')
-    
-    # Створити writer з крапкою з комою (для Excel)
-    writer = csv.writer(response, delimiter=';')
-    
-    # Записати заголовки
-    writer.writerow([
-        'Номер заявки',
-        'Дата',
-        'Клієнт',
-        'Телефон',
-        'Пристрій',
-        'Проблема',
-        'Статус',
-        'Майстер',
-        'Ціна'
-    ])
-    
-    # Записати дані
-    for order in orders:
-        writer.writerow([
-            order.order_number,
-            order.created_at.strftime('%d.%m.%Y %H:%M'),
-            order.client.name,
-            order.client.phone,
-            order.device,
-            (order.problem[:50] + '...') if len(order.problem) > 50 else order.problem,
-            order.get_status_display(),
-            order.assigned_master.name if order.assigned_master else 'Не призначено',
-            f'{order.price}' if order.price else '0',
-        ])
-    
-    # Якщо порожній - додати рядок з повідомленням
-    if orders.count() == 0:
-        writer.writerow(['Немає даних за обраний період', '', '', '', '', '', '', '', ''])
-    
-    return response
-
-
 
 @login_required
 def admin_view(request):
