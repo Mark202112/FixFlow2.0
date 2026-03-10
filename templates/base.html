@@ -28,17 +28,25 @@
 <header id="hdr" style="position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(20,20,21,0.55);border-bottom:1px solid rgba(0,122,255,0.25);box-shadow:0 2px 30px rgba(0,0,0,0.35);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);">
     <div style="max-width:1280px;margin:0 auto;padding:0 24px;">
         <div style="display:flex;align-items:center;justify-content:space-between;height:72px;">
-            <a href="{% url 'main:home' %}" style="text-decoration:none;">
-                <span style="font-size:1.25rem;font-weight:700;letter-spacing:-0.02em;">
-                    <span style="color:#fff;">Fix</span><span style="color:#007AFF;">Flow</span>
+            
+            <a href="{% url 'main:home' %}" style="text-decoration:none; display:flex; align-items:center; gap:12px;">
+                <div style="width:36px; height:36px; background:#007AFF; border-radius:10px; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; box-shadow:0 0 15px rgba(0, 122, 255, 0.45); background:linear-gradient(135deg, #007AFF 0%, #0056CC 100%);">
+                    <span style="color:#fff; font-size:1.2rem; font-weight:900; font-family:sans-serif; font-style:italic;">F</span>
+                    <div style="position:absolute; bottom:0; right:0; width:12px; height:12px; background:rgba(0,0,0,0.2); clip-path:polygon(100% 0, 0% 100%, 100% 100%);"></div>
+                </div>
+
+                <span style="font-size:1.25rem; font-weight:700; letter-spacing:-0.02em;">
+                    <span style="color:#fff;">Fix</span><span style="color:#007AFF; text-shadow: 0 0 10px rgba(0, 122, 255, 0.4);">Flow</span>
                 </span>
             </a>
+
             <nav id="desk-nav" style="display:none;align-items:center;gap:32px;">
-                <a href="{% url 'main:home' %}"            class="hdr-link">Головна</a>
+                <a href="{% url 'main:home' %}"           class="hdr-link">Головна</a>
                 <a href="{% url 'main:home' %}#services"   class="hdr-link">Послуги</a>
                 <a href="{% url 'main:home' %}#status"     class="hdr-link">Статус</a>
                 <a href="{% url 'main:home' %}#advantages" class="hdr-link">Про нас</a>
             </nav>
+
             <div style="display:flex;align-items:center;gap:12px;">
                 <a href="{% url 'main:home' %}#contact" class="zvyazok-btn btn-primary" style="padding:10px 20px;border-radius:10px;font-size:.875rem;"><i class="fas fa-phone" style="font-size:.75rem;"></i> Зв'язок</a>
                 <button id="burger" onclick="toggleMobileMenu()" style="display:flex;flex-direction:column;justify-content:center;gap:5px;width:40px;height:40px;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:8px;cursor:pointer;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='transparent'">

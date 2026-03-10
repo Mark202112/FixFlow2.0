@@ -22,10 +22,6 @@
                 <span style="color:#9ca3af;font-size:0.85rem;">Терміново</span>
             </div>
             <div style="display:flex;align-items:center;gap:6px;">
-                <div style="width:12px;height:12px;background:#007AFF;border-radius:3px;"></div>
-                <span style="color:#9ca3af;font-size:0.85rem;">В плані</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:6px;">
                 <div style="width:12px;height:12px;background:#34c759;border-radius:3px;"></div>
                 <span style="color:#9ca3af;font-size:0.85rem;">Готово</span>
             </div>
@@ -60,13 +56,13 @@
 }
 
 .calendar-day:hover {
-    border-color:#007AFF;
+    border-color:#34c759;
     transform:translateY(-2px);
 }
 
 .calendar-day.today {
-    border-color:#007AFF;
-    box-shadow:0 0 0 2px rgba(0,122,255,0.2);
+    border-color:#34c759;
+    box-shadow:0 0 0 2px rgba(52,199,89,0.2);
 }
 
 .calendar-day.other-month {
@@ -94,8 +90,8 @@
 }
 
 .event-item {
-    background:rgba(0,122,255,0.15);
-    border-left:3px solid #007AFF;
+    background:rgba(52,199,89,0.15);
+    border-left:3px solid #34c759;
     border-radius:6px;
     padding:6px 8px;
     font-size:0.75rem;
@@ -107,7 +103,7 @@
 }
 
 .event-item:hover {
-    background:rgba(0,122,255,0.25);
+    background:rgba(52,199,89,0.25);
 }
 
 .event-item.deadline {
@@ -115,9 +111,8 @@
     border-left-color:#ff3b30;
 }
 
-.event-item.completed {
-    background:rgba(52,199,89,0.15);
-    border-left-color:#34c759;
+.event-item.deadline:hover {
+    background:rgba(255,59,48,0.25);
 }
 
 .event-time {
@@ -137,7 +132,7 @@
 
 .more-events {
     font-size:0.7rem;
-    color:#007AFF;
+    color:#34c759;
     margin-top:4px;
     cursor:pointer;
 }
@@ -210,11 +205,11 @@ function createDayElement(day, month, isOtherMonth) {
             const eventEl = document.createElement('div');
             eventEl.className = 'event-item';
             
-            if (event.status_code === 'completed' || event.status_code === 'ready') {
-                eventEl.classList.add('completed');
-            } else if (event.has_deadline || event.is_overdue) {
+            // ВИПРАВЛЕНО: Червоний тільки якщо є дедлайн, інакше зелений
+            if (event.has_deadline || event.is_overdue) {
                 eventEl.classList.add('deadline');
             }
+            // Інакше залишається зеленим (за замовчуванням)
             
             eventEl.innerHTML = `
                 <div class="event-time">
