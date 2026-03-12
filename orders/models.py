@@ -71,7 +71,7 @@ class Order(models.Model):
     )
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     
-    # ДЕДЛАЙН - НОВЕ ПОЛЕ
+    # Дедлайн
     deadline = models.DateField(
         verbose_name="Дедлайн виконання",
         null=True,
@@ -86,6 +86,19 @@ class Order(models.Model):
         verbose_name = "Замовлення"
         verbose_name_plural = "Замовлення"
         ordering = ['-created_at']
+    
+    def save(self, *args, **kwargs):
+        # Генерація номера
+        if not self.order_number:
+            import time
+            self.order_number = f"RM{int(time.time())}"
+        
+        # АВТОМАТИЧНЕ ВИДАЛЕННЯ ДЕДЛАЙНУ
+        # Якщо "Видана" або "Скасована" - видалити дедлайн
+        if self.status in ['completed', 'cancelled']:
+            self.deadline = None
+        
+        super().save(*args, **kwargs)
     
     def __str__(self):
         return f"{self.order_number} - {self.device}"

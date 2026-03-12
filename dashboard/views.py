@@ -307,7 +307,9 @@ def create_client(request):
 
 @login_required
 def calendar_view(request):
-    """Календар як на фото"""
+    """Календар з дедлайнами - червоний і зелений"""
+    from django.db.models import Q
+    
     today = timezone.now().date()
     
     month_start = today.replace(day=1)
@@ -316,52 +318,31 @@ def calendar_view(request):
     else:
         month_end = today.replace(month=today.month+1, day=1) - timedelta(days=1)
     
-    # Отримати заявки з дедлайнами в цьому місяці
+    # Заявки з дедлайном в цьому місяці
+    # НЕ видані і НЕ скасовані (вони автоматично втрачають дедлайн)
     orders = Order.objects.filter(
-        Q(created_at__date__gte=month_start, created_at__date__lte=month_end) |
-        Q(deadline__gte=month_start, deadline__lte=month_end)
-    ).select_related('client', 'assigned_master').distinct()
-    
-    colors = {
-        'new': '#5e8aee',
-        'in_progress': '#5e8aee',
-        'ready': '#34c759',
-        'completed': '#34c759',
-        'cancelled': '#ff3b30'
-    }
+        deadline__gte=month_start,
+        deadline__lte=month_end,
+        deadline__isnull=False
+    ).exclude(
+        status__in=['completed', 'cancelled']
+    ).select_related('client', 'assigned_master')
     
     events = []
     for o in orders:
-        # Якщо є дедлайн - показати на день дедлайну
-        if o.deadline and month_start <= o.deadline <= month_end:
-            event = {
-                'id': o.order_number,
-                'title': f'{o.device[:20]}',
-                'date': o.deadline.strftime('%Y-%m-%d'),
-                'time': o.deadline.strftime('%H:%M') if hasattr(o.deadline, 'hour') else '—',
-                'color': colors.get(o.status, '#5e8aee'),
-                'status': o.get_status_display(),
-                'status_code': o.status,
-                'has_deadline': True,
-                'deadline': o.deadline.strftime('%d.%m.%Y'),
-                'is_overdue': o.deadline < today and o.status not in ['completed', 'cancelled']
-            }
-            events.append(event)
-        # Інакше показати на день створення
-        elif month_start <= o.created_at.date() <= month_end:
-            event = {
-                'id': o.order_number,
-                'title': f'{o.device[:20]}',
-                'date': o.created_at.strftime('%Y-%m-%d'),
-                'time': o.created_at.strftime('%H:%M'),
-                'color': colors.get(o.status, '#5e8aee'),
-                'status': o.get_status_display(),
-                'status_code': o.status,
-                'has_deadline': bool(o.deadline),
-                'deadline': o.deadline.strftime('%d.%m.%Y') if o.deadline else None,
-                'is_overdue': o.deadline < today if o.deadline else False
-            }
-            events.append(event)
+        event = {
+            'id': o.order_number,
+            'title': f'{o.device[:20]}',
+            'date': o.deadline.strftime('%Y-%m-%d'),
+            'time': '—',
+            'color': '#34c759' if o.status == 'ready' else '#ff3b30',
+            'status': o.get_status_display(),
+            'status_code': o.status,
+            'has_deadline': True,
+            'deadline': o.deadline.strftime('%d.%m.%Y'),
+            'is_overdue': o.deadline < today
+        }
+        events.append(event)
     
     context = {
         'events_json': json.dumps(events),
