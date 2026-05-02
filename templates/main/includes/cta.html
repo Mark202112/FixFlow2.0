@@ -1,0 +1,95 @@
+<!-- ═══════════════════════════ CTA ═══════════════════════════ -->
+<section class="relative overflow-hidden" style="padding:100px 0; background:#007AFF;">
+
+    <!-- Dot grid overlay -->
+    <div style="position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,0.15) 1px, transparent 1px);background-size:28px 28px;pointer-events:none;"></div>
+
+    <!-- Decorative blobs -->
+    <div style="position:absolute;top:-80px;right:-80px;width:420px;height:420px;border-radius:50%;background:rgba(255,255,255,0.07);filter:blur(70px);pointer-events:none;"></div>
+    <div style="position:absolute;bottom:-100px;left:-80px;width:380px;height:380px;border-radius:50%;background:rgba(0,0,0,0.1);filter:blur(80px);pointer-events:none;"></div>
+
+    <div class="max-w-4xl mx-auto px-6 relative z-10 text-center">
+
+        <div class="reveal-on-scroll">
+
+            <!-- Label -->
+            <span style="display:inline-block;padding:6px 20px;border-radius:20px;
+                          border:1px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.1);
+                          font-size:.62rem;font-weight:700;text-transform:uppercase;
+                          letter-spacing:.25em;color:rgba(255,255,255,0.9);margin-bottom:28px;">
+                Готові допомогти прямо зараз
+            </span>
+
+            <!-- Heading -->
+            <h2 style="color:#FFFFFF;font-size:clamp(2rem,5vw,3.5rem);font-weight:800;
+                        letter-spacing:-.03em;line-height:1.1;margin-bottom:20px;">
+                Ваша техніка потребує<br>ремонту?
+            </h2>
+
+            <!-- Subtext -->
+            <p style="color:rgba(255,255,255,0.82);font-size:1.05rem;line-height:1.75;
+                       max-width:520px;margin:0 auto 42px;">
+                Залиште заявку — ми зв'яжемося протягом
+                <strong style="color:#fff;">5 хвилин</strong> та призначимо зручний час.
+            </p>
+
+            <!-- Buttons -->
+            <div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-bottom:52px;">
+                <button onclick="openOrderModal()" class="cta-btn-white">
+                    <i class="fas fa-bolt" style="margin-right:8px;"></i>Залишити заявку
+                </button>
+                <button onclick="smoothScrollTo('contact')" class="cta-btn-outline">
+                    <i class="fas fa-phone" style="margin-right:8px;"></i>Зв'язатися
+                </button>
+            </div>
+
+            <!-- Trust micro-row -->
+            <div style="display:flex;flex-wrap:wrap;gap:24px;justify-content:center;">
+                <div style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.75);font-size:.8rem;">
+                    <i class="fas fa-shield-alt"></i> Гарантія до 12 місяців
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.75);font-size:.8rem;">
+                    <i class="fas fa-stethoscope"></i> Безкоштовна діагностика
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.75);font-size:.8rem;">
+                    <i class="fas fa-credit-card"></i> Оплата після ремонту
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<style>
+.cta-btn-white {
+    padding: 15px 36px;
+    background: #FFFFFF;
+    color: #007AFF;
+    font-size: 1rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform .2s ease, box-shadow .2s ease;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+.cta-btn-white:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 32px rgba(0,0,0,0.22);
+}
+.cta-btn-outline {
+    padding: 15px 32px;
+    background: transparent;
+    color: #FFFFFF;
+    font-size: 1rem;
+    font-weight: 600;
+    border: 2px solid rgba(255,255,255,0.45);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: border-color .2s ease, background .2s ease;
+}
+.cta-btn-outline:hover {
+    border-color: rgba(255,255,255,0.9);
+    background: rgba(255,255,255,0.1);
+}
+</style>

@@ -62,14 +62,14 @@
                 <div class="stat-icon">
                     <i class="fas fa-tools"></i>
                 </div>
-                <p class="stat-value">15 000+</p>
+                <p class="stat-value" data-counter="15000" data-suffix="+" data-format="spaced">15 000+</p>
                 <p class="stat-label">Відремонтованих пристроїв</p>
             </div>
             <div class="stat-item group">
                 <div class="stat-icon">
                     <i class="fas fa-smile"></i>
                 </div>
-                <p class="stat-value">98%</p>
+                <p class="stat-value" data-counter="98" data-suffix="%">98%</p>
                 <p class="stat-label">Задоволених клієнтів</p>
             </div>
             <div class="stat-item group">
@@ -230,6 +230,7 @@
 }
 
 /* Responsive */
+
 @media (max-width: 1024px) {
     .modern-card {
         border-left: 1px solid rgba(0,0,0,0.07);
@@ -240,3 +241,49 @@
     }
 }
 </style>
+
+<script>
+/* ── Animated counters (IntersectionObserver, no deps) ────────── */
+(function(){
+    function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
+
+    function formatNum(n, fmt){
+        if(fmt === 'spaced' && n >= 1000){
+            var th = Math.floor(n / 1000);
+            var rest = String(n % 1000).padStart(3, '0');
+            return th + ' ' + rest;
+        }
+        return String(n);
+    }
+
+    function startCounter(el){
+        var target   = parseInt(el.dataset.counter, 10);
+        var suffix   = el.dataset.suffix  || '';
+        var fmt      = el.dataset.format  || '';
+        var duration = 1600;
+        var startTs  = null;
+
+        function step(ts){
+            if(!startTs) startTs = ts;
+            var p   = Math.min((ts - startTs) / duration, 1);
+            var val = Math.round(easeOutCubic(p) * target);
+            el.textContent = formatNum(val, fmt) + suffix;
+            if(p < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+    }
+
+    var obs = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){
+            if(e.isIntersecting){
+                startCounter(e.target);
+                obs.unobserve(e.target);
+            }
+        });
+    }, { threshold: 0.6 });
+
+    document.querySelectorAll('[data-counter]').forEach(function(el){
+        obs.observe(el);
+    });
+})();
+</script>

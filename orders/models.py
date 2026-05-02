@@ -128,6 +128,33 @@ class Comment(models.Model):
         return f"Коментар до {self.order.order_number}"
 
 
+class Service(models.Model):
+    """Послуга сервісного центру — ціни та умови керуються через адмін"""
+    slug        = models.SlugField(max_length=50, unique=True, verbose_name="Slug")
+    name        = models.CharField(max_length=200, verbose_name="Назва")
+    label       = models.CharField(max_length=100, verbose_name="Коротка назва (для бейджа)")
+    icon        = models.CharField(max_length=60, verbose_name="Іконка Font Awesome", help_text="Наприклад: fa-mobile-alt")
+    description = models.TextField(verbose_name="Опис послуги")
+    price_display = models.CharField(max_length=60, verbose_name="Ціна (текст)", help_text="Наприклад: від 250 ₴")
+    price_from  = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name="Ціна від (₴)", help_text="Числове значення для сортування")
+    time_estimate = models.CharField(max_length=100, verbose_name="Час виконання", help_text="Наприклад: 30 хв – 2 год")
+    warranty    = models.CharField(max_length=100, verbose_name="Гарантія", help_text="Наприклад: 12 місяців")
+    features    = models.TextField(verbose_name="Що входить", help_text="По одному пункту на рядок")
+    is_active   = models.BooleanField(default=True, verbose_name="Активна")
+    sort_order  = models.PositiveSmallIntegerField(default=0, verbose_name="Порядок")
+
+    class Meta:
+        verbose_name = "Послуга"
+        verbose_name_plural = "Послуги"
+        ordering = ['sort_order']
+
+    def __str__(self):
+        return f"{self.name} — {self.price_display}"
+
+    def get_features_list(self):
+        return [f.strip() for f in self.features.split('\n') if f.strip()]
+
+
 class Notification(models.Model):
     """Повідомлення про дедлайни"""
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='notifications')

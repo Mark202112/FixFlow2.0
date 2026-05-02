@@ -56,7 +56,7 @@
                 <!-- Stats row -->
                 <div class="grid grid-cols-3 gap-6">
                     <div class="pl-4" style="border-left: 2px solid #007AFF;">
-                        <p class="text-3xl font-bold mb-1" style="color:#1A202C;">15K+</p>
+                        <p class="text-3xl font-bold mb-1" data-counter="15" data-suffix="K+" style="color:#1A202C;">15K+</p>
                         <p class="text-xs text-gray-500 uppercase tracking-wider">ремонтів</p>
                     </div>
                     <div class="pl-4" style="border-left: 2px solid #007AFF;">
@@ -109,9 +109,11 @@
 {% include 'main/includes/services.html' %}
 {% include 'main/includes/advantages.html' %}
 {% include 'main/includes/process.html' %}
+{% include 'main/includes/reviews.html' %}
 {% include 'main/includes/status.html' %}
 {% include 'main/includes/contact.html' %}
 {% include 'main/includes/faq.html' %}
+{% include 'main/includes/cta.html' %}
 
 <!-- Modals -->
 {% include 'main/includes/service_modal.html' %}

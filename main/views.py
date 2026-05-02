@@ -1,10 +1,36 @@
-from django.shortcuts import render, redirect
+import json
+from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-from orders.models import Order, Client
+from orders.models import Order, Client, Service
+
 
 def home(request):
-    return render(request, 'main/home.html')
+    services_qs = Service.objects.filter(is_active=True)
+
+    # Dict для шаблону: slug → Service об'єкт
+    services_dict = {s.slug: s for s in services_qs}
+
+    # JSON для JavaScript serviceInfo (замість хардкоду)
+    services_json = {}
+    for s in services_qs:
+        services_json[s.slug] = {
+            'num': str(s.sort_order).zfill(2),
+            'icon': s.icon,
+            'label': s.label,
+            'title': s.name,
+            'price': s.price_display,
+            'time': s.time_estimate,
+            'warranty': s.warranty,
+            'desc': s.description,
+            'features': s.get_features_list(),
+        }
+
+    return render(request, 'main/home.html', {
+        'services_dict': services_dict,
+        'services_json': json.dumps(services_json, ensure_ascii=False),
+    })
+
 
 @require_POST
 def create_order(request):
@@ -15,81 +41,58 @@ def create_order(request):
         email   = request.POST.get('email', '').strip()
         device  = request.POST.get('device', '').strip()
         problem = request.POST.get('problem', '').strip()
-        
+
         if not (name and phone and device and problem):
             return JsonResponse({'success': False, 'error': 'Заповніть всі поля'}, status=400)
-        
-        # Створюємо або знаходимо клієнта
+
         client, _ = Client.objects.get_or_create(
             phone=phone,
             defaults={'name': name, 'email': email}
         )
-        
-        # Створюємо замовлення
+
         order = Order.objects.create(
             client=client,
             device=device,
             problem=problem
         )
-        
-        # Повертаємо успішну відповідь
+
         return JsonResponse({
             'success': True,
             'order_number': order.order_number,
             'message': 'Заявку успішно створено'
         })
-        
+
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
-def check_status(request):
-    """Перевірка статусу замовлення"""
-    orders = None
-    
-    if request.method == 'POST':
-        search = request.POST.get('search', '').strip()
-        if search:
-            # Шукаємо по номеру замовлення або телефону
-            orders = Order.objects.filter(
-                order_number__icontains=search
-            ) | Order.objects.filter(
-                client__phone__icontains=search
-            )
-    
-    return render(request, 'main/home.html', {'orders': orders})
 
 @require_POST
 def check_status_api(request):
-    """API endpoint для перевірки статусу (без перезавантаження сторінки)"""
+    """API endpoint для перевірки статусу (без перезавантаження)"""
     try:
         from orders.models import Comment
-        
+
         search = request.POST.get('search', '').strip()
-        
+
         if not search:
             return JsonResponse({'orders': []})
-        
-        # Шукаємо по номеру замовлення або телефону
-        orders = Order.objects.filter(
-            order_number__icontains=search
-        ) | Order.objects.filter(
-            client__phone__icontains=search
-        )
-        
-        orders = orders.select_related('client').prefetch_related('comments__author')[:10]
-        
-        # Серіалізуємо в JSON
+
+        orders = (
+            Order.objects.filter(order_number__icontains=search) |
+            Order.objects.filter(client__phone__icontains=search)
+        ).select_related('client').prefetch_related('comments__author')[:10]
+
         results = []
         for order in orders:
-            # Коментарі для клієнта
-            comments_data = []
-            for comment in order.comments.all():
-                comments_data.append({
-                    'text': comment.text,
-                    'author': comment.author.name if comment.author else 'Майстер',
-                    'date': comment.created_at.strftime('%d.%m.%Y %H:%M'),
-                })
-            
+            comments_data = [
+                {
+                    'text': c.text,
+                    'author': c.author.name if c.author else 'Майстер',
+                    'date': c.created_at.strftime('%d.%m.%Y %H:%M'),
+                }
+                for c in order.comments.all()
+            ]
+
             results.append({
                 'order_number': order.order_number,
                 'device': order.device,
@@ -99,8 +102,12 @@ def check_status_api(request):
                 'comments': comments_data,
                 'created': order.created_at.strftime('%d.%m.%Y'),
             })
-        
+
         return JsonResponse({'orders': results})
-        
+
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+def check_status(request):
+    return render(request, 'main/home.html')
