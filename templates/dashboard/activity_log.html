@@ -37,7 +37,7 @@
                         <div style="width:28px;height:28px;border-radius:7px;background:rgba(0,122,255,.15);display:flex;align-items:center;justify-content:center;color:#007AFF;font-size:.7rem;font-weight:700;">
                             {% if log.user %}{{ log.user.username|slice:":1"|upper }}{% else %}S{% endif %}
                         </div>
-                        <span style="font-size:.85rem;color:#d1d5db;">
+                        <span style="font-size:.85rem;color:#4b5563;">
                             {% if log.user %}{{ log.user.username }}{% else %}Система{% endif %}
                         </span>
                     </div>
@@ -50,7 +50,7 @@
                 <td style="color:#9ca3af;font-size:.82rem;">
                     {{ log.model }}
                 </td>
-                <td style="color:#d1d5db;font-size:.85rem;">
+                <td style="color:#4b5563;font-size:.85rem;">
                     {{ log.description }}
                 </td>
                 <td style="color:#6b7280;font-size:.75rem;font-family:monospace;">

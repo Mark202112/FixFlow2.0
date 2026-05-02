@@ -23,7 +23,7 @@
         </div>
         <div class="dash-section">
             <div style="padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                <div style="text-align:center;padding:12px;background:rgba(0,122,255,.06);border-radius:8px;border:1px solid rgba(0,122,255,.15);"><p style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#4b5563;margin-bottom:5px;">Замовлень</p><p style="color:#fff;font-size:1.3rem;font-weight:700;">{{ orders.count }}</p></div>
+                <div style="text-align:center;padding:12px;background:rgba(0,122,255,.06);border-radius:8px;border:1px solid rgba(0,122,255,.15);"><p style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#4b5563;margin-bottom:5px;">Замовлень</p><p style="color:#1A202C;font-size:1.3rem;font-weight:700;">{{ orders.count }}</p></div>
                 <div style="text-align:center;padding:12px;background:rgba(52,199,89,.05);border-radius:8px;border:1px solid rgba(52,199,89,.15);"><p style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#4b5563;margin-bottom:5px;">Витрат</p><p style="color:#34c759;font-size:1.1rem;font-weight:700;">{{ orders.filter.count|default:"—" }}</p></div>
             </div>
         </div>
@@ -40,7 +40,7 @@
                     <td style="font-family:monospace;color:#007AFF;font-weight:600;font-size:.78rem;">{{ o.order_number }}</td>
                     <td>{{ o.device }}</td>
                     <td><span class="status-chip status-{{ o.status }}">{{ o.get_status_display }}</span></td>
-                    <td style="color:#fff;font-weight:500;">{% if o.price %}{{ o.price }} ₴{% else %}—{% endif %}</td>
+                    <td style="color:#1A202C;font-weight:500;">{% if o.price %}{{ o.price }} ₴{% else %}—{% endif %}</td>
                     <td style="font-size:.75rem;color:#4b5563;">{{ o.created_at|date:"d.m.Y" }}</td>
                     <td><a href="{% url 'dashboard:order_detail' o.order_number %}" class="tb-btn tb-btn-ghost" style="padding:5px 10px;font-size:.72rem;">Відкрити</a></td>
                 </tr>

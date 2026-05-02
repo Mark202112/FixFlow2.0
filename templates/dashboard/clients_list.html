@@ -25,7 +25,7 @@
             {% for c in clients %}
             <tr>
                 <td style="color:#4b5563;font-size:.75rem;">{{ forloop.counter }}</td>
-                <td style="font-weight:500;color:#fff;">{{ c.name }}</td>
+                <td style="font-weight:500;color:#1A202C;">{{ c.name }}</td>
                 <td style="font-family:monospace;color:#007AFF;font-size:.85rem;">{{ c.phone }}</td>
                 <td style="color:#6b7280;font-size:.82rem;">{{ c.email|default:"—" }}</td>
                 <td><span style="padding:3px 10px;background:rgba(0,122,255,.1);color:#007AFF;border-radius:5px;font-size:.72rem;font-weight:600;border:1px solid rgba(0,122,255,.2);">{{ c.order_count }}</span></td>

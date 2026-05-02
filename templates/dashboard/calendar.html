@@ -6,11 +6,11 @@
     <!-- Шапка -->
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;">
         <div style="display:flex;align-items:center;gap:16px;">
-            <button onclick="previousMonth()" style="width:40px;height:40px;background:#2a2a2d;border:1px solid #3a3a3c;border-radius:8px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;">
+            <button onclick="previousMonth()" style="width:40px;height:40px;background:#FFFFFF;border:1px solid #E2E8F0;border-radius:8px;color:#1A202C;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
                 <i class="fas fa-chevron-left"></i>
             </button>
-            <h2 id="currentMonth" style="margin:0;font-size:1.5rem;font-weight:600;color:#fff;min-width:220px;text-align:center;"></h2>
-            <button onclick="nextMonth()" style="width:40px;height:40px;background:#2a2a2d;border:1px solid #3a3a3c;border-radius:8px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;">
+            <h2 id="currentMonth" style="margin:0;font-size:1.5rem;font-weight:600;color:#1A202C;min-width:220px;text-align:center;"></h2>
+            <button onclick="nextMonth()" style="width:40px;height:40px;background:#FFFFFF;border:1px solid #E2E8F0;border-radius:8px;color:#1A202C;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
                 <i class="fas fa-chevron-right"></i>
             </button>
         </div>
@@ -19,11 +19,11 @@
         <div style="display:flex;gap:20px;align-items:center;">
             <div style="display:flex;align-items:center;gap:6px;">
                 <div style="width:12px;height:12px;background:#ff3b30;border-radius:3px;"></div>
-                <span style="color:#9ca3af;font-size:0.85rem;">Дедлайн</span>
+                <span style="color:#718096;font-size:0.85rem;">Дедлайн</span>
             </div>
             <div style="display:flex;align-items:center;gap:6px;">
                 <div style="width:12px;height:12px;background:#34c759;border-radius:3px;"></div>
-                <span style="color:#9ca3af;font-size:0.85rem;">Готова</span>
+                <span style="color:#718096;font-size:0.85rem;">Готова</span>
             </div>
         </div>
     </div>
@@ -38,31 +38,33 @@
     padding:12px;
     font-size:0.75rem;
     font-weight:600;
-    color:#6b7280;
+    color:#718096;
     text-transform:uppercase;
     letter-spacing:0.5px;
 }
 
 .calendar-day {
-    background:#2a2a2d;
+    background:#FFFFFF;
     border-radius:12px;
     padding:14px;
     min-height:140px;
     cursor:pointer;
     transition:all 0.2s;
-    border:1px solid #3a3a3c;
+    border:1px solid #E2E8F0;
     display:flex;
     flex-direction:column;
+    box-shadow:0 1px 3px rgba(0,0,0,0.06);
 }
 
 .calendar-day:hover {
-    border-color:#34c759;
+    border-color:#007AFF;
     transform:translateY(-2px);
+    box-shadow:0 4px 12px rgba(0,122,255,0.15);
 }
 
 .calendar-day.today {
-    border-color:#34c759;
-    box-shadow:0 0 0 2px rgba(52,199,89,0.2);
+    border-color:#007AFF;
+    box-shadow:0 0 0 2px rgba(0,122,255,0.2);
 }
 
 .calendar-day.other-month {
@@ -72,13 +74,14 @@
 
 .calendar-day.other-month:hover {
     transform:none;
-    border-color:#3a3a3c;
+    border-color:#E2E8F0;
+    box-shadow:0 1px 3px rgba(0,0,0,0.06);
 }
 
 .day-number {
     font-size:1.1rem;
     font-weight:600;
-    color:#fff;
+    color:#1A202C;
     margin-bottom:10px;
 }
 
@@ -89,14 +92,14 @@
     flex:1;
 }
 
-/* За замовчуванням - червоний */
+/* За замовчуванням - червоний (дедлайн) */
 .event-item {
     background:rgba(255,59,48,0.15);
     border-left:3px solid #ff3b30;
     border-radius:6px;
     padding:6px 8px;
     font-size:0.75rem;
-    color:#fff;
+    color:#1A202C;
     display:flex;
     align-items:center;
     gap:6px;
@@ -119,7 +122,7 @@
 
 .event-time {
     font-size:0.7rem;
-    color:#9ca3af;
+    color:#718096;
     display:flex;
     align-items:center;
     gap:3px;
@@ -130,11 +133,12 @@
     overflow:hidden;
     text-overflow:ellipsis;
     white-space:nowrap;
+    color:#1A202C;
 }
 
 .more-events {
     font-size:0.7rem;
-    color:#ff3b30;
+    color:#007AFF;
     margin-top:4px;
     cursor:pointer;
 }
@@ -207,11 +211,9 @@ function createDayElement(day, month, isOtherMonth) {
             const eventEl = document.createElement('div');
             eventEl.className = 'event-item';
             
-            // Якщо статус "ready" - зелений
             if (event.status_code === 'ready') {
                 eventEl.classList.add('ready');
             }
-            // Інакше червоний (за замовчуванням)
             
             eventEl.innerHTML = `
                 <div class="event-time">

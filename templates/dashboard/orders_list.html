@@ -60,11 +60,11 @@
             {% for o in orders %}
             <tr>
                 <td style="font-family:monospace;color:#007AFF;font-weight:600;font-size:.78rem;white-space:nowrap;">{{ o.order_number }}</td>
-                <td><div style="font-weight:500;color:#fff;">{{ o.client.name }}</div><div style="font-size:.72rem;color:#4b5563;">{{ o.client.phone }}</div></td>
+                <td><div style="font-weight:500;color:#1A202C;">{{ o.client.name }}</div><div style="font-size:.72rem;color:#4b5563;">{{ o.client.phone }}</div></td>
                 <td style="max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ o.device }}</td>
                 <td style="color:#6b7280;font-size:.82rem;">{{ o.assigned_master.name|default:"—" }}</td>
                 <td><span class="status-chip status-{{ o.status }}">{{ o.get_status_display }}</span></td>
-                <td style="white-space:nowrap;color:#fff;font-weight:500;">{% if o.price %}{{ o.price }} ₴{% else %}—{% endif %}</td>
+                <td style="white-space:nowrap;color:#1A202C;font-weight:500;">{% if o.price %}{{ o.price }} ₴{% else %}—{% endif %}</td>
                 <td style="font-size:.75rem;color:#4b5563;white-space:nowrap;">{{ o.created_at|date:"d.m.Y" }}</td>
                 <td><a href="{% url 'dashboard:order_detail' o.order_number %}" class="tb-btn tb-btn-ghost" style="padding:5px 10px;font-size:.72rem;">Відкрити</a></td>
             </tr>

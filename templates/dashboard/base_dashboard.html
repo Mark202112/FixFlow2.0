@@ -11,107 +11,106 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-        body{font-family:'Inter',sans-serif;background:#111112;color:#fff;display:flex;min-height:100vh;-webkit-font-smoothing:antialiased;}
+        body{font-family:'Inter',sans-serif;background:#F5F7FA;color:#1A202C;display:flex;min-height:100vh;-webkit-font-smoothing:antialiased;}
         a{text-decoration:none;}ul{list-style:none;}
         input,select,textarea,button{font-family:inherit;}
 
-        /* ── Sidebar ── */
+        /* ── Sidebar (СВІТЛА) ── */
         #sidebar{
             width:240px;flex-shrink:0;
-            background:#1A1A1B;
-            border-right:1px solid rgba(0,122,255,.12);
+            background:#FFFFFF;
+            border-right:1px solid #E2E8F0;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.04);
             display:flex;flex-direction:column;
             position:fixed;top:0;left:0;bottom:0;z-index:100;
             transition:transform .3s ease;
         }
-        .sb-logo{padding:24px 20px 20px;border-bottom:1px solid rgba(255,255,255,.05);}
+        .sb-logo{padding:24px 20px 20px;border-bottom:1px solid #E2E8F0;}
         .sb-logo a{display:flex;align-items:center;gap:10px;text-decoration:none;}
-        .sb-logo-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;
-                      background:linear-gradient(135deg,#2A2A2D,#007AFF);flex-shrink:0;}
-        .sb-logo-text{font-size:1.1rem;font-weight:700;letter-spacing:-.02em;}
-        .sb-logo-text span{color:#007AFF;}
         .sb-section{padding:20px 12px 0;flex:1;overflow-y:auto;}
         .sb-section-label{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.18em;
-                           color:#3a3a3d;padding:0 8px;margin-bottom:8px;}
+                           color:#A0AEC0;padding:0 8px;margin-bottom:8px;}
         .sb-link{display:flex;align-items:center;gap:10px;padding:10px 10px;border-radius:8px;
-                 color:#6b7280;font-size:.875rem;font-weight:500;
+                 color:#718096;font-size:.875rem;font-weight:500;
                  transition:color .2s,background .2s;margin-bottom:2px;cursor:pointer;}
-        .sb-link:hover{color:#fff;background:rgba(255,255,255,.05);}
-        .sb-link.active{color:#007AFF;background:rgba(0,122,255,.1);border:1px solid rgba(0,122,255,.18);}
+        .sb-link:hover{color:#1A202C;background:#F7FAFC;}
+        .sb-link.active{color:#007AFF;background:rgba(0,122,255,.08);border:1px solid rgba(0,122,255,.2);}
         .sb-link .sb-icon{width:18px;text-align:center;font-size:.85rem;flex-shrink:0;}
         .sb-link .sb-badge{margin-left:auto;font-size:.6rem;font-weight:700;padding:2px 7px;
                             border-radius:10px;background:rgba(0,122,255,.15);color:#007AFF;}
-        .sb-bottom{padding:16px 12px;border-top:1px solid rgba(255,255,255,.05);}
+        .sb-bottom{padding:16px 12px;border-top:1px solid #E2E8F0;}
         .sb-user{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;
-                 background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);}
+                 background:#F7FAFC;border:1px solid #E2E8F0;}
         .sb-avatar{width:32px;height:32px;border-radius:8px;background:rgba(0,122,255,.2);
-                   display:flex;align-items:center;justify-content:center;color:#007AFF;font-size:.75rem;flex-shrink:0;}
-        .sb-username{font-size:.8rem;font-weight:600;color:#d1d5db;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-        .sb-role{font-size:.65rem;color:#4b5563;}
+                   display:flex;align-items:center;justify-content:center;color:#007AFF;font-size:.75rem;flex-shrink:0;font-weight:600;}
+        .sb-username{font-size:.8rem;font-weight:600;color:#2D3748;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .sb-role{font-size:.65rem;color:#718096;}
 
-        /* ── Main content ── */
+        /* ── Main ── */
         #main-wrap{margin-left:240px;flex:1;display:flex;flex-direction:column;min-height:100vh;}
 
-        /* ── Topbar ── */
+        /* ── Topbar (СВІТЛИЙ) ── */
         #topbar{
             height:64px;display:flex;align-items:center;justify-content:space-between;
-            padding:0 28px;background:#1A1A1B;
-            border-bottom:1px solid rgba(255,255,255,.05);
+            padding:0 28px;background:#FFFFFF;
+            border-bottom:1px solid #E2E8F0;
             position:sticky;top:0;z-index:50;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
         }
-        .tb-title{font-size:1rem;font-weight:600;color:#fff;}
+        .tb-title{font-size:1rem;font-weight:600;color:#1A202C;}
         .tb-actions{display:flex;align-items:center;gap:10px;}
         .tb-btn{display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:8px;
                 font-size:.8rem;font-weight:500;cursor:pointer;transition:background .2s,color .2s;border:none;}
-        .tb-btn-ghost{background:transparent;color:#6b7280;border:1px solid rgba(255,255,255,.08);}
-        .tb-btn-ghost:hover{background:rgba(255,255,255,.06);color:#fff;}
-        .tb-btn-primary{background:#007AFF;color:#fff;box-shadow:0 0 16px rgba(0,122,255,.3);}
-        .tb-btn-primary:hover{opacity:.88;}
+        .tb-btn-ghost{background:transparent;color:#718096;border:1px solid #E2E8F0;}
+        .tb-btn-ghost:hover{background:#F7FAFC;color:#1A202C;}
+        .tb-btn-primary{background:#007AFF;color:#fff;box-shadow:0 2px 8px rgba(0,122,255,.3);}
+        .tb-btn-primary:hover{background:#0056CC;}
 
-        /* ── Page content ── */
-        #page-content{flex:1;padding:28px;}
+        /* ── Content ── */
+        #page-content{flex:1;padding:28px;background:#F5F7FA;}
 
-        /* ── Stat cards ── */
+        /* ── Stat cards (СВІТЛІ) ── */
         .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:28px;}
         .stat-card{
-            padding:22px 24px;background:#1A1A1B;
-            border:1px solid rgba(255,255,255,.06);border-radius:12px;
+            padding:22px 24px;background:#FFFFFF;
+            border:1px solid #E2E8F0;border-radius:12px;
             position:relative;overflow:hidden;
-            transition:border-color .2s,transform .2s;
+            transition:border-color .2s,transform .2s,box-shadow .2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
         }
-        .stat-card:hover{border-color:rgba(0,122,255,.25);transform:translateY(-1px);}
-        .stat-card-label{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:#6b7280;margin-bottom:10px;}
-        .stat-card-value{font-size:2rem;font-weight:800;color:#fff;letter-spacing:-.02em;line-height:1;}
+        .stat-card:hover{border-color:#007AFF;transform:translateY(-2px);box-shadow: 0 4px 12px rgba(0,122,255,0.15);}
+        .stat-card-label{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:#718096;margin-bottom:10px;}
+        .stat-card-value{font-size:2rem;font-weight:800;color:#1A202C;letter-spacing:-.02em;line-height:1;}
         .stat-card-icon{position:absolute;right:20px;top:50%;transform:translateY(-50%);
-                        font-size:1.6rem;opacity:.08;}
-        .stat-card-trend{font-size:.72rem;margin-top:8px;color:#6b7280;}
+                        font-size:1.6rem;opacity:.06;color:#007AFF;}
+        .stat-card-trend{font-size:.72rem;margin-top:8px;color:#718096;}
         .stat-card-trend.up{color:#34c759;}
 
-        /* ── Table ── */
+        /* ── Table (СВІТЛА) ── */
         .dash-table{width:100%;border-collapse:separate;border-spacing:0;}
         .dash-table th{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;
-                       color:#4b5563;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.05);
-                       text-align:left;white-space:nowrap;}
-        .dash-table td{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.04);
-                       font-size:.875rem;color:#d1d5db;vertical-align:middle;}
+                       color:#718096;padding:10px 16px;border-bottom:1px solid #E2E8F0;
+                       text-align:left;white-space:nowrap;background:#F7FAFC;}
+        .dash-table td{padding:14px 16px;border-bottom:1px solid #E2E8F0;
+                       font-size:.875rem;color:#2D3748;background:#FFFFFF;vertical-align:middle;}
         .dash-table tr:last-child td{border-bottom:none;}
         .dash-table tbody tr{transition:background .15s;}
-        .dash-table tbody tr:hover td{background:rgba(255,255,255,.025);}
+        .dash-table tbody tr:hover td{background:#F7FAFC;}
 
-        /* ── Section card ── */
-        .dash-section{background:#1A1A1B;border:1px solid rgba(255,255,255,.06);border-radius:12px;overflow:hidden;}
+        /* ── Section card (СВІТЛІ) ── */
+        .dash-section{background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06);margin-bottom:20px;}
         .dash-section-header{padding:18px 22px;display:flex;align-items:center;justify-content:space-between;
-                              border-bottom:1px solid rgba(255,255,255,.05);}
-        .dash-section-title{font-size:.9rem;font-weight:600;color:#fff;}
+                              border-bottom:1px solid #E2E8F0;background:#F7FAFC;}
+        .dash-section-title{font-size:.9rem;font-weight:600;color:#2D3748;}
 
-        /* ── Search ── */
+        /* ── Search/Input (СВІТЛІ) ── */
         .dash-search{display:flex;align-items:center;gap:8px;padding:0 22px 16px;}
-        .dash-input{flex:1;padding:10px 14px;background:rgba(42,42,45,.5);
-                    border:1px solid rgba(255,255,255,.08);border-radius:8px;
-                    color:#fff;font-size:.875rem;outline:none;
+        .dash-input{flex:1;padding:10px 14px;background:#FFFFFF;
+                    border:1px solid #E2E8F0;border-radius:8px;
+                    color:#1A202C;font-size:.875rem;outline:none;
                     transition:border-color .2s,box-shadow .2s;}
-        .dash-input:focus{border-color:rgba(0,122,255,.6);box-shadow:0 0 0 3px rgba(0,122,255,.1);}
-        .dash-input::placeholder{color:#4b5563;}
+        .dash-input:focus{border-color:#007AFF;box-shadow:0 0 0 3px rgba(0,122,255,.1);}
+        .dash-input::placeholder{color:#A0AEC0;}
 
         /* ── Status chips ── */
         .status-chip{
@@ -124,51 +123,59 @@
         .status-completed {background:rgba(134,134,139,.1); color:#86868b; border-color:rgba(134,134,139,.2);}
         .status-cancelled {background:rgba(255,59,48,.1);   color:#ff3b30; border-color:rgba(255,59,48,.2);}
 
-        /* ── Timeline (order detail) ── */
+        /* ── Timeline (СВІТЛИЙ) ── */
         .timeline-dot{
             width:28px;height:28px;border-radius:50%;
             display:flex;align-items:center;justify-content:center;
-            background:rgba(42,42,45,.8);border:1px solid rgba(255,255,255,.08);
+            background:#F7FAFC;border:1px solid #E2E8F0;
             transition:background .25s,box-shadow .25s;
         }
         .timeline-dot--active{background:#007AFF;border-color:#007AFF;box-shadow:0 0 12px rgba(0,122,255,.4);}
-        .timeline-dot-icon{font-size:.4rem;color:rgba(255,255,255,.15);}
+        .timeline-dot-icon{font-size:.4rem;color:#A0AEC0;}
         .timeline-dot--active .timeline-dot-icon{font-size:.6rem;color:#fff;}
-        .timeline-label{font-size:.82rem;font-weight:400;color:#4b5563;}
-        .timeline-label--active{font-weight:600;color:#fff;}
+        .timeline-label{font-size:.82rem;font-weight:400;color:#718096;}
+        .timeline-label--active{font-weight:600;color:#1A202C;}
         .timeline-item--spaced{margin-bottom:20px;}
 
-        /* ── Master load badges ── */
+        /* ── Master badges ── */
         .master-busy{background:rgba(255,149,0,.12);color:#ff9500;border-color:rgba(255,149,0,.25);}
         .master-free{background:rgba(52,199,89,.1);color:#34c759;border-color:rgba(52,199,89,.2);}
 
-        /* ── Admin journal dot ── */
-        .journal-dot{width:6px;height:6px;border-radius:50%;background:#4b5563;flex-shrink:0;}
+        /* ── Journal dot ── */
+        .journal-dot{width:6px;height:6px;border-radius:50%;background:#A0AEC0;flex-shrink:0;}
         .journal-dot--active{background:#34c759;}
 
-        /* Mobile sidebar toggle */
-        #sb-toggle{display:none;background:none;border:none;color:#fff;cursor:pointer;font-size:1.1rem;padding:4px;}
+        /* Mobile */
+        #sb-toggle{display:none;background:none;border:none;color:#1A202C;cursor:pointer;font-size:1.1rem;padding:4px;}
         @media(max-width:900px){
             #sidebar{transform:translateX(-100%);}
             #sidebar.open{transform:translateX(0);}
             #main-wrap{margin-left:0;}
             #sb-toggle{display:block;}
         }
+
+        /* Print */
+        @media print {
+            #sidebar, #topbar { display: none !important; }
+            #main-wrap { margin-left: 0 !important; }
+            body { background: white !important; }
+            .dash-section { box-shadow: none !important; border: 1px solid #ddd !important; page-break-inside: avoid; }
+        }
     </style>
 </head>
 <body>
 
-<!-- ── Sidebar ── -->
+<!-- Sidebar -->
 <nav id="sidebar">
 <div class="sb-logo">
     <a href="/" style="display:flex;align-items:center;gap:12px;text-decoration:none;">
-        <div style="width:42px;height:42px;background:#0f172a;border:2px solid #007AFF;border-radius:12px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;box-shadow:0 0 15px rgba(56, 117, 248, 0.3);">
-            <span style="color:#007AFF;font-size:1.5rem;font-weight:900;font-family:sans-serif;font-style:italic;">F</span>
-            <div style="position:absolute;bottom:0;right:0;width:15px;height:15px;background:#007AFF;clip-path:polygon(100% 0, 0% 100%, 100% 100%);"></div>
+        <!-- ЛОГОТИП ЯК НА ГОЛОВНІЙ СТОРІНЦІ -->
+        <div style="width:42px;height:42px;background:linear-gradient(135deg,#007AFF,#0051D5);border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,122,255,.3);">
+            <span style="color:#fff;font-size:1.5rem;font-weight:900;">F</span>
         </div>
         <div>
-            <p style="color:#fff;font-size:1.15rem;font-weight:800;margin:0;line-height:1;letter-spacing:0.5px;">FIX<span style="color:#007AFF;">FLOW</span></p>
-            <p style="color:#64748b;font-size:.6rem;margin:0;line-height:1.4;margin-top:3px;text-transform:uppercase;letter-spacing:.15em;font-weight:600;">Service Master</p>
+            <p style="color:#1A202C;font-size:1.15rem;font-weight:800;margin:0;line-height:1;">FIX<span style="color:#007AFF;">FLOW</span></p>
+            <p style="color:#718096;font-size:.6rem;margin:0;line-height:1.4;margin-top:3px;text-transform:uppercase;letter-spacing:.15em;font-weight:600;">Сервісний центр</p>
         </div>
     </a>
 </div>
@@ -176,11 +183,10 @@
     <div class="sb-section">
         <p class="sb-section-label">Головне</p>
         <a href="{% url 'dashboard:home' %}" class="sb-link {% block nav_home %}{% endblock %}">
-            <i class="fas fa-chart-bar sb-icon"></i> Огляд
+            <i class="fas fa-chart-line sb-icon"></i> Огляд
         </a>
         <a href="{% url 'dashboard:orders_list' %}" class="sb-link {% block nav_orders %}{% endblock %}">
             <i class="fas fa-clipboard-list sb-icon"></i> Заявки
-            {% if new_orders_count %}<span class="sb-badge">{{ new_orders_count }}</span>{% endif %}
         </a>
         <a href="{% url 'dashboard:clients_list' %}" class="sb-link {% block nav_clients %}{% endblock %}">
             <i class="fas fa-users sb-icon"></i> Клієнти
@@ -191,72 +197,54 @@
             <i class="fas fa-calendar-alt sb-icon"></i> Календар
         </a>
         <a href="{% url 'dashboard:reports' %}" class="sb-link {% block nav_reports %}{% endblock %}">
-            <i class="fas fa-chart-line sb-icon"></i> Звіти
+            <i class="fas fa-chart-bar sb-icon"></i> Звіти
         </a>
+
         {% if request.user.is_staff %}
+        <p class="sb-section-label" style="margin-top:20px;">Адмін</p>
         <a href="{% url 'dashboard:admin' %}" class="sb-link {% block nav_admin %}{% endblock %}">
-            <i class="fas fa-shield-halved sb-icon"></i> Адмін
+            <i class="fas fa-cog sb-icon"></i> Адмін
         </a>
         {% endif %}
-
-        <p class="sb-section-label" style="margin-top:20px;">Система</p>
-        <a href="/admin/" class="sb-link">
-            <i class="fas fa-cog sb-icon"></i> Django Admin
-        </a>
-        <a href="{% url 'main:home' %}" class="sb-link" target="_blank">
-            <i class="fas fa-external-link-alt sb-icon"></i> Сайт
-        </a>
     </div>
 
     <div class="sb-bottom">
         <div class="sb-user">
-            <div class="sb-avatar"><i class="fas fa-user"></i></div>
-            <div style="min-width:0;">
-                <p class="sb-username">{{ request.user.username|default:"Адміністратор" }}</p>
-                <p class="sb-role">Персонал</p>
+            <div class="sb-avatar">{{ request.user.username|slice:":1"|upper }}</div>
+            <div style="flex:1;min-width:0;">
+                <div class="sb-username">{{ request.user.username }}</div>
+                {% if request.user.employee %}
+                <div class="sb-role">{{ request.user.employee.get_role_display }}</div>
+                {% endif %}
             </div>
-            <a href="{% url 'dashboard:logout' %}" style="margin-left:auto;color:#4b5563;transition:color .2s;"
-               onmouseover="this.style.color='#ff3b30'" onmouseout="this.style.color='#4b5563'"
-               title="Вийти">
-                <i class="fas fa-sign-out-alt" style="font-size:.85rem;"></i>
+            <a href="{% url 'dashboard:logout' %}" style="margin-left:auto;color:#718096;transition:color .2s;"
+               onmouseover="this.style.color='#1A202C'" onmouseout="this.style.color='#718096'">
+                <i class="fas fa-sign-out-alt" style="font-size:.9rem;"></i>
             </a>
         </div>
     </div>
 </nav>
 
-<!-- ── Main ── -->
+<!-- Main -->
 <div id="main-wrap">
-
     <!-- Topbar -->
-    <header id="topbar">
-        <div style="display:flex;align-items:center;gap:14px;">
-            <button id="sb-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">
-                <i class="fas fa-bars"></i>
-            </button>
-            <span class="tb-title">{% block page_title %}Dashboard{% endblock %}</span>
-        </div>
+    <div id="topbar">
+        <button id="sb-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="tb-title">{% block page_title %}Dashboard{% endblock %}</div>
         <div class="tb-actions">
             {% block topbar_actions %}{% endblock %}
         </div>
-    </header>
+    </div>
 
     <!-- Content -->
-    <main id="page-content">
+    <div id="page-content">
         {% block content %}{% endblock %}
-    </main>
+    </div>
 </div>
 
-<script>
-// Close sidebar on outside click (mobile)
-document.addEventListener('click', function(e){
-    var sb = document.getElementById('sidebar');
-    if(window.innerWidth<=900 && sb.classList.contains('open') &&
-       !sb.contains(e.target) && e.target.id !== 'sb-toggle'){
-        sb.classList.remove('open');
-    }
-});
-</script>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.umd.min.js"></script>
 {% block extra_js %}{% endblock %}
 </body>
 </html>

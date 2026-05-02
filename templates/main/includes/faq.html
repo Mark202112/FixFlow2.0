@@ -1,5 +1,5 @@
 <!-- ═══════════════════════════════ FAQ ═══════════════════════════════ -->
-<section id="faq" style="background-color:#1A1A1B; background-image:radial-gradient(rgba(255,255,255,0.045) 1px, transparent 1px); background-size:30px 30px; padding:100px 0;">
+<section id="faq" style="background-color:#FFFFFF; background-image:radial-gradient(rgba(0,122,255,0.05) 1px, transparent 1px); background-size:30px 30px; padding:100px 0;">
 
     <div class="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 divider-line"></div>
 
@@ -9,7 +9,7 @@
         <div class="reveal-on-scroll" style="text-align:center; margin-bottom:64px;">
             <span style="display:block; font-size:.62rem; font-weight:700; text-transform:uppercase;
                           letter-spacing:.3em; color:#007AFF; margin-bottom:14px;">Запитання та відповіді</span>
-            <h2 style="color:#fff; font-size:2.6rem; font-weight:800; letter-spacing:-.02em;
+            <h2 style="color:#1A202C; font-size:2.6rem; font-weight:800; letter-spacing:-.02em;
                         line-height:1.15; margin-bottom:16px;">Часті запитання</h2>
             <p style="color:#6b7280; font-size:1rem; max-width:480px; margin:0 auto; line-height:1.7;">
                 Відповіді на найпопулярніші запитання наших клієнтів
@@ -22,14 +22,14 @@
             {% for faq in faqs %}
             <div class="faq-item reveal-on-scroll"
                  style="border:1px solid rgba(0,122,255,0.15); border-radius:12px;
-                         background:rgba(42,42,45,0.15); overflow:hidden;
+                         background:#FFFFFF; overflow:hidden;
                          transition:border-color .25s;">
                 <button class="faq-trigger"
                         onclick="toggleFaq(this)"
                         style="width:100%; display:flex; align-items:center; justify-content:space-between;
                                padding:20px 24px; background:none; border:none; cursor:pointer;
                                text-align:left; gap:16px;">
-                    <span style="color:#fff; font-size:.95rem; font-weight:600; line-height:1.4;">{{ faq.question }}</span>
+                    <span style="color:#1A202C; font-size:.95rem; font-weight:600; line-height:1.4;">{{ faq.question }}</span>
                     <span class="faq-icon"
                           style="width:28px; height:28px; flex-shrink:0; border-radius:7px;
                                  background:rgba(0,122,255,0.1); border:1px solid rgba(0,122,255,0.25);
@@ -42,7 +42,7 @@
                      style="max-height:0; overflow:hidden; transition:max-height .4s cubic-bezier(.16,1,.3,1);">
                     <div style="padding:0 24px 20px;">
                         <div style="height:1px; background:rgba(0,122,255,0.12); margin-bottom:16px;"></div>
-                        <p style="color:#9ca3af; font-size:.9rem; line-height:1.75;">{{ faq.answer }}</p>
+                        <p style="color:#4b5563; font-size:.9rem; line-height:1.75;">{{ faq.answer }}</p>
                     </div>
                 </div>
             </div>
@@ -51,14 +51,14 @@
             {% for item in faq_default %}
             <div class="faq-item reveal-on-scroll"
                  style="border:1px solid rgba(0,122,255,0.15); border-radius:12px;
-                         background:rgba(42,42,45,0.15); overflow:hidden;
+                         background:#FFFFFF; overflow:hidden;
                          transition:border-color .25s;">
                 <button class="faq-trigger"
                         onclick="toggleFaq(this)"
                         style="width:100%; display:flex; align-items:center; justify-content:space-between;
                                padding:20px 24px; background:none; border:none; cursor:pointer;
                                text-align:left; gap:16px;">
-                    <span style="color:#fff; font-size:.95rem; font-weight:600; line-height:1.4;">{{ item.q }}</span>
+                    <span style="color:#1A202C; font-size:.95rem; font-weight:600; line-height:1.4;">{{ item.q }}</span>
                     <span class="faq-icon"
                           style="width:28px; height:28px; flex-shrink:0; border-radius:7px;
                                  background:rgba(0,122,255,0.1); border:1px solid rgba(0,122,255,0.25);
@@ -71,7 +71,7 @@
                      style="max-height:0; overflow:hidden; transition:max-height .4s cubic-bezier(.16,1,.3,1);">
                     <div style="padding:0 24px 20px;">
                         <div style="height:1px; background:rgba(0,122,255,0.12); margin-bottom:16px;"></div>
-                        <p style="color:#9ca3af; font-size:.9rem; line-height:1.75;">{{ item.a }}</p>
+                        <p style="color:#4b5563; font-size:.9rem; line-height:1.75;">{{ item.a }}</p>
                     </div>
                 </div>
             </div>
@@ -136,10 +136,10 @@
         defaults.forEach(function(d) {
             var el = document.createElement('div');
             el.className = 'faq-item reveal-on-scroll';
-            el.style.cssText = 'border:1px solid rgba(0,122,255,0.15);border-radius:12px;background:rgba(42,42,45,0.15);overflow:hidden;transition:border-color .25s;';
+            el.style.cssText = 'border:1px solid rgba(0,122,255,0.15);border-radius:12px;background:#FFFFFF;overflow:hidden;transition:border-color .25s;';
             el.innerHTML =
                 '<button class="faq-trigger" onclick="toggleFaq(this)" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:20px 24px;background:none;border:none;cursor:pointer;text-align:left;gap:16px;">' +
-                    '<span style="color:#fff;font-size:.95rem;font-weight:600;line-height:1.4;">' + d.q + '</span>' +
+                    '<span style="color:#1A202C;font-size:.95rem;font-weight:600;line-height:1.4;">' + d.q + '</span>' +
                     '<span class="faq-icon" style="width:28px;height:28px;flex-shrink:0;border-radius:7px;background:rgba(0,122,255,0.1);border:1px solid rgba(0,122,255,0.25);display:flex;align-items:center;justify-content:center;transition:transform .3s ease,background .25s;">' +
                         '<i class="fas fa-plus" style="font-size:.65rem;color:#007AFF;transition:transform .3s ease;"></i>' +
                     '</span>' +
@@ -147,7 +147,7 @@
                 '<div class="faq-body" style="max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.16,1,.3,1);">' +
                     '<div style="padding:0 24px 20px;">' +
                         '<div style="height:1px;background:rgba(0,122,255,0.12);margin-bottom:16px;"></div>' +
-                        '<p style="color:#9ca3af;font-size:.9rem;line-height:1.75;">' + d.a + '</p>' +
+                        '<p style="color:#4b5563;font-size:.9rem;line-height:1.75;">' + d.a + '</p>' +
                     '</div>' +
                 '</div>';
             container.appendChild(el);

@@ -13,11 +13,11 @@
 :root {
     --brand:      #007AFF;
     --brand-dark: #0056CC;
-    --bg-main:    #1A1A1B;
-    --surface:    #2A2A2D;
-    --text:       #ffffff;
-    --text-muted: #6b7280;
-    --border:     rgba(0, 122, 255, 0.18);
+    --bg-main:    #F5F7FA;
+    --surface:    #FFFFFF;
+    --text:       #1A202C;
+    --text-muted: #718096;
+    --border:     #E2E8F0;
 }
 
 html {
@@ -31,18 +31,34 @@ body {
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    color-scheme: light;
+}
+
+/* Force light-theme inputs globally */
+input, textarea, select {
+    color-scheme: light;
+    background-color: #F7FAFC;
+    color: #1A202C;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: inherit;
+    font-size: .875rem;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+    box-sizing: border-box;
 }
 
 /* ---------- Dot-grid pattern (your original pattern, updated colour) ---------- */
 .dot-grid {
-    background-image: radial-gradient(rgba(255, 255, 255, 0.055) 1px, transparent 1px);
+    background-image: radial-gradient(rgba(0, 122, 255, 0.08) 1px, transparent 1px);
     background-size: 30px 30px;
 }
 
 /* ---------- Divider line ---------- */
 .divider-line {
     height: 1px;
-    background: linear-gradient(to right, transparent, rgba(0, 122, 255, 0.3), transparent);
+    background: linear-gradient(to right, transparent, rgba(0, 122, 255, 0.2), transparent);
 }
 
 /* ---------- Reveal on scroll ---------- */
@@ -128,13 +144,13 @@ img {
 .badge-completed  { background: rgba(134,134,139,0.12); color: #86868b; border: 1px solid rgba(134,134,139,0.3); }
 .badge-cancelled  { background: rgba(255,59,48,0.12);  color: #ff3b30;  border: 1px solid rgba(255,59,48,0.3); }
 
-/* ---------- Form inputs (global reset for dark bg) ---------- */
+/* ---------- Form inputs (global reset for light bg) ---------- */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0 1000px #1A1A1B inset;
-    -webkit-text-fill-color: #ffffff;
-    caret-color: #ffffff;
+    -webkit-box-shadow: 0 0 0 1000px #FFFFFF inset;
+    -webkit-text-fill-color: #1A202C;
+    caret-color: #1A202C;
 }
 
 /* ── Online indicator dot ─────────────────────────────────────── */

@@ -25,14 +25,14 @@
                     <td>
                         <div style="display:flex;align-items:center;gap:8px;">
                             <div style="width:28px;height:28px;border-radius:7px;background:rgba(0,122,255,.15);display:flex;align-items:center;justify-content:center;color:#007AFF;font-size:.7rem;font-weight:700;flex-shrink:0;">{{ u.username|slice:":1"|upper }}</div>
-                            <span style="color:#fff;font-weight:500;font-size:.875rem;">{{ u.username }}</span>
+                            <span style="color:#1A202C;font-weight:500;font-size:.875rem;">{{ u.username }}</span>
                             {% if u.is_superuser %}<span style="padding:2px 7px;background:rgba(255,149,0,.12);color:#ff9500;border-radius:4px;font-size:.62rem;font-weight:700;border:1px solid rgba(255,149,0,.25);">super</span>{% endif %}
                             {% if u.is_staff and not u.is_superuser %}<span style="padding:2px 7px;background:rgba(0,122,255,.1);color:#007AFF;border-radius:4px;font-size:.62rem;font-weight:700;border:1px solid rgba(0,122,255,.2);">admin</span>{% endif %}
                         </div>
                     </td>
                     <td>
                         {% if u.employee %}
-                        <div style="font-size:.82rem;color:#d1d5db;">{{ u.employee.name }}</div>
+                        <div style="font-size:.82rem;color:#4b5563;">{{ u.employee.name }}</div>
                         <div style="font-size:.7rem;color:#4b5563;">{{ u.employee.get_role_display }}</div>
                         {% else %}<span style="color:#4b5563;font-size:.8rem;">—</span>{% endif %}
                     </td>

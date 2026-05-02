@@ -1,7 +1,7 @@
 <!-- ═══════════════════════════ STATUS ═══════════════════════════ -->
 <section id="status" class="relative overflow-hidden"
-         style="background-color:#1A1A1B;
-                background-image:radial-gradient(rgba(255,255,255,0.055) 1px, transparent 1px);
+         style="background-color:#FFFFFF;
+                background-image:radial-gradient(rgba(0,122,255,0.05) 1px, transparent 1px);
                 background-size:30px 30px;
                 padding:100px 0;">
     <div class="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 divider-line"></div>
@@ -10,14 +10,14 @@
 
         <div class="reveal-on-scroll text-center mb-16">
             <span class="block text-[10px] font-bold uppercase tracking-[0.3em] mb-4" style="color:#007AFF;">Відстеження</span>
-            <h2 class="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4">Статус замовлення</h2>
+            <h2 class="text-4xl md:text-5xl font-bold tracking-tight mb-4" style="color:#1A202C;">Статус замовлення</h2>
             <p class="text-gray-400 text-lg max-w-2xl mx-auto">Введіть номер телефону або номер замовлення</p>
         </div>
 
         <div class="reveal-on-scroll max-w-2xl mx-auto">
             <form id="status-form"
-                  style="background:rgba(26,26,27,0.85); border:1px solid rgba(0,122,255,0.25);
-                         padding:40px; border-radius:14px; backdrop-filter:blur(8px);">
+                  style="background:#FFFFFF; border:1px solid #E2E8F0;
+                         padding:40px; border-radius:14px; box-shadow:0 4px 24px rgba(0,0,0,0.06);">
 
                 <div class="flex flex-col sm:flex-row gap-3">
                     <div class="relative flex-1">
@@ -25,11 +25,11 @@
                         <input type="text" name="search" id="status-input"
                                placeholder="Номер замовлення або телефон"
                                required
-                               style="width:100%;padding:14px 16px 14px 44px;background:rgba(42,42,45,0.5);
-                                      border:1px solid rgba(0,122,255,0.2);border-radius:10px;
-                                      color:#fff;font-size:0.9rem;outline:none;transition:border-color .2s;box-sizing:border-box;"
-                               onfocus="this.style.borderColor='rgba(0,122,255,0.7)'"
-                               onblur="this.style.borderColor='rgba(0,122,255,0.2)'">
+                               style="width:100%;padding:14px 16px 14px 44px;background:#F7FAFC;
+                                      border:1px solid #E2E8F0;border-radius:10px;
+                                      color:#1A202C;font-size:0.9rem;outline:none;transition:border-color .2s;box-sizing:border-box;"
+                               onfocus="this.style.borderColor='rgba(0,122,255,0.6)'"
+                               onblur="this.style.borderColor='#E2E8F0'">
                     </div>
                     <button type="submit" id="status-btn" class="btn-primary" style="white-space:nowrap;padding:14px 28px;">
                         Знайти
@@ -125,13 +125,13 @@ document.getElementById('status-form').addEventListener('submit', function(e){
                 else if (order.status === 'completed') badgeClass = 'badge-completed';
                 else if (order.status === 'cancelled') badgeClass = 'badge-cancelled';
 
-                html += '<div class="result-item" style="padding:20px;background:rgba(42,42,45,0.25);border:1px solid rgba(0,122,255,0.2);border-radius:10px;animation-delay:' + (index * 0.1) + 's;">';
+                html += '<div class="result-item" style="padding:20px;background:#F7FAFC;border:1px solid #E2E8F0;border-radius:10px;animation-delay:' + (index * 0.1) + 's;">';
                 
                 // Header
                 html += '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;">';
                 html += '<div>';
                 html += '<p style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:#007AFF;margin-bottom:6px;">' + order.order_number + '</p>';
-                html += '<p style="color:#fff;font-size:1rem;font-weight:600;margin-bottom:4px;">' + order.device + '</p>';
+                html += '<p style="color:#1A202C;font-size:1rem;font-weight:600;margin-bottom:4px;">' + order.device + '</p>';
                 html += '<p style="color:#6b7280;font-size:.8rem;">Створено: ' + order.created + '</p>';
                 html += '</div>';
                 html += '<div><span class="status-badge ' + badgeClass + '">' + order.status_display + '</span></div>';
@@ -144,12 +144,12 @@ document.getElementById('status-form').addEventListener('submit', function(e){
                     html += '<div style="display:flex;flex-direction:column;gap:10px;">';
                     
                     order.comments.forEach(function(comment){
-                        html += '<div style="padding:12px;background:rgba(42,42,45,0.4);border:1px solid rgba(0,122,255,0.08);border-radius:8px;border-left:3px solid #007AFF;">';
+                        html += '<div style="padding:12px;background:#FFFFFF;border:1px solid #E2E8F0;border-radius:8px;border-left:3px solid #007AFF;">';
                         html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">';
                         html += '<span style="font-size:.75rem;font-weight:600;color:#007AFF;">' + comment.author + '</span>';
                         html += '<span style="font-size:.7rem;color:#4b5563;">' + comment.date + '</span>';
                         html += '</div>';
-                        html += '<p style="color:#9ca3af;font-size:.85rem;line-height:1.6;margin:0;">' + comment.text + '</p>';
+                        html += '<p style="color:#4b5563;font-size:.85rem;line-height:1.6;margin:0;">' + comment.text + '</p>';
                         html += '</div>';
                     });
                     
