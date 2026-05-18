@@ -16,8 +16,7 @@
                     <div style="width:56px;height:56px;border-radius:14px;background:rgba(0,122,255,.15);display:inline-flex;align-items:center;justify-content:center;color:#007AFF;font-size:1.4rem;font-weight:700;">{{ client.name|slice:":1"|upper }}</div>
                 </div>
                 <div><p class="det-label-c">Ім'я</p><input type="text" name="name" value="{{ client.name }}" class="dash-input"></div>
-                <div><p class="det-label-c">Телефон</p><p style="color:#007AFF;font-family:monospace;font-size:.9rem;padding:10px 14px;background:rgba(42,42,45,.5);border-radius:8px;border:1px solid rgba(255,255,255,.06);">{{ client.phone }}</p></div>
-                <div><p class="det-label-c">Email</p><input type="email" name="email" value="{{ client.email }}" placeholder="email@example.com" class="dash-input"></div>
+                <div><p class="det-label-c">Телефон</p><p style="color:#007AFF;font-family:monospace;font-size:.9rem;padding:10px 14px;background:#F7FAFC;border-radius:8px;border:1px solid #E2E8F0;">{{ client.phone }}</p></div>
                 <button type="submit" class="tb-btn tb-btn-primary" style="width:100%;justify-content:center;padding:10px;"><i class="fas fa-save" style="font-size:.75rem;margin-right:6px;"></i>Зберегти</button>
             </form>
         </div>

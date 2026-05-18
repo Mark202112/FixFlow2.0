@@ -285,7 +285,6 @@ def client_detail(request, pk):
     orders=Order.objects.filter(client=client).order_by('-created_at')
     if request.method=='POST':
         client.name=request.POST.get('name',client.name).strip()
-        client.email=request.POST.get('email',client.email).strip()
         client.save()
         return redirect('dashboard:client_detail',pk=pk)
     return render(request,'dashboard/client_detail.html',{'client':client,'orders':orders,'status_choices':Order.STATUS_CHOICES})
@@ -296,11 +295,10 @@ def create_client(request):
     if request.method=='POST':
         name=request.POST.get('name','').strip()
         phone=request.POST.get('phone','').strip()
-        email=request.POST.get('email','').strip()
         if name and phone:
             if Client.objects.filter(phone=phone).exists(): error='Клієнт з таким номером вже існує'
             else:
-                c=Client.objects.create(name=name,phone=phone,email=email)
+                c=Client.objects.create(name=name,phone=phone)
                 return redirect('dashboard:client_detail',pk=c.pk)
         else: error="Ім'я та телефон обов'язкові"
     return render(request,'dashboard/create_client.html',{'error':error})

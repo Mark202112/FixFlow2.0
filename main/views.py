@@ -38,7 +38,6 @@ def create_order(request):
     try:
         name    = request.POST.get('name', '').strip()
         phone   = request.POST.get('phone', '').strip()
-        email   = request.POST.get('email', '').strip()
         device  = request.POST.get('device', '').strip()
         problem = request.POST.get('problem', '').strip()
 
@@ -47,7 +46,7 @@ def create_order(request):
 
         client, _ = Client.objects.get_or_create(
             phone=phone,
-            defaults={'name': name, 'email': email}
+            defaults={'name': name}
         )
 
         order = Order.objects.create(
