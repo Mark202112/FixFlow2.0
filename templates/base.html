@@ -121,8 +121,8 @@
         <div style="padding-top:32px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px;border-top:1px solid #E2E8F0;">
             <p style="color:#9ca3af;font-size:.75rem;">© 2026 FixFlow Professional. Всі права захищені.</p>
             <div style="display:flex;align-items:center;gap:24px;">
-                <a href="#" class="ftr-link" style="font-size:.75rem;">Політика конфіденційності</a>
-                <a href="#" class="ftr-link" style="font-size:.75rem;">Умови використання</a>
+                <a href="{% url 'main:privacy' %}" class="ftr-link" style="font-size:.75rem;">Політика конфіденційності</a>
+                <a href="{% url 'main:terms' %}" class="ftr-link" style="font-size:.75rem;">Умови використання</a>
                 <span style="color:#E2E8F0;font-size:.75rem;">·</span>
                 {% if user.is_authenticated %}
                 <a href="{% url 'dashboard:home' %}" style="display:inline-flex;align-items:center;gap:6px;color:#CBD5E0;font-size:.7rem;font-weight:500;text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#718096'" onmouseout="this.style.color='#CBD5E0'"><i class="fas fa-tachometer-alt"></i> Dashboard</a>

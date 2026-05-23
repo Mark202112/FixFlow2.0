@@ -5,6 +5,12 @@ from django.views.decorators.http import require_POST
 from orders.models import Order, Client, Service
 
 
+def privacy(request):
+    return render(request, 'main/privacy.html')
+
+def terms(request):
+    return render(request, 'main/terms.html')
+
 def home(request):
     services_qs = Service.objects.filter(is_active=True)
 
